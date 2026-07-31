@@ -1,0 +1,81 @@
+meta:
+  project: fte
+  commit: abb332f7ea069ef190953021e2f87e34b3f0267a
+  timestamp: 2026-07-31T10:11:48-04:00
+  scope: full working tree at abb332f
+structure:
+  root: /Users/clay/source/claylo/fte
+  total_files: 11
+  total_lines: 2082
+  languages:
+    - language: Markdown
+      files: 1
+      lines: 84
+      percentage: 4.03
+    - language: Rust
+      files: 9
+      lines: 1981
+      percentage: 95.15
+    - language: TOML
+      files: 1
+      lines: 17
+      percentage: 0.82
+  modules:
+    - name: fte
+      path: src
+      files: 9
+      lines: 1981
+      entry_points:
+        - name: main
+          path: src/main.rs
+          line: 47
+          kind: cli_main
+dependencies:
+  manifest: /Users/clay/source/claylo/fte/Cargo.toml
+  items:
+    - name: anyhow
+      version: ^1.0
+      kind: direct
+    - name: clap
+      version: ^4.6
+      kind: direct
+    - name: librebar
+      version: =0.3.0
+      kind: direct
+    - name: roxmltree
+      version: ^0.21
+      kind: direct
+    - name: scraper
+      version: ^0.22
+      kind: direct
+    - name: serde
+      version: ^1.0
+      kind: direct
+    - name: zip
+      version: ^4.0
+      kind: direct
+churn:
+  period: last 12 months
+  hotspots: []
+  recent_activity:
+    total_commits: 1
+    active_authors: 1
+    files_changed: 13
+testing:
+  runner: cargo-test
+  command: cargo test --workspace
+  sources:
+    - Cargo.toml
+boundaries:
+  - name: untrusted_document_parsing
+    description: HTML, XML, and ePub content enters format-specific parsers and Markdown renderers
+    modules: [fte]
+    notes: Primary correctness and denial-of-service surface
+  - name: archive_and_filesystem_io
+    description: CLI paths and ePub ZIP entries cross filesystem and archive boundaries
+    modules: [fte]
+    notes: Requires path, size, and resource-limit discipline
+  - name: layered_configuration
+    description: User and project configuration changes publisher detection and extraction selectors
+    modules: [fte]
+    notes: Configuration is trusted for intent but may contain invalid selectors or paths

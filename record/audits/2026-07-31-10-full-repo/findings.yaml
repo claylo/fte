@@ -1,0 +1,1273 @@
+audit_date: 2026-07-31
+scope: Full repository audit of the fte Rust CLI, source, configuration, and dependency graph
+commit: abb332f7ea069ef190953021e2f87e34b3f0267a
+assessment: |
+  fte is a compact, readable extractor with no unsafe code, no known vulnerable dependencies,
+  and a clear format-dispatch architecture. Its main risks sit at the document boundary: valid
+  Unicode can panic detection, deeply nested markup can exhaust the stack, and crafted ePub
+  metadata can drive unchecked allocation. Extraction fidelity also has material gaps: a
+  documented selector is inert, common XML block structures disappear, and several errors are
+  converted into plausible success. The dependency graph is vulnerability-clean but carries one
+  unmaintained transitive crate and two avoidable feature costs. The most important work is to
+  harden untrusted-input limits and make incomplete extraction impossible to report as success.
+
+narratives:
+  - slug: untrusted-document-boundary
+    title: The Untrusted Document Boundary Surface
+    thesis: Document bytes cross into string slicing, archive allocation, and recursive traversal without consistent boundary checks.
+    verdict: |
+      The parsers rely on memory-safe Rust, but safe Rust still permits panics, allocation aborts,
+      and stack exhaustion. Character-safe sampling, bounded archive reads, explicit traversal
+      limits, and declared-encoding support should be treated as one hardening project.
+    flow:
+      - id: input-bytes
+        label: Read document bytes
+        type: start
+        findings:
+          - slug: declared-document-encodings-unsupported
+            label: UTF-8 only
+      - id: sample-prefix
+        label: Sample detection prefix
+        type: process
+        findings:
+          - slug: utf8-prefix-byte-slicing-panics
+            label: Byte-slice panic
+      - id: format-branch
+        label: Archive or DOM?
+        type: decision
+        no: parse-dom
+      - id: reserve-entry
+        label: Reserve ePub entry
+        type: process
+        findings:
+          - slug: epub-declared-size-drives-capacity
+            label: Unchecked size
+      - id: parse-dom
+        label: Parse document tree
+        type: process
+        spine: false
+        next: walk-tree
+      - id: walk-tree
+        label: Walk nested nodes
+        type: process
+        findings:
+          - slug: unbounded-recursive-document-walks
+            label: No depth bound
+      - id: boundary-output
+        label: Render Markdown
+        type: end
+    findings:
+      - slug: utf8-prefix-byte-slicing-panics
+        title: UTF-8 prefix sampling can panic at arbitrary byte boundaries
+        criterion: "11.1"
+        surface: Panic & Program Flow
+        concern: significant
+        locations:
+          - path: src/detect.rs
+            start_line: 56
+            end_line: 61
+          - path: src/detect.rs
+            start_line: 75
+            end_line: 77
+        evidence: |-
+          fn detect_xml(content: &str) -> Format {
+              let head: &str = if content.len() > 2048 {
+                  &content[..2048]
+              } else {
+                  content
+              };
+        evidence_lang: rust
+        evidence_markers:
+          - lines: "3"
+            type: del
+            label: Byte index may split a UTF-8 code point
+        mechanism: |
+          Both XML and HTML detection derive prefix lengths in bytes and index `str` values
+          directly. A valid input whose multi-byte character crosses byte 2,048 or 150,000 makes
+          the index cease to be a character boundary, so detection panics before extraction error
+          handling runs.
+        remediation: |
+          Compute a character-boundary-safe prefix before slicing, or perform detection over bytes
+          while searching each configured marker's encoded byte sequence. Add regression cases with
+          multi-byte characters spanning both sampling boundaries.
+        temporal:
+          introduced: 2026-07-31
+          last_modified: 2026-07-31
+          commit_count: 1
+          monthly_commits: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+        chains:
+          enables: []
+          enabled_by: []
+          related: [unbounded-recursive-document-walks, epub-declared-size-drives-capacity]
+        effort: small
+        effort_notes: Two localized prefix calculations plus focused boundary tests.
+
+      - slug: unbounded-recursive-document-walks
+        title: Untrusted document nesting can exhaust the process stack
+        criterion: "11.5"
+        surface: Panic & Program Flow
+        concern: significant
+        locations:
+          - path: src/html.rs
+            start_line: 245
+            end_line: 251
+          - path: src/jats.rs
+            start_line: 257
+            end_line: 264
+          - path: src/wiley_xml.rs
+            start_line: 316
+            end_line: 323
+        evidence: |-
+              // Recurse into child elements
+              for child in el.children() {
+                  match child.value() {
+                      Node::Element(_) => {
+                          if let Some(child_el) = ElementRef::wrap(child) {
+                              walk_element(&child_el, cruft, out, depth + 1);
+                          }
+        evidence_lang: rust
+        evidence_markers:
+          - lines: "6"
+            type: del
+            label: Recursive call has no enforced depth limit
+        mechanism: |
+          HTML, ePub XHTML, JATS, and Wiley XML all reach recursive tree walkers whose depth is
+          controlled by document nesting. The HTML depth argument changes rendering behavior but
+          does not stop recursion; the XML heading depth is capped, but call depth is not.
+          Sufficiently deep input can therefore overflow the process stack.
+        remediation: |
+          Replace recursive traversal with an explicit heap-backed work stack, or enforce a shared
+          maximum depth and return a contextual error when it is exceeded. Apply the same policy to
+          section, inline-text, and general text walkers across every format.
+        temporal:
+          introduced: 2026-07-31
+          last_modified: 2026-07-31
+          commit_count: 1
+          monthly_commits: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+        chains:
+          enables: []
+          enabled_by: []
+          related: [utf8-prefix-byte-slicing-panics, epub-declared-size-drives-capacity, recursive-renderers-allocate-per-node]
+        effort: medium
+        effort_notes: Several traversal signatures must change consistently across three parsers.
+
+      - slug: epub-declared-size-drives-capacity
+        title: Untrusted ePub size metadata drives an unchecked allocation
+        criterion: "11.2"
+        surface: Panic & Program Flow
+        concern: significant
+        locations:
+          - path: src/epub.rs
+            start_line: 60
+            end_line: 64
+        evidence: |-
+          fn read_entry(archive: &mut zip::ZipArchive<std::fs::File>, name: &str) -> Result<String> {
+              let mut entry = archive.by_name(name)?;
+              let mut buf = String::with_capacity(entry.size() as usize);
+              entry.read_to_string(&mut buf)?;
+              Ok(buf)
+        evidence_lang: rust
+        evidence_markers:
+          - lines: "3"
+            type: del
+            label: Archive-controlled size is cast and allocated directly
+        mechanism: |
+          `ZipFile::size` returns the archive's declared uncompressed `u64` size. A crafted central
+          directory value is cast to `usize` and passed to `String::with_capacity`; oversized values
+          can cause capacity-overflow panic, allocation abort, or truncation on narrower targets.
+        remediation: |
+          Define a maximum uncompressed entry size, convert with `usize::try_from`, reserve with
+          `try_reserve`, and read through a bounded adapter. Reject both oversized declarations and
+          streams whose expanded data exceeds the cap.
+        temporal:
+          introduced: 2026-07-31
+          last_modified: 2026-07-31
+          commit_count: 1
+          monthly_commits: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+        chains:
+          enables: []
+          enabled_by: []
+          related: [unbounded-recursive-document-walks, epub-overflow-read-errors-are-silently-discarded]
+        effort: medium
+        effort_notes: A robust fix needs checked reservation, a bounded read, and oversized-entry cases.
+
+      - slug: declared-document-encodings-unsupported
+        title: HTML, XML, and ePub inputs are restricted to UTF-8 without documentation
+        criterion: FC-4
+        surface: Completeness
+        concern: moderate
+        locations:
+          - path: src/main.rs
+            start_line: 124
+            end_line: 128
+          - path: src/epub.rs
+            start_line: 60
+            end_line: 64
+        evidence: |-
+          // HTML/XML: read to string, detect, extract
+          let content =
+              fs::read_to_string(path).with_context(|| format!("reading {}", path.display()))?;
+
+          let format = detect::detect_format(path, &content, &cfg);
+        evidence_lang: rust
+        evidence_markers:
+          - lines: "2-3"
+            type: mark
+            label: read_to_string rejects every non-UTF-8 document
+        mechanism: |
+          `fs::read_to_string` rejects non-UTF-8 bytes before detection or parsing, and ePub entries
+          use the equivalent `Read::read_to_string` path. XML commonly declares UTF-16, while
+          publisher HTML may use BOM or charset declarations. The README claims HTML, XML, and ePub
+          support without disclosing the narrower encoding contract.
+        remediation: |
+          Read bytes, detect BOM and XML/HTML encoding declarations, decode to Unicode, then invoke
+          the existing parsers. Apply equivalent decoding to ePub XHTML entries and report malformed
+          or unsupported encodings with the input path and declared charset.
+        temporal:
+          introduced: 2026-07-31
+          last_modified: 2026-07-31
+          commit_count: 1
+          monthly_commits: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+        chains:
+          enables: []
+          enabled_by: []
+          related: [utf8-prefix-byte-slicing-panics]
+        effort: medium
+        effort_notes: Requires byte-oriented input plumbing and encoding detection across handlers.
+
+  - slug: extraction-fidelity
+    title: The Extraction Fidelity Surface
+    thesis: Several failure paths return plausible Markdown while silently omitting configured or source content.
+    verdict: |
+      The extraction architecture is easy to extend, but omission is too often represented as
+      success. Configuration should be compiled and validated once, and each format walker should
+      preserve document order while surfacing unsupported or unreadable structures.
+    flow:
+      - id: load-profile
+        label: Load publisher profile
+        type: start
+      - id: compile-selectors
+        label: Compile selectors
+        type: process
+        findings:
+          - slug: invalid-css-selectors-are-silently-discarded
+            label: Errors erased
+          - slug: ref-selector-has-no-effect
+            label: ref_selector inert
+      - id: select-handler
+        label: HTML or XML/ePub?
+        type: decision
+        no: xml-block-walk
+      - id: html-walk
+        label: Walk selected HTML
+        type: process
+      - id: xml-block-walk
+        label: Walk selected XML blocks
+        type: process
+        spine: false
+        findings:
+          - slug: xml-block-content-silently-omitted
+            label: Blocks omitted
+        next: optional-members
+      - id: optional-members
+        label: Read ePub members
+        type: process
+        findings:
+          - slug: epub-overflow-read-errors-are-silently-discarded
+            label: Read errors lost
+      - id: fidelity-output
+        label: Emit plausible Markdown
+        type: end
+    findings:
+      - slug: ref-selector-has-no-effect
+        title: The documented ref_selector profile field is never applied
+        criterion: FC-1
+        surface: Completeness
+        concern: significant
+        locations:
+          - path: src/html.rs
+            start_line: 57
+            end_line: 63
+          - path: src/config.rs
+            start_line: 23
+            end_line: 28
+        evidence: |-
+          let cruft_sels: Vec<Selector> = profile
+              .cruft_selectors
+              .iter()
+              .filter_map(|s| Selector::parse(s).ok())
+              .collect();
+
+          walk_element(&body_el, &cruft_sels, &mut body, 0);
+        evidence_lang: rust
+        evidence_markers:
+          - lines: "1-5"
+            type: del
+            label: Only cruft_selectors are compiled for removal
+        mechanism: |
+          `PublisherProfile::ref_selector` is documented as identifying a references section that
+          is stripped from body output, and five built-in profiles populate it. HTML extraction
+          constructs its removal selector set solely from `cruft_selectors`; no behavioral path
+          reads `ref_selector`, so custom and built-in reference selectors silently do nothing.
+        remediation: |
+          Parse `ref_selector` and add it to the selector set passed to `walk_element`, reporting an
+          invalid configured selector instead of ignoring it. Add profile-level coverage proving a
+          selected references subtree is excluded.
+        temporal:
+          introduced: 2026-07-31
+          last_modified: 2026-07-31
+          commit_count: 1
+          monthly_commits: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+        chains:
+          enables: []
+          enabled_by: []
+          related: [invalid-css-selectors-are-silently-discarded]
+        effort: small
+        effort_notes: Wire one optional selector into extraction and cover valid and invalid configuration.
+
+      - slug: xml-block-content-silently-omitted
+        title: JATS and Wiley extraction omit lists and nested block content
+        criterion: FC-1
+        surface: Completeness
+        concern: significant
+        locations:
+          - path: src/jats.rs
+            start_line: 142
+            end_line: 169
+          - path: src/wiley_xml.rs
+            start_line: 142
+            end_line: 169
+        evidence: |-
+          fn extract_sections(parent: &Node, depth: u8, out: &mut String) {
+              for child in parent.children() {
+                  if child.has_tag_name("sec") {
+                      // Section heading
+                      if let Some(title) = find_child(&child, "title") {
+                          let t = markdown::normalize_text(&text_content(&title));
+                          if !t.is_empty() {
+                              let hashes = "#".repeat(depth as usize);
+                              out.push_str(&format!("{hashes} {t}\n\n"));
+                          }
+                      }
+
+                      // Direct paragraphs in this section
+                      out.push_str(&collect_paragraphs(&child));
+
+                      // Tables
+                      for tw in child.children().filter(|n| n.has_tag_name("table-wrap")) {
+                          extract_table(&tw, out);
+                      }
+
+                      // Figures
+                      for fig in child.children().filter(|n| n.has_tag_name("fig")) {
+                          extract_figure(&fig, out);
+                      }
+
+                      // Recurse into subsections
+                      let next_depth = (depth + 1).min(6);
+                      extract_sections(&child, next_depth, out);
+        evidence_lang: rust
+        evidence_markers:
+          - lines: "13-24"
+            type: del
+            label: Only direct paragraphs, tables, and figures are emitted
+        mechanism: |
+          The XML walkers extract direct paragraphs, selected table and figure nodes, and nested
+          sections. They have no branch or generic block recursion for standard structures such as
+          lists, definition lists, boxed text, quotations, or statements. Those nodes disappear
+          without an error, producing plausible but incomplete Markdown. Wiley uses the same
+          whitelist structure.
+        remediation: |
+          Replace the per-section whitelist with an order-preserving block walker shared where
+          practical by both XML handlers. Handle list/list-item, definition-list, boxed-text,
+          quotation, and nested paragraph containers while retaining existing table, figure, and
+          subsection handling.
+        temporal:
+          introduced: 2026-07-31
+          last_modified: 2026-07-31
+          commit_count: 1
+          monthly_commits: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+        chains:
+          enables: []
+          enabled_by: []
+          related: [epub-overflow-read-errors-are-silently-discarded]
+        effort: medium
+        effort_notes: Requires an order-preserving block model and fixtures for both XML dialects.
+
+      - slug: invalid-css-selectors-are-silently-discarded
+        title: Invalid configured CSS selectors lose their parse errors
+        criterion: "5.3"
+        surface: Error Handling
+        concern: moderate
+        locations:
+          - path: src/html.rs
+            start_line: 39
+            end_line: 42
+          - path: src/html.rs
+            start_line: 57
+            end_line: 61
+        evidence: |-
+              let body_el = profile
+                  .body_selectors
+                  .iter()
+                  .find_map(|sel| Selector::parse(sel).ok().and_then(|s| doc.select(&s).next()));
+        evidence_lang: rust
+        evidence_markers:
+          - lines: "4"
+            type: del
+            label: Parse error converted to None
+        mechanism: |
+          Publisher selectors come from user configuration, but `.ok()` erases CSS parse failures.
+          Invalid body selectors become indistinguishable from selectors that matched no content,
+          while invalid cruft selectors are omitted and extraction may succeed with unwanted data.
+        remediation: |
+          Parse and validate every configured selector when loading the profile. Propagate an error
+          that names the publisher, selector category, selector text, and parser cause instead of
+          converting `Result` to `Option`.
+        temporal:
+          introduced: 2026-07-31
+          last_modified: 2026-07-31
+          commit_count: 1
+          monthly_commits: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+        chains:
+          enables: []
+          enabled_by: []
+          related: [ref-selector-has-no-effect, css-selectors-recompiled-per-document]
+        effort: small
+        effort_notes: Selector validation can be centralized at profile loading and reused.
+
+      - slug: epub-overflow-read-errors-are-silently-discarded
+        title: Corrupt ePub overflow members produce incomplete successful output
+        criterion: "5.3"
+        surface: Error Handling
+        concern: moderate
+        locations:
+          - path: src/epub.rs
+            start_line: 29
+            end_line: 36
+          - path: src/epub.rs
+            start_line: 48
+            end_line: 54
+        evidence: |-
+              for name in &table_names {
+                  if let Ok(content) = read_entry(&mut archive, name) {
+                      // Extract just the <body> content from overflow files
+                      main_xhtml.push_str("\n<!-- overflow: ");
+                      main_xhtml.push_str(name);
+                      main_xhtml.push_str(" -->\n");
+                      main_xhtml.push_str(&content);
+                  }
+        evidence_lang: rust
+        evidence_markers:
+          - lines: "2"
+            type: del
+            label: Err branch is ignored
+        mechanism: |
+          Table and figure members discovered in the archive are read with `if let Ok` and no error
+          branch. Decompression, CRC, I/O, or UTF-8 failures omit content without warning;
+          extraction continues and the CLI can mark incomplete Markdown as successful.
+        remediation: |
+          Propagate overflow-member failures with the member name and archive path as context. If
+          members are intentionally optional, collect and report structured warnings and avoid
+          presenting the result as an unqualified success.
+        temporal:
+          introduced: 2026-07-31
+          last_modified: 2026-07-31
+          commit_count: 1
+          monthly_commits: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+        chains:
+          enables: []
+          enabled_by: []
+          related: [epub-declared-size-drives-capacity, xml-block-content-silently-omitted]
+        effort: small
+        effort_notes: Both loops can share a contextual read helper or propagate via anyhow.
+
+  - slug: batch-cli-contract
+    title: The Batch CLI Contract Surface
+    thesis: Several batch-mode outcomes diverge from their command-line contract while still ending in process success.
+    verdict: |
+      The CLI keeps processing after individual errors, which is useful, but it does not preserve a
+      trustworthy machine contract. Inputs must not disappear from accounting, stdout must bypass
+      output-file state, documented config paths must resolve, and any failed file must influence
+      the final exit status.
+    flow:
+      - id: load-user-config
+        label: Discover user config
+        type: start
+        findings:
+          - slug: documented-user-config-path-wrong-on-macos
+            label: macOS path mismatch
+      - id: enumerate-inputs
+        label: Enumerate inputs
+        type: process
+        findings:
+          - slug: directory-entry-errors-are-silently-discarded
+            label: Entries disappear
+      - id: output-exists
+        label: Output exists?
+        type: decision
+        no: extract-input
+        findings:
+          - slug: stdout-skipped-when-output-exists
+            label: stdout skipped
+      - id: skip-input
+        label: Count as skipped
+        type: process
+        spine: false
+        next: summarize
+      - id: extract-input
+        label: Extract each input
+        type: process
+      - id: summarize
+        label: Summarize failures
+        type: process
+        findings:
+          - slug: extraction-failures-return-success
+            label: Exit zero
+      - id: cli-exit
+        label: Exit process
+        type: end
+    findings:
+      - slug: stdout-skipped-when-output-exists
+        title: stdout mode silently skips files whose output already exists
+        criterion: FC-1
+        surface: Completeness
+        concern: significant
+        locations:
+          - path: src/main.rs
+            start_line: 135
+            end_line: 144
+          - path: src/main.rs
+            start_line: 98
+            end_line: 107
+        evidence: |-
+          let out_path = output_dir.join(format!("{id}.md"));
+          if !cli.force && out_path.exists() {
+              skip += 1;
+              continue;
+          }
+
+          match extract::extract(&format, id, &content) {
+              Ok(md) => {
+                  if cli.stdout {
+                      println!("{md}");
+        evidence_lang: rust
+        evidence_markers:
+          - lines: "2-4"
+            type: del
+            label: Existing output suppresses stdout before stdout branch
+        mechanism: |
+          The documented `--stdout` mode is evaluated only after the normal output-file existence
+          check. If the output directory already contains `<id>.md`, fte emits nothing and counts
+          the input as skipped unless the unrelated `--force` flag is also supplied. The ePub path
+          repeats the same ordering.
+        remediation: |
+          Bypass output-path existence checks whenever `cli.stdout` is true. Apply the guard in both
+          the ePub and HTML/XML paths and cover stdout mode with a pre-existing output file.
+        temporal:
+          introduced: 2026-07-31
+          last_modified: 2026-07-31
+          commit_count: 1
+          monthly_commits: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+        chains:
+          enables: []
+          enabled_by: []
+          related: [extraction-failures-return-success]
+        effort: small
+        effort_notes: Two localized guards plus CLI regression coverage.
+
+      - slug: documented-user-config-path-wrong-on-macos
+        title: The documented user config path is not discovered on macOS
+        criterion: FC-1
+        surface: Completeness
+        concern: significant
+        locations:
+          - path: README.md
+            start_line: 50
+            end_line: 58
+          - path: src/main.rs
+            start_line: 57
+            end_line: 60
+        evidence: |-
+          ## Configuration
+
+          fte uses [librebar](https://crates.io/crates/librebar) for config discovery. Config files are found by walking up from the working directory, checking for `.fte.yaml`, `.config/fte.yaml`, or `fte.yaml` (also `.toml` and `.json`). User-level config lives at `~/.config/fte/config.yaml`.
+
+          Merge order (lowest to highest precedence):
+          1. Compiled defaults (all 8 publishers built in)
+          2. User config (`~/.config/fte/config.yaml`)
+          3. Project config (`.fte.yaml` in repo root)
+          4. CLI flags (`--indir`, `--outdir`)
+        evidence_lang: markdown
+        evidence_markers:
+          - lines: "3"
+            type: del
+            label: Not librebar's macOS ProjectDirs location
+          - lines: "7"
+            type: del
+            label: Merge-order example repeats the path
+        mechanism: |
+          fte delegates user-config discovery to librebar 0.3.0 without adding an explicit path.
+          That version resolves user configuration via `directories::ProjectDirs`; on macOS the
+          result is under `~/Library/Application Support/fte`, not `~/.config/fte`. A macOS user
+          following the README can create valid configuration that fte never loads.
+        remediation: |
+          Document the platform-specific directory returned by librebar, or explicitly support
+          `~/.config/fte/config.*` when that cross-platform path is the intended contract. Add a
+          config-inspection command or startup diagnostic that reports loaded sources.
+        temporal:
+          introduced: 2026-07-31
+          last_modified: 2026-07-31
+          commit_count: 1
+          monthly_commits: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+        chains:
+          enables: []
+          enabled_by: []
+          related: []
+        effort: small
+        effort_notes: Documentation is trivial; preserving the stated path needs discovery plumbing.
+
+      - slug: directory-entry-errors-are-silently-discarded
+        title: Directory scan errors silently remove inputs from the batch
+        criterion: "5.3"
+        surface: Error Handling
+        concern: moderate
+        locations:
+          - path: src/main.rs
+            start_line: 170
+            end_line: 178
+        evidence: |-
+                  let mut paths: Vec<PathBuf> = fs::read_dir(input_dir)
+                      .with_context(|| format!("reading {}", input_dir.display()))?
+                      .filter_map(|e| e.ok())
+                      .map(|e| e.path())
+                      .filter(|p| {
+                          p.extension()
+                              .is_some_and(|ext| ext == "html" || ext == "xml" || ext == "epub")
+                      })
+                      .collect();
+        evidence_lang: rust
+        evidence_markers:
+          - lines: "3"
+            type: del
+            label: Per-entry I/O errors are discarded
+        mechanism: |
+          `ReadDir` can yield per-entry I/O failures after the directory opens. Converting each
+          result with `.ok()` drops those failures, so affected files disappear from the input set
+          and are absent from the final failure count.
+        remediation: |
+          Collect directory entries through `Result` and propagate errors with directory context.
+          If best-effort processing is intended, report each failed entry explicitly and include it
+          in the failure total.
+        temporal:
+          introduced: 2026-07-31
+          last_modified: 2026-07-31
+          commit_count: 1
+          monthly_commits: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+        chains:
+          enables: []
+          enabled_by: []
+          related: [extraction-failures-return-success]
+        effort: small
+        effort_notes: Collect results or connect iteration failures to existing batch accounting.
+
+      - slug: extraction-failures-return-success
+        title: Per-file extraction failures still produce a successful process exit
+        criterion: FC-4
+        surface: Completeness
+        concern: moderate
+        locations:
+          - path: src/main.rs
+            start_line: 153
+            end_line: 164
+          - path: src/main.rs
+            start_line: 116
+            end_line: 120
+        evidence: |-
+          Err(e) => {
+              eprintln!("  FAIL {id}: {e}");
+              fail += 1;
+          }
+          }
+          }
+
+          if !cli.stdout && !cli.detect_only {
+              eprintln!("\nDone: {ok} extracted, {skip} skipped, {fail} failed");
+          }
+
+          Ok(())
+        evidence_lang: rust
+        evidence_markers:
+          - lines: "1-4"
+            type: mark
+            label: Failure is counted but not propagated
+          - lines: "12"
+            type: del
+            label: main returns success when fail is nonzero
+        mechanism: |
+          Handler errors are caught so batch processing can continue, but the accumulated failure
+          count never affects the `Result` returned from `main`. Shell scripts and CI receive exit
+          status zero even when one or every requested extraction failed.
+        remediation: |
+          Continue the batch, print the summary, then return a nonzero error when `fail > 0`.
+          Document the chosen exit contract and cover all-success, partial-failure, and all-failure
+          runs.
+        temporal:
+          introduced: 2026-07-31
+          last_modified: 2026-07-31
+          commit_count: 1
+          monthly_commits: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+        chains:
+          enables: []
+          enabled_by: []
+          related: [stdout-skipped-when-output-exists, directory-entry-errors-are-silently-discarded]
+        effort: trivial
+        effort_notes: One post-loop result check plus exit-status coverage.
+
+  - slug: performance
+    title: The Performance Surface
+    thesis: Parsing costs are dominated by avoidable full-document copies and per-node buffer churn rather than the parsers themselves.
+    verdict: |
+      The largest gains come from shared output accumulators and compiling immutable configuration
+      once. The remaining allocation findings are localized polish, but together they matter for
+      the directory-batch use case advertised by the CLI.
+    flow:
+      - id: detect-format
+        label: Detect format
+        type: start
+        findings:
+          - slug: publisher-profile-cloned-per-document
+            label: Clone profile
+      - id: prepare-parser
+        label: Prepare parser input
+        type: process
+        findings:
+          - slug: jats-no-doctype-copies-entire-input
+            label: Copy full XML
+          - slug: css-selectors-recompiled-per-document
+            label: Reparse selectors
+      - id: recursive-render
+        label: Render nested nodes
+        type: process
+        findings:
+          - slug: recursive-renderers-allocate-per-node
+            label: Buffer per node
+      - id: normalize-output
+        label: Normalize fragments
+        type: process
+        findings:
+          - slug: normalize-text-reallocates-result
+            label: Copy result
+      - id: performance-output
+        label: Return Markdown
+        type: end
+    findings:
+      - slug: publisher-profile-cloned-per-document
+        title: HTML detection deep-clones immutable publisher profiles
+        criterion: "3.2"
+        surface: Performance
+        concern: moderate
+        locations:
+          - path: src/detect.rs
+            start_line: 75
+            end_line: 93
+          - path: src/config.rs
+            start_line: 16
+            end_line: 37
+        evidence: |-
+          fn detect_html(content: &str, config: &Config) -> Format {
+              let sample_len = content.len().min(150_000);
+              let head = &content[..sample_len];
+
+              // Iterate publishers in order, first match wins
+              for (name, profile) in &config.publishers {
+                  if matches_profile(head, profile) {
+                      return Format::Html {
+                          name: name.clone(),
+                          profile: profile.clone(),
+                      };
+                  }
+              }
+
+              // No match — use fallback
+              Format::Html {
+                  name: "other".into(),
+                  profile: config.fallback.clone(),
+              }
+        evidence_lang: rust
+        evidence_markers:
+          - lines: "9-10"
+            type: del
+            label: Deep clones matched profile
+          - lines: "18"
+            type: del
+            label: Deep clones fallback profile
+        mechanism: |
+          `PublisherProfile` contains four `Vec<String>` fields and optional strings, so clone
+          performs multiple allocations and copies every selector and marker. This occurs for every
+          HTML document even though configuration is immutable for the process, and it inflates the
+          `Format` enum enough for Clippy to report a 224-byte variant.
+        remediation: |
+          Return a `Format` that borrows the publisher name and profile, or return a compact key and
+          resolve the profile during extraction. Keep the configuration owner alive across the input
+          loop.
+        temporal:
+          introduced: 2026-07-31
+          last_modified: 2026-07-31
+          commit_count: 1
+          monthly_commits: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+        chains:
+          enables: []
+          enabled_by: []
+          related: [css-selectors-recompiled-per-document, clippy-baseline-fails]
+        effort: small
+        effort_notes: A lifetime or key change is localized to detection, dispatch, and their caller.
+
+      - slug: recursive-renderers-allocate-per-node
+        title: Recursive text renderers allocate and recopy at every nested node
+        criterion: "12.5"
+        surface: Performance
+        concern: moderate
+        locations:
+          - path: src/jats.rs
+            start_line: 270
+            end_line: 299
+          - path: src/html.rs
+            start_line: 268
+            end_line: 323
+          - path: src/wiley_xml.rs
+            start_line: 316
+            end_line: 357
+        evidence: |-
+          fn inline_text(node: &Node) -> String {
+              let mut out = String::new();
+              for child in node.children() {
+                  if child.is_text() {
+                      out.push_str(child.text().unwrap_or(""));
+                  } else if child.is_element() {
+                      if child.has_tag_name("xref") {
+                          // Preserve citation text inline
+                          out.push_str(&text_content(&child));
+                      } else if child.has_tag_name("italic") || child.has_tag_name("i") {
+                          out.push('*');
+                          out.push_str(&inline_text(&child));
+                          out.push('*');
+                      } else if child.has_tag_name("bold") || child.has_tag_name("b") {
+                          out.push_str("**");
+                          out.push_str(&inline_text(&child));
+                          out.push_str("**");
+                      } else if child.has_tag_name("sup") {
+                          out.push('^');
+                          out.push_str(&inline_text(&child));
+                      } else if child.has_tag_name("sub") {
+                          out.push('_');
+                          out.push_str(&inline_text(&child));
+                      } else {
+                          out.push_str(&inline_text(&child));
+                      }
+                  }
+              }
+              out
+          }
+        evidence_lang: rust
+        evidence_markers:
+          - lines: "2"
+            type: del
+            label: New buffer for every recursive call
+          - lines: "8-25"
+            type: del
+            label: Child buffers are copied into parent buffers
+        mechanism: |
+          Each recursive call creates and grows a fresh `String`, returns it, and copies its bytes
+          into the parent. The same pattern appears in HTML, JATS, and Wiley text walkers. Allocation
+          count scales with element count, while deeply nested markup can copy each text byte once
+          per ancestor.
+        remediation: |
+          Introduce accumulator variants such as `inline_text_into(node, &mut String)` and recurse
+          with one output buffer. Keep owned wrappers only for callers that truly require a standalone
+          `String`.
+        temporal:
+          introduced: 2026-07-31
+          last_modified: 2026-07-31
+          commit_count: 1
+          monthly_commits: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+        chains:
+          enables: []
+          enabled_by: []
+          related: [normalize-text-reallocates-result, unbounded-recursive-document-walks]
+        effort: medium
+        effort_notes: The accumulator pattern must be applied consistently across three renderers.
+
+      - slug: jats-no-doctype-copies-entire-input
+        title: JATS parsing copies the entire input when no DOCTYPE exists
+        criterion: "3.1"
+        surface: Performance
+        concern: advisory
+        locations:
+          - path: src/jats.rs
+            start_line: 337
+            end_line: 348
+        evidence: |-
+          /// Strip DOCTYPE declaration from XML since roxmltree doesn't support DTDs.
+          fn strip_doctype(content: &str) -> String {
+              if let Some(start) = content.find("<!DOCTYPE") {
+                  if let Some(end) = content[start..].find('>') {
+                      let mut out = String::with_capacity(content.len());
+                      out.push_str(&content[..start]);
+                      out.push_str(&content[start + end + 1..]);
+                      return out;
+                  }
+              }
+              content.to_string()
+          }
+        evidence_lang: rust
+        evidence_markers:
+          - lines: "11"
+            type: del
+            label: Full-input copy on unchanged path
+        mechanism: |
+          The common unchanged branch copies the borrowed XML into a new `String`, and the parsed
+          document keeps that second buffer alive for extraction. Ordinary JATS inputs without a
+          DOCTYPE therefore hold two simultaneous raw-document buffers before parser and Markdown
+          allocations.
+        remediation: |
+          Return `Cow<'_, str>`: borrow when no declaration is removed and allocate only for the
+          modified case. Parse through the borrowed view while retaining the `Cow` for the document
+          lifetime.
+        temporal:
+          introduced: 2026-07-31
+          last_modified: 2026-07-31
+          commit_count: 1
+          monthly_commits: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+        chains:
+          enables: []
+          enabled_by: []
+          related: [recursive-renderers-allocate-per-node]
+        effort: trivial
+        effort_notes: A localized helper return-type change.
+
+      - slug: normalize-text-reallocates-result
+        title: Whitespace normalization reallocates its completed buffer
+        criterion: "2.5"
+        surface: Performance
+        concern: advisory
+        locations:
+          - path: src/markdown.rs
+            start_line: 60
+            end_line: 75
+        evidence: |-
+          pub fn normalize_text(s: &str) -> String {
+              let mut out = String::with_capacity(s.len());
+              let mut last_was_space = true;
+              for c in s.chars() {
+                  if c.is_whitespace() {
+                      if !last_was_space {
+                          out.push(' ');
+                          last_was_space = true;
+                      }
+                  } else {
+                      out.push(c);
+                      last_was_space = false;
+                  }
+              }
+              out.trim().to_string()
+          }
+        evidence_lang: rust
+        evidence_markers:
+          - lines: "15"
+            type: del
+            label: Second allocation and full-result copy
+        mechanism: |
+          The function builds a capacity-sized `String`, then `trim().to_string()` allocates another
+          buffer and copies the normalized contents before discarding the first allocation. This
+          helper runs for paragraphs, headings, metadata, citations, and table cells.
+        remediation: |
+          Remove the possible trailing normalized space in place and return the existing `String`.
+          Leading whitespace is already suppressed, so an `ends_with(' ')` check followed by `pop()`
+          preserves behavior without a second allocation.
+        temporal:
+          introduced: 2026-07-31
+          last_modified: 2026-07-31
+          commit_count: 1
+          monthly_commits: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+        chains:
+          enables: []
+          enabled_by: []
+          related: [recursive-renderers-allocate-per-node]
+        effort: trivial
+        effort_notes: Replace the final expression with in-place trailing-space removal.
+
+      - slug: css-selectors-recompiled-per-document
+        title: Static CSS selectors are parsed again for every document
+        criterion: "12.5"
+        surface: Performance
+        concern: advisory
+        locations:
+          - path: src/html.rs
+            start_line: 38
+            end_line: 63
+        evidence: |-
+              // Find the body content container
+              let body_el = profile
+                  .body_selectors
+                  .iter()
+                  .find_map(|sel| Selector::parse(sel).ok().and_then(|s| doc.select(&s).next()));
+
+              let body_el = match body_el {
+                  Some(el) => el,
+                  None => anyhow::bail!("no content container found"),
+              };
+
+              let mut body = String::new();
+
+              // Title
+              if let Some(t) = &meta.title {
+                  body.push_str(&format!("# {t}\n\n"));
+              }
+
+              // Walk the body DOM and emit markdown
+              let cruft_sels: Vec<Selector> = profile
+                  .cruft_selectors
+                  .iter()
+                  .filter_map(|s| Selector::parse(s).ok())
+                  .collect();
+
+              walk_element(&body_el, &cruft_sels, &mut body, 0);
+        evidence_lang: rust
+        evidence_markers:
+          - lines: "5"
+            type: del
+            label: Body selector parsed during every extraction
+          - lines: "20-24"
+            type: del
+            label: Fresh selector collection per document
+        mechanism: |
+          Publisher selector strings are stable for the process, but each HTML extraction reparses
+          candidate body selectors and rebuilds every cruft selector. ePub extraction similarly
+          recompiles fixed selectors. This repeats allocation and parsing cost across directory runs.
+        remediation: |
+          Build compiled runtime profiles once after configuration loading and borrow their
+          `Selector` values during extraction. Keep serialized strings separate from the compiled
+          cache, and lazily initialize or otherwise cache ePub's fixed selector list as well.
+        temporal:
+          introduced: 2026-07-31
+          last_modified: 2026-07-31
+          commit_count: 1
+          monthly_commits: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+        chains:
+          enables: []
+          enabled_by: []
+          related: [publisher-profile-cloned-per-document, invalid-css-selectors-are-silently-discarded]
+        effort: medium
+        effort_notes: Requires a small runtime-profile layer and borrowed selector plumbing.
+
+  - slug: supply-chain
+    title: The Supply Chain Surface
+    thesis: The dependency graph has no known vulnerabilities or unused direct dependencies, but it carries one unmaintained transitive crate and avoidable feature weight.
+    verdict: |
+      Cargo audit, udeps, and machete are clean for vulnerabilities and unused declarations. The
+      remaining work is dependency hygiene: reduce scraper and zip features, then upgrade away from
+      transitive fxhash when the upstream path permits.
+    findings:
+      - slug: unmaintained-fxhash-through-scraper
+        title: HTML parsing retains an unmaintained hashing crate
+        criterion: "7.5"
+        surface: Supply Chain
+        concern: advisory
+        locations:
+          - path: .crustoleum/audit.txt
+            start_line: 6
+            end_line: 9
+          - path: Cargo.toml
+            start_line: 15
+            end_line: 15
+        evidence: |-
+          Crate: fxhash 0.2.1
+          ID: RUSTSEC-2025-0057
+          Status: unmaintained
+          Path: fxhash -> selectors -> scraper -> fte
+        evidence_lang: text
+        evidence_markers:
+          - lines: "1-4"
+            type: mark
+            label: Unmaintained crate and dependency path
+        mechanism: |
+          scraper 0.22.0 depends on selectors 0.26.0, which retains fxhash 0.2.1. This expands the
+          maintenance and monitoring burden on the path that processes publisher-controlled HTML,
+          though no vulnerability is currently reported.
+        remediation: |
+          Upgrade scraper/selectors to a compatible release that removes fxhash. If none is
+          available, document a temporary advisory exception with an expiry condition and continue
+          monitoring RUSTSEC-2025-0057.
+        temporal:
+          introduced: 2026-07-31
+          last_modified: 2026-07-31
+          commit_count: 1
+          monthly_commits: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+        chains:
+          enables: []
+          enabled_by: []
+          related: [scraper-default-cli-feature]
+        effort: small
+        effort_notes: Upgrade is small but needs representative malformed and publisher-specific HTML checks.
+
+      - slug: scraper-default-cli-feature
+        title: scraper's default CLI feature pulls an unused argument parser
+        criterion: "7.3"
+        surface: Supply Chain
+        concern: advisory
+        locations:
+          - path: Cargo.toml
+            start_line: 15
+            end_line: 15
+        evidence: |-
+          scraper = "0.22"
+        evidence_lang: toml
+        evidence_markers:
+          - lines: "1"
+            type: mark
+            label: Default features remain enabled
+        mechanism: |
+          scraper 0.22.0 enables its main feature by default, bringing `getopts` and
+          `unicode-width` into the graph for scraper's standalone executable. fte uses only library
+          APIs, so that CLI-only path adds compile and supply-chain cost without runtime value.
+        remediation: |
+          Set `default-features = false` for scraper. Enable only `errors` if retaining scraper's
+          parse-error collection is desired; fte does not currently inspect it.
+        temporal:
+          introduced: 2026-07-31
+          last_modified: 2026-07-31
+          commit_count: 1
+          monthly_commits: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+        chains:
+          enables: []
+          enabled_by: []
+          related: [unmaintained-fxhash-through-scraper]
+        effort: trivial
+        effort_notes: One manifest change followed by HTML and ePub extraction checks.
+
+      - slug: zip-deflate-includes-unused-zopfli
+        title: zip's aggregate deflate feature compiles an unused encoder
+        criterion: "13.8"
+        surface: Dependency Fitness
+        concern: advisory
+        locations:
+          - path: Cargo.toml
+            start_line: 17
+            end_line: 17
+        evidence: |-
+          zip = { version = "4.0", default-features = false, features = ["deflate"] }
+        evidence_lang: toml
+        evidence_markers:
+          - lines: "1"
+            type: mark
+            label: Aggregate deflate feature
+        mechanism: |
+          zip 4.6.1's `deflate` feature enables both `deflate-flate2-zlib-rs` and
+          `deflate-zopfli`. fte only opens `ZipArchive` entries and never creates a writer, so the
+          zopfli encoder and its transitive crates are compiled for unreachable functionality.
+        remediation: |
+          Replace the aggregate `deflate` feature with `deflate-flate2-zlib-rs`, retaining DEFLATE
+          decompression without enabling zopfli compression.
+        temporal:
+          introduced: 2026-07-31
+          last_modified: 2026-07-31
+          commit_count: 1
+          monthly_commits: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+        chains:
+          enables: []
+          enabled_by: []
+          related: []
+        effort: trivial
+        effort_notes: One feature change plus extraction of a DEFLATE-compressed ePub.
+
+  - slug: static-analysis
+    title: The Static Analysis Surface
+    thesis: The crate compiles, but its configured strict Clippy baseline currently fails before it can act as a quality gate.
+    verdict: |
+      Most failures are mechanical style lints, not latent defects. Fix the enum-size and derivable
+      implementation findings first, apply the localized collapsible-control-flow suggestions, and
+      keep `cargo clippy --all-targets -- -D warnings` clean thereafter.
+    findings:
+      - slug: clippy-baseline-fails
+        title: Strict Clippy analysis fails with 28 denied warnings
+        criterion: Tooling
+        surface: Static Analysis
+        concern: advisory
+        locations:
+          - path: .crustoleum/clippy.txt
+            start_line: 101
+            end_line: 129
+        evidence: |-
+          src/markdown.rs:1:1: error: empty line after doc comment
+          src/detect.rs:8:1: error: large size difference between variants: the entire enum is at least 224 bytes
+          src/epub.rs:112:5: error: this `if` statement can be collapsed
+          src/epub.rs:122:5: error: this `if` statement can be collapsed
+          src/epub.rs:123:9: error: this `if` statement can be collapsed
+          src/epub.rs:147:5: error: this `if` statement can be collapsed
+          src/epub.rs:148:9: error: this `if` statement can be collapsed
+          src/epub.rs:149:13: error: this `if` statement can be collapsed
+          src/epub.rs:163:5: error: this `if` statement can be collapsed
+          src/epub.rs:179:5: error: this `if` statement can be collapsed
+          src/epub.rs:189:5: error: this `if` statement can be collapsed
+          src/epub.rs:196:5: error: this `if` statement can be collapsed
+          src/epub.rs:203:5: error: this `if` statement can be collapsed
+          src/html.rs:18:5: error: this `if` statement can be collapsed
+          src/html.rs:23:5: error: this `if` statement can be collapsed
+          src/html.rs:95:17: error: this `if` can be collapsed into the outer `match`
+          src/html.rs:104:5: error: this `if` statement can be collapsed
+          src/html.rs:105:9: error: matching on `Some` with `ok()` is redundant
+          src/html.rs:105:9: error: this `if` statement can be collapsed
+          src/html.rs:192:17: error: this `if` statement can be collapsed
+          src/html.rs:255:17: error: this `if` can be collapsed into the outer `match`
+          src/jats.rs:130:5: error: this `if` statement can be collapsed
+          src/jats.rs:339:5: error: this `if` statement can be collapsed
+          src/markdown.rs:44:1: error: this `impl` can be derived
+          src/wiley_xml.rs:19:5: error: this `if` statement can be collapsed
+          src/wiley_xml.rs:115:13: error: this `if` statement can be collapsed
+          src/wiley_xml.rs:124:13: error: this `if` statement can be collapsed
+          src/wiley_xml.rs:195:5: error: this `if` statement can be collapsed
+          error: could not compile `fte` (bin "fte" test) due to 28 previous errors
+        evidence_lang: text
+        evidence_markers:
+          - lines: "1-2"
+            type: mark
+            label: Structural warnings
+          - lines: "24"
+            type: mark
+            label: Manual Default can be derived
+          - lines: "29"
+            type: del
+            label: Strict gate fails
+        mechanism: |
+          The repository has no clean strict-lint baseline: `cargo clippy --all-targets -- -D warnings`
+          stops on 28 warnings. Most are mechanical control-flow suggestions, but the failure makes
+          it difficult to distinguish newly introduced warnings from existing debt and would block
+          a CI job using the same command.
+        remediation: |
+          Address the large enum and derivable `Default` findings deliberately, then apply localized
+          Clippy suggestions without reformatting unrelated files. Add the strict Clippy command to
+          CI or a Justfile check once it passes.
+        chains:
+          enables: []
+          enabled_by: []
+          related: [publisher-profile-cloned-per-document]
+        effort: small
+        effort_notes: Most changes are mechanical; the enum representation needs a small design choice.
+
+  - slug: type-design
+    title: The Type Design Surface
+    thesis: The private binary modules use borrowing and standard traits conventionally, with no caller-facing type-safety defect worth elevating beyond the findings already captured elsewhere.
+    verdict: |
+      Ownership and lifetime usage are generally sound. The profile cloning issue is tracked under
+      performance, and the manual `Default` implementation is covered by the Clippy baseline; no
+      separate public API remediation is warranted for this binary crate.
+    findings: []
+
+summary:
+  counts:
+    critical: 0
+    significant: 7
+    moderate: 7
+    advisory: 7
+    note: 0
