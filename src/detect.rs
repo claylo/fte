@@ -53,12 +53,29 @@ pub fn detect_format(path: &Path, content: &str, config: &Config) -> Format {
     }
 }
 
+/// Longest prefix of `s` that is at most `max` bytes and ends on a character
+/// boundary.
+///
+/// Detection samples a fixed byte count from the head of a document, but the
+/// document is untrusted: a multi-byte character straddling that offset would
+/// make `&s[..max]` panic before any extraction error handling runs.
+///
+/// `str::floor_char_boundary` does this in std, but it stabilized in 1.91 and
+/// this crate's `rust-version` floor is 1.89. Swap to it if that floor moves.
+fn char_safe_prefix(s: &str, max: usize) -> &str {
+    if s.len() <= max {
+        return s;
+    }
+    // UTF-8 code points are at most 4 bytes, so this steps back at most 3 times.
+    let mut end = max;
+    while end > 0 && !s.is_char_boundary(end) {
+        end -= 1;
+    }
+    &s[..end]
+}
+
 fn detect_xml(content: &str) -> Format {
-    let head: &str = if content.len() > 2048 {
-        &content[..2048]
-    } else {
-        content
-    };
+    let head = char_safe_prefix(content, 2048);
 
     if head.contains("<component") && head.contains("wiley") {
         Format::WileyXml
@@ -73,8 +90,7 @@ fn detect_xml(content: &str) -> Format {
 }
 
 fn detect_html(content: &str, config: &Config) -> Format {
-    let sample_len = content.len().min(150_000);
-    let head = &content[..sample_len];
+    let head = char_safe_prefix(content, 150_000);
 
     // Iterate publishers in order, first match wins
     for (name, profile) in &config.publishers {
@@ -109,4 +125,65 @@ fn matches_profile(head: &str, profile: &PublisherProfile) -> bool {
 
     // At least one detection group must be non-empty
     !profile.detect.is_empty() || !profile.detect_any.is_empty()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// A string whose final character is multi-byte and straddles `boundary`,
+    /// so slicing at exactly `boundary` splits a UTF-8 code point.
+    fn straddling(boundary: usize) -> String {
+        // 'é' is 2 bytes: placing it at boundary-1 puts its second byte at
+        // `boundary`, which is therefore not a character boundary.
+        let mut s = "a".repeat(boundary - 1);
+        s.push('é');
+        s
+    }
+
+    #[test]
+    fn xml_detection_survives_a_character_spanning_the_sample_boundary() {
+        let content = straddling(2048);
+        assert!(!content.is_char_boundary(2048), "test fixture is wrong");
+
+        // Must not panic. Content is not XML, so Unknown is the right answer.
+        assert!(matches!(detect_xml(&content), Format::Unknown));
+    }
+
+    #[test]
+    fn html_detection_survives_a_character_spanning_the_sample_boundary() {
+        let content = straddling(150_000);
+        assert!(!content.is_char_boundary(150_000), "test fixture is wrong");
+
+        let config = Config::default();
+        // Must not panic. No publisher matches, so the fallback profile is used.
+        assert!(matches!(detect_html(&content, &config), Format::Html { .. }));
+    }
+
+    #[test]
+    fn xml_detection_still_reads_markers_inside_the_sample() {
+        let content = format!(r#"<?xml version="1.0"?><article xmlns:jats="JATS">{}"#, "x".repeat(4096));
+        assert!(matches!(detect_xml(&content), Format::Jats));
+    }
+
+    #[test]
+    fn char_safe_prefix_never_splits_a_code_point() {
+        // 'é' occupies bytes 1..3, so byte 2 is mid-character.
+        let s = "aéb";
+        assert_eq!(char_safe_prefix(s, 2), "a");
+        assert_eq!(char_safe_prefix(s, 3), "aé");
+        assert_eq!(char_safe_prefix(s, 0), "");
+        // Shorter than the cap returns the whole string.
+        assert_eq!(char_safe_prefix(s, 999), s);
+    }
+
+    #[test]
+    fn char_safe_prefix_handles_a_four_byte_character() {
+        // An emoji is 4 bytes; every interior index must floor to 0.
+        let s = "😀";
+        for i in 0..4 {
+            assert_eq!(char_safe_prefix(s, i), "", "index {i} should floor to empty");
+        }
+        assert_eq!(char_safe_prefix(s, 4), s);
+    }
 }

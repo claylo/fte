@@ -2,6 +2,7 @@ use anyhow::Result;
 use scraper::{ElementRef, Html, Node, Selector};
 
 use crate::config::PublisherProfile;
+use crate::depth::MAX_HTML_DEPTH;
 use crate::markdown::{self, Metadata};
 
 /// Core HTML extraction driven by a publisher profile.
@@ -128,6 +129,13 @@ pub fn extract_meta_tags(doc: &Html) -> Metadata {
 
 /// Recursively walk an element and emit markdown.
 pub fn walk_element(el: &ElementRef, cruft: &[Selector], out: &mut String, depth: usize) {
+    // Untrusted nesting: stop descending rather than exhausting the stack.
+    // `html5ever` parses arbitrarily deep input fine; this recursion is what
+    // overflows, so the limit belongs here rather than at the parse boundary.
+    if depth >= MAX_HTML_DEPTH {
+        return;
+    }
+
     // Skip cruft elements
     for sel in cruft {
         if sel.matches(el) {
@@ -266,6 +274,14 @@ pub fn walk_element(el: &ElementRef, cruft: &[Selector], out: &mut String, depth
 
 /// Convert inline content to markdown (handles bold, italic, links, etc.)
 pub fn inline_markdown(el: &ElementRef, cruft: &[Selector]) -> String {
+    inline_markdown_at(el, cruft, 0)
+}
+
+fn inline_markdown_at(el: &ElementRef, cruft: &[Selector], depth: usize) -> String {
+    // Untrusted nesting: stop descending rather than exhausting the stack.
+    if depth >= MAX_HTML_DEPTH {
+        return String::new();
+    }
     let mut out = String::new();
     for child in el.children() {
         match child.value() {
@@ -283,35 +299,35 @@ pub fn inline_markdown(el: &ElementRef, cruft: &[Selector]) -> String {
                     match tag {
                         "b" | "strong" => {
                             out.push_str("**");
-                            out.push_str(&inline_markdown(&child_el, cruft));
+                            out.push_str(&inline_markdown_at(&child_el, cruft, depth + 1));
                             out.push_str("**");
                         }
                         "i" | "em" => {
                             out.push('*');
-                            out.push_str(&inline_markdown(&child_el, cruft));
+                            out.push_str(&inline_markdown_at(&child_el, cruft, depth + 1));
                             out.push('*');
                         }
                         "sup" => {
                             out.push('^');
-                            out.push_str(&inline_markdown(&child_el, cruft));
+                            out.push_str(&inline_markdown_at(&child_el, cruft, depth + 1));
                         }
                         "sub" => {
                             out.push('_');
-                            out.push_str(&inline_markdown(&child_el, cruft));
+                            out.push_str(&inline_markdown_at(&child_el, cruft, depth + 1));
                         }
                         "a" => {
                             // Just emit the link text, drop the URL
-                            out.push_str(&inline_markdown(&child_el, cruft));
+                            out.push_str(&inline_markdown_at(&child_el, cruft, depth + 1));
                         }
                         "span" | "div" => {
-                            out.push_str(&inline_markdown(&child_el, cruft));
+                            out.push_str(&inline_markdown_at(&child_el, cruft, depth + 1));
                         }
                         "br" => {
                             out.push('\n');
                         }
                         "script" | "style" | "svg" | "img" => {}
                         _ => {
-                            out.push_str(&inline_markdown(&child_el, cruft));
+                            out.push_str(&inline_markdown_at(&child_el, cruft, depth + 1));
                         }
                     }
                 }
@@ -364,6 +380,14 @@ fn extract_html_table(el: &ElementRef, out: &mut String) {
 
 /// Get all visible text from an element, recursively.
 pub fn element_text(el: &ElementRef) -> String {
+    element_text_at(el, 0)
+}
+
+fn element_text_at(el: &ElementRef, depth: usize) -> String {
+    // Untrusted nesting: stop descending rather than exhausting the stack.
+    if depth >= MAX_HTML_DEPTH {
+        return String::new();
+    }
     let mut out = String::new();
     for child in el.children() {
         match child.value() {
@@ -372,7 +396,7 @@ pub fn element_text(el: &ElementRef) -> String {
                 if let Some(child_el) = ElementRef::wrap(child) {
                     let tag = child_el.value().name();
                     if !matches!(tag, "script" | "style" | "svg") {
-                        out.push_str(&element_text(&child_el));
+                        out.push_str(&element_text_at(&child_el, depth + 1));
                     }
                 }
             }
@@ -380,4 +404,65 @@ pub fn element_text(el: &ElementRef) -> String {
         }
     }
     out
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn nested_html(depth: usize) -> String {
+        let mut h = String::from("<html><body>");
+        for _ in 0..depth {
+            h.push_str("<div>");
+        }
+        h.push_str("deep");
+        for _ in 0..depth {
+            h.push_str("</div>");
+        }
+        h.push_str("</body></html>");
+        h
+    }
+
+    /// Depth 20,000 aborted the process before `walk_element` was bounded.
+    /// A stack overflow is a SIGABRT, not a panic, so this test cannot assert
+    /// on an error — reaching the assertion at all is the result.
+    #[test]
+    fn deeply_nested_html_does_not_exhaust_the_stack() {
+        let doc = Html::parse_document(&nested_html(20_000));
+        let sel = Selector::parse("body").unwrap();
+        let body = doc.select(&sel).next().unwrap();
+
+        let mut out = String::new();
+        walk_element(&body, &[], &mut out, 0);
+    }
+
+    #[test]
+    fn deeply_nested_inline_markup_does_not_exhaust_the_stack() {
+        let mut h = String::from("<html><body><p>");
+        for _ in 0..20_000 {
+            h.push_str("<em>");
+        }
+        h.push_str("text");
+        for _ in 0..20_000 {
+            h.push_str("</em>");
+        }
+        h.push_str("</p></body></html>");
+
+        let doc = Html::parse_document(&h);
+        let sel = Selector::parse("p").unwrap();
+        let p = doc.select(&sel).next().unwrap();
+
+        let _ = inline_markdown(&p, &[]);
+        let _ = element_text(&p);
+    }
+
+    #[test]
+    fn ordinary_nesting_is_unaffected() {
+        let doc = Html::parse_document("<html><body><p>hello <b>world</b></p></body></html>");
+        let sel = Selector::parse("p").unwrap();
+        let p = doc.select(&sel).next().unwrap();
+
+        assert_eq!(element_text(&p), "hello world");
+        assert_eq!(inline_markdown(&p, &[]), "hello **world**");
+    }
 }

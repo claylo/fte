@@ -1,9 +1,15 @@
-use anyhow::{Context, Result};
+use anyhow::{Context, Result, bail};
 use roxmltree::{Document, Node};
 
+use crate::depth::{MAX_XML_DEPTH, xml_depth_exceeds};
 use crate::markdown::{self, Metadata};
 
 pub fn extract(id: &str, content: &str) -> Result<String> {
+    // Must precede `Document::parse` — see the JATS extractor for why.
+    if xml_depth_exceeds(content, MAX_XML_DEPTH) {
+        bail!("Wiley XML nests deeper than {MAX_XML_DEPTH} elements; refusing to parse");
+    }
+
     let doc = Document::parse(content).context("parsing Wiley XML")?;
     let root = doc.root_element();
 
@@ -376,4 +382,28 @@ fn find_child<'a>(node: &'a Node, tag: &str) -> Option<Node<'a, 'a>> {
 
 fn find_desc<'a>(node: &'a Node, tag: &str) -> Option<Node<'a, 'a>> {
     node.descendants().find(|n| n.has_tag_name(tag))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn deeply_nested_wiley_is_rejected_rather_than_aborting() {
+        let mut s = String::from("<component><header/>");
+        for _ in 0..5_000 {
+            s.push_str("<section>");
+        }
+        s.push_str("<p>deep</p>");
+        for _ in 0..5_000 {
+            s.push_str("</section>");
+        }
+        s.push_str("</component>");
+
+        let err = extract("test", &s).expect_err("deep input must be refused, not parsed");
+        assert!(
+            err.to_string().contains("nests deeper"),
+            "error should name the depth limit: {err}"
+        );
+    }
 }

@@ -1,11 +1,20 @@
-use anyhow::{Context, Result};
+use anyhow::{Context, Result, bail};
 use roxmltree::{Document, Node};
 
+use crate::depth::{MAX_XML_DEPTH, xml_depth_exceeds};
 use crate::markdown::{self, Metadata};
 
 pub fn extract(id: &str, content: &str) -> Result<String> {
     // Strip DOCTYPE declarations — roxmltree doesn't handle DTDs
     let content = strip_doctype(content);
+
+    // Must precede `Document::parse`: roxmltree recurses per element, so deep
+    // input aborts the process inside the parser, where no error handling can
+    // reach it.
+    if xml_depth_exceeds(&content, MAX_XML_DEPTH) {
+        bail!("JATS XML nests deeper than {MAX_XML_DEPTH} elements; refusing to parse");
+    }
+
     let doc = Document::parse(&content).context("parsing JATS XML")?;
     let root = doc.root_element();
 
@@ -353,4 +362,53 @@ fn find_child<'a>(node: &'a Node, tag: &str) -> Option<Node<'a, 'a>> {
 
 fn find_descendant<'a>(node: &'a Node, tag: &str) -> Option<Node<'a, 'a>> {
     node.descendants().find(|n| n.has_tag_name(tag))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn nested_jats(depth: usize) -> String {
+        let mut s = String::from("<article><body>");
+        for _ in 0..depth {
+            s.push_str("<sec>");
+        }
+        s.push_str("<p>deep</p>");
+        for _ in 0..depth {
+            s.push_str("</sec>");
+        }
+        s.push_str("</body></article>");
+        s
+    }
+
+    /// Before the guard, this aborted the process inside `roxmltree::parse`
+    /// with a stack overflow — reaching an `Err` at all is the fix.
+    #[test]
+    fn deeply_nested_jats_is_rejected_rather_than_aborting() {
+        let err = extract("test", &nested_jats(5_000))
+            .expect_err("deep input must be refused, not parsed");
+        assert!(
+            err.to_string().contains("nests deeper"),
+            "error should name the depth limit: {err}"
+        );
+    }
+
+    #[test]
+    fn the_guard_runs_before_the_parser_sees_the_document() {
+        // Depth beyond roxmltree's own failure point but well-formed: if the
+        // guard ran after parsing, this test would abort instead of failing.
+        assert!(extract("test", &nested_jats(200)).is_err());
+    }
+
+    #[test]
+    fn ordinary_jats_is_not_rejected_for_depth() {
+        let xml = r#"<article><front><article-meta><title-group><article-title>T</article-title></title-group></article-meta></front><body><sec><title>S</title><p>hello</p></sec></body></article>"#;
+        match extract("test", xml) {
+            Ok(md) => assert!(md.contains("hello"), "body should survive: {md}"),
+            Err(e) => assert!(
+                !e.to_string().contains("nests deeper"),
+                "ordinary depth must not trip the guard: {e}"
+            ),
+        }
+    }
 }

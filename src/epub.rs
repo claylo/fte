@@ -57,11 +57,60 @@ pub fn extract(id: &str, path: &Path) -> Result<String> {
     parse_epub_xhtml(id, &main_xhtml)
 }
 
+/// Largest uncompressed entry fte will read out of an ePub archive.
+///
+/// Generous for a chapter of XHTML; a single entry past this is a malformed or
+/// hostile archive, not a paper.
+const MAX_ENTRY_BYTES: u64 = 64 * 1024 * 1024;
+
 fn read_entry(archive: &mut zip::ZipArchive<std::fs::File>, name: &str) -> Result<String> {
+    read_entry_limited(archive, name, MAX_ENTRY_BYTES)
+}
+
+/// Read one archive entry as UTF-8, refusing anything larger than `max` bytes.
+///
+/// Both halves of the size are untrusted and are checked separately:
+///
+/// * The *declared* uncompressed size comes from the archive's central
+///   directory. It was previously cast straight to `usize` and handed to
+///   `String::with_capacity`, so a crafted declaration could trigger a
+///   capacity-overflow panic or an allocation abort before a single byte was
+///   read.
+/// * The *actual* stream need not match that declaration — a small declared
+///   size can expand without bound. So the read is capped as well, and a
+///   stream that reaches the cap is rejected rather than silently truncated.
+fn read_entry_limited(
+    archive: &mut zip::ZipArchive<std::fs::File>,
+    name: &str,
+    max: u64,
+) -> Result<String> {
     let mut entry = archive.by_name(name)?;
-    let mut buf = String::with_capacity(entry.size() as usize);
-    entry.read_to_string(&mut buf)?;
-    Ok(buf)
+
+    let declared = entry.size();
+    if declared > max {
+        anyhow::bail!("{name}: declared uncompressed size {declared} exceeds the limit of {max}");
+    }
+
+    // Now that `declared` is bounded, it is safe as a capacity hint.
+    // `try_reserve` reports allocation failure instead of aborting.
+    let hint = usize::try_from(declared).unwrap_or(0);
+    let mut buf = Vec::new();
+    buf.try_reserve_exact(hint)
+        .with_context(|| format!("reserving {hint} bytes for {name}"))?;
+
+    // Read one byte past the cap so "exactly at the limit" stays distinguishable
+    // from "the declaration lied and this kept going".
+    entry
+        .by_ref()
+        .take(max + 1)
+        .read_to_end(&mut buf)
+        .with_context(|| format!("reading {name}"))?;
+
+    if buf.len() as u64 > max {
+        anyhow::bail!("{name}: uncompressed data exceeds the limit of {max}");
+    }
+
+    String::from_utf8(buf).with_context(|| format!("{name} is not valid UTF-8"))
 }
 
 fn parse_epub_xhtml(id: &str, xhtml: &str) -> Result<String> {
@@ -207,4 +256,79 @@ fn find_body_element(doc: &Html) -> Option<ElementRef<'_>> {
     }
 
     None
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::io::Write;
+
+    fn temp_zip(tag: &str, name: &str, data: &[u8]) -> std::path::PathBuf {
+        let path = std::env::temp_dir()
+            .join(format!("fte-epub-{}-{}.zip", std::process::id(), tag));
+        let f = std::fs::File::create(&path).unwrap();
+        let mut w = zip::ZipWriter::new(f);
+        w.start_file(name, zip::write::SimpleFileOptions::default())
+            .unwrap();
+        w.write_all(data).unwrap();
+        w.finish().unwrap();
+        path
+    }
+
+    fn open(path: &std::path::Path) -> zip::ZipArchive<std::fs::File> {
+        zip::ZipArchive::new(std::fs::File::open(path).unwrap()).unwrap()
+    }
+
+    #[test]
+    fn an_entry_within_the_limit_reads_normally() {
+        let p = temp_zip("ok", "a.xhtml", b"<html>hi</html>");
+        let mut a = open(&p);
+
+        let got = read_entry_limited(&mut a, "a.xhtml", 1024).expect("should read");
+        assert_eq!(got, "<html>hi</html>");
+
+        let _ = std::fs::remove_file(&p);
+    }
+
+    #[test]
+    fn an_oversized_declaration_is_refused_before_allocating() {
+        let big = vec![b'x'; 4096];
+        let p = temp_zip("big", "a.xhtml", &big);
+        let mut a = open(&p);
+
+        let err = read_entry_limited(&mut a, "a.xhtml", 100)
+            .expect_err("declared size over the limit must be refused");
+        assert!(
+            err.to_string().contains("declared uncompressed size"),
+            "should name the declared-size check: {err}"
+        );
+
+        let _ = std::fs::remove_file(&p);
+    }
+
+    #[test]
+    fn an_entry_exactly_at_the_limit_is_still_accepted() {
+        let exact = vec![b'y'; 100];
+        let p = temp_zip("exact", "a.xhtml", &exact);
+        let mut a = open(&p);
+
+        let got = read_entry_limited(&mut a, "a.xhtml", 100).expect("exactly at the cap is fine");
+        assert_eq!(got.len(), 100);
+
+        let _ = std::fs::remove_file(&p);
+    }
+
+    #[test]
+    fn non_utf8_content_is_an_error_not_a_panic() {
+        let p = temp_zip("utf8", "a.xhtml", &[0xff, 0xfe, 0x00]);
+        let mut a = open(&p);
+
+        let err = read_entry_limited(&mut a, "a.xhtml", 1024).expect_err("invalid UTF-8");
+        assert!(
+            err.to_string().contains("not valid UTF-8"),
+            "should name the encoding problem: {err}"
+        );
+
+        let _ = std::fs::remove_file(&p);
+    }
 }
