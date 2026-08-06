@@ -32,8 +32,16 @@ test:
 test-ci:
   cargo nextest run --all-features --profile ci
 
+# `cargo test --doc` hard-errors on a crate with no library target, which is
+# how a binary-only crate like fte fails `check` for the wrong reason. Probe for
+# a lib target first so the recipe skips instead, and still runs — and still
+# fails loudly — the moment one is added.
 doc-test:
-  cargo test --doc --all-features
+  @if cargo metadata --no-deps --format-version 1 | grep -q '"kind":\[[^]]*"lib"'; then \
+    cargo test --doc --all-features; \
+  else \
+    echo "doc-test: no library target in this crate, skipping"; \
+  fi
 
 cov:
   @cargo llvm-cov clean

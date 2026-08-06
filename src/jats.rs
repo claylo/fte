@@ -134,12 +134,12 @@ fn extract_metadata(root: &Node) -> Metadata {
     }
 
     // Journal title
-    if let Some(jm) = find_descendant(root, "journal-meta") {
-        if let Some(jt) = find_descendant(&jm, "journal-title") {
-            let t = text_content(&jt).trim().to_string();
-            if !t.is_empty() {
-                meta.journal = Some(t);
-            }
+    if let Some(jm) = find_descendant(root, "journal-meta")
+        && let Some(jt) = find_descendant(&jm, "journal-title")
+    {
+        let t = text_content(&jt).trim().to_string();
+        if !t.is_empty() {
+            meta.journal = Some(t);
         }
     }
 
@@ -340,13 +340,13 @@ fn collect_text_blocks(node: &Node) -> String {
 
 /// Strip DOCTYPE declaration from XML since roxmltree doesn't support DTDs.
 fn strip_doctype(content: &str) -> String {
-    if let Some(start) = content.find("<!DOCTYPE") {
-        if let Some(end) = content[start..].find('>') {
-            let mut out = String::with_capacity(content.len());
-            out.push_str(&content[..start]);
-            out.push_str(&content[start + end + 1..]);
-            return out;
-        }
+    if let Some(start) = content.find("<!DOCTYPE")
+        && let Some(end) = content[start..].find('>')
+    {
+        let mut out = String::with_capacity(content.len());
+        out.push_str(&content[..start]);
+        out.push_str(&content[start + end + 1..]);
+        return out;
     }
     content.to_string()
 }

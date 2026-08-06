@@ -1,4 +1,4 @@
-/// Helpers for building clean markdown output.
+//! Helpers for building clean markdown output.
 
 /// Wrap extracted content in a markdown document with YAML frontmatter.
 pub fn document(id: &str, format: &str, meta: &Metadata, body: &str) -> String {
@@ -34,22 +34,12 @@ pub fn document(id: &str, format: &str, meta: &Metadata, body: &str) -> String {
     out
 }
 
+#[derive(Default)]
 pub struct Metadata {
     pub title: Option<String>,
     pub authors: Vec<String>,
     pub doi: Option<String>,
     pub journal: Option<String>,
-}
-
-impl Default for Metadata {
-    fn default() -> Self {
-        Self {
-            title: None,
-            authors: Vec::new(),
-            doi: None,
-            journal: None,
-        }
-    }
 }
 
 fn escape_yaml(s: &str) -> String {

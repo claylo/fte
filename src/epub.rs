@@ -154,24 +154,23 @@ fn extract_epub_metadata(doc: &Html) -> Metadata {
     let mut meta = Metadata::default();
 
     // Title from h1[property="name"] or <title>
-    if let Ok(sel) = Selector::parse(r#"h1[property="name"]"#) {
-        if let Some(el) = doc.select(&sel).next() {
-            let t = markdown::normalize_text(&html::element_text(&el));
-            if !t.is_empty() {
-                meta.title = Some(t);
-            }
+    if let Ok(sel) = Selector::parse(r#"h1[property="name"]"#)
+        && let Some(el) = doc.select(&sel).next()
+    {
+        let t = markdown::normalize_text(&html::element_text(&el));
+        if !t.is_empty() {
+            meta.title = Some(t);
         }
     }
 
     // Fallback: <title> tag
-    if meta.title.is_none() {
-        if let Ok(sel) = Selector::parse("title") {
-            if let Some(el) = doc.select(&sel).next() {
-                let t = markdown::normalize_text(&html::element_text(&el));
-                if !t.is_empty() {
-                    meta.title = Some(t);
-                }
-            }
+    if meta.title.is_none()
+        && let Ok(sel) = Selector::parse("title")
+        && let Some(el) = doc.select(&sel).next()
+    {
+        let t = markdown::normalize_text(&html::element_text(&el));
+        if !t.is_empty() {
+            meta.title = Some(t);
         }
     }
 
@@ -189,28 +188,26 @@ fn extract_epub_metadata(doc: &Html) -> Metadata {
     }
 
     // DOI from a[property="sameAs"] containing doi.org
-    if let Ok(sel) = Selector::parse(r#"a[property="sameAs"]"#) {
-        if let Some(el) = doc.select(&sel).next() {
-            if let Some(href) = el.value().attr("href") {
-                if href.contains("doi.org") {
-                    // Extract DOI from URL
-                    let doi = href
-                        .strip_prefix("https://doi.org/")
-                        .or_else(|| href.strip_prefix("http://doi.org/"))
-                        .unwrap_or(href);
-                    meta.doi = Some(doi.to_string());
-                }
-            }
-        }
+    if let Ok(sel) = Selector::parse(r#"a[property="sameAs"]"#)
+        && let Some(el) = doc.select(&sel).next()
+        && let Some(href) = el.value().attr("href")
+        && href.contains("doi.org")
+    {
+        // Extract DOI from URL
+        let doi = href
+            .strip_prefix("https://doi.org/")
+            .or_else(|| href.strip_prefix("http://doi.org/"))
+            .unwrap_or(href);
+        meta.doi = Some(doi.to_string());
     }
 
     // Journal from span[property="name"] inside span[property="isPartOf"][typeof="Periodical"]
-    if let Ok(sel) = Selector::parse(r#"span[typeof="Periodical"] span[property="name"]"#) {
-        if let Some(el) = doc.select(&sel).next() {
-            let j = markdown::normalize_text(&html::element_text(&el));
-            if !j.is_empty() {
-                meta.journal = Some(j);
-            }
+    if let Ok(sel) = Selector::parse(r#"span[typeof="Periodical"] span[property="name"]"#)
+        && let Some(el) = doc.select(&sel).next()
+    {
+        let j = markdown::normalize_text(&html::element_text(&el));
+        if !j.is_empty() {
+            meta.journal = Some(j);
         }
     }
 
@@ -219,34 +216,34 @@ fn extract_epub_metadata(doc: &Html) -> Metadata {
 
 fn extract_property(el: &ElementRef, prop: &str) -> String {
     let sel_str = format!(r#"span[property="{prop}"]"#);
-    if let Ok(sel) = Selector::parse(&sel_str) {
-        if let Some(child) = el.select(&sel).next() {
-            return html::element_text(&child);
-        }
+    if let Ok(sel) = Selector::parse(&sel_str)
+        && let Some(child) = el.select(&sel).next()
+    {
+        return html::element_text(&child);
     }
     String::new()
 }
 
 fn find_body_element(doc: &Html) -> Option<ElementRef<'_>> {
     // Try section#bodymatter first
-    if let Ok(sel) = Selector::parse("section#bodymatter") {
-        if let Some(el) = doc.select(&sel).next() {
-            return Some(el);
-        }
+    if let Ok(sel) = Selector::parse("section#bodymatter")
+        && let Some(el) = doc.select(&sel).next()
+    {
+        return Some(el);
     }
 
     // Fallback: article
-    if let Ok(sel) = Selector::parse("article") {
-        if let Some(el) = doc.select(&sel).next() {
-            return Some(el);
-        }
+    if let Ok(sel) = Selector::parse("article")
+        && let Some(el) = doc.select(&sel).next()
+    {
+        return Some(el);
     }
 
     // Last resort: body
-    if let Ok(sel) = Selector::parse("body") {
-        if let Some(el) = doc.select(&sel).next() {
-            return Some(el);
-        }
+    if let Ok(sel) = Selector::parse("body")
+        && let Some(el) = doc.select(&sel).next()
+    {
+        return Some(el);
     }
 
     None

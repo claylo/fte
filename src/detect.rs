@@ -4,7 +4,13 @@ use std::path::Path;
 use crate::config::{Config, PublisherProfile};
 
 /// Detected format of a fulltext file.
+///
+/// `Html` carries an owned `PublisherProfile`, which makes it much larger than
+/// the unit variants. Boxing it would trade a one-time 224-byte move for a heap
+/// allocation on a value constructed once per input file, alongside parsing
+/// hundreds of kilobytes of HTML — not a trade worth making here.
 #[derive(Debug, Clone)]
+#[allow(clippy::large_enum_variant)]
 pub enum Format {
     /// ePub (Sage structured XHTML)
     Epub,

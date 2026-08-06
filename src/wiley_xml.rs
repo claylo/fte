@@ -22,29 +22,29 @@ pub fn extract(id: &str, content: &str) -> Result<String> {
     }
 
     // Abstract
-    if let Some(abs_group) = find_desc(&root, "abstractGroup") {
-        if let Some(abs) = find_desc(&abs_group, "abstract") {
-            body.push_str("## Abstract\n\n");
-            // Wiley abstracts can be sectioned or flat
-            let sections: Vec<Node> = abs
-                .children()
-                .filter(|n| n.has_tag_name("section"))
-                .collect();
-            if sections.is_empty() {
-                body.push_str(&collect_paragraphs(&abs));
-            } else {
-                for sec in sections {
-                    if let Some(title) = find_child(&sec, "title") {
-                        let t = text_content(&title);
-                        if !t.is_empty() {
-                            body.push_str(&format!("**{t}** "));
-                        }
+    if let Some(abs_group) = find_desc(&root, "abstractGroup")
+        && let Some(abs) = find_desc(&abs_group, "abstract")
+    {
+        body.push_str("## Abstract\n\n");
+        // Wiley abstracts can be sectioned or flat
+        let sections: Vec<Node> = abs
+            .children()
+            .filter(|n| n.has_tag_name("section"))
+            .collect();
+        if sections.is_empty() {
+            body.push_str(&collect_paragraphs(&abs));
+        } else {
+            for sec in sections {
+                if let Some(title) = find_child(&sec, "title") {
+                    let t = text_content(&title);
+                    if !t.is_empty() {
+                        body.push_str(&format!("**{t}** "));
                     }
-                    body.push_str(&collect_paragraphs(&sec));
                 }
+                body.push_str(&collect_paragraphs(&sec));
             }
-            body.push('\n');
         }
+        body.push('\n');
     }
 
     // Body sections
@@ -118,23 +118,23 @@ fn extract_metadata(root: &Node) -> Metadata {
 
         // DOI from publication meta (unit level)
         for pm in h.children().filter(|n| n.has_tag_name("publicationMeta")) {
-            if pm.attribute("level") == Some("unit") {
-                if let Some(doi) = find_child(&pm, "doi") {
-                    let d = text_content(&doi).trim().to_string();
-                    if !d.is_empty() {
-                        meta.doi = Some(d);
-                    }
+            if pm.attribute("level") == Some("unit")
+                && let Some(doi) = find_child(&pm, "doi")
+            {
+                let d = text_content(&doi).trim().to_string();
+                if !d.is_empty() {
+                    meta.doi = Some(d);
                 }
             }
             // Journal title from product level
-            if pm.attribute("level") == Some("product") {
-                if let Some(tg) = find_child(&pm, "titleGroup") {
-                    for t in tg.children().filter(|n| n.has_tag_name("title")) {
-                        if t.attribute("type") == Some("main") {
-                            let jt = text_content(&t).trim().to_string();
-                            if !jt.is_empty() {
-                                meta.journal = Some(jt);
-                            }
+            if pm.attribute("level") == Some("product")
+                && let Some(tg) = find_child(&pm, "titleGroup")
+            {
+                for t in tg.children().filter(|n| n.has_tag_name("title")) {
+                    if t.attribute("type") == Some("main") {
+                        let jt = text_content(&t).trim().to_string();
+                        if !jt.is_empty() {
+                            meta.journal = Some(jt);
                         }
                     }
                 }
@@ -198,31 +198,31 @@ fn extract_tabular(tab: &Node, out: &mut String) {
     }
 
     // CALS table model: table > tgroup > thead/tbody
-    if let Some(table) = find_desc(tab, "table") {
-        if let Some(tgroup) = find_child(&table, "tgroup") {
-            if let Some(thead) = find_child(&tgroup, "thead") {
-                for row in thead.children().filter(|n| n.has_tag_name("row")) {
-                    let cells: Vec<String> = row
-                        .children()
-                        .filter(|n| n.has_tag_name("entry"))
-                        .map(|c| markdown::normalize_text(&text_content(&c)))
-                        .collect();
-                    out.push_str(&format!("| {} |\n", cells.join(" | ")));
-                    out.push_str(&format!(
-                        "| {} |\n",
-                        cells.iter().map(|_| "---").collect::<Vec<_>>().join(" | ")
-                    ));
-                }
+    if let Some(table) = find_desc(tab, "table")
+        && let Some(tgroup) = find_child(&table, "tgroup")
+    {
+        if let Some(thead) = find_child(&tgroup, "thead") {
+            for row in thead.children().filter(|n| n.has_tag_name("row")) {
+                let cells: Vec<String> = row
+                    .children()
+                    .filter(|n| n.has_tag_name("entry"))
+                    .map(|c| markdown::normalize_text(&text_content(&c)))
+                    .collect();
+                out.push_str(&format!("| {} |\n", cells.join(" | ")));
+                out.push_str(&format!(
+                    "| {} |\n",
+                    cells.iter().map(|_| "---").collect::<Vec<_>>().join(" | ")
+                ));
             }
-            if let Some(tbody) = find_child(&tgroup, "tbody") {
-                for row in tbody.children().filter(|n| n.has_tag_name("row")) {
-                    let cells: Vec<String> = row
-                        .children()
-                        .filter(|n| n.has_tag_name("entry"))
-                        .map(|c| markdown::normalize_text(&text_content(&c)))
-                        .collect();
-                    out.push_str(&format!("| {} |\n", cells.join(" | ")));
-                }
+        }
+        if let Some(tbody) = find_child(&tgroup, "tbody") {
+            for row in tbody.children().filter(|n| n.has_tag_name("row")) {
+                let cells: Vec<String> = row
+                    .children()
+                    .filter(|n| n.has_tag_name("entry"))
+                    .map(|c| markdown::normalize_text(&text_content(&c)))
+                    .collect();
+                out.push_str(&format!("| {} |\n", cells.join(" | ")));
             }
         }
     }

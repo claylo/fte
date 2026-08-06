@@ -16,20 +16,20 @@ pub fn extract_html(
     if profile.abstract_only {
         anyhow::bail!("abstract-only format");
     }
-    if let Some(req) = &profile.fulltext_required {
-        if !content.contains(req.as_str()) {
-            anyhow::bail!("abstract-only (no fulltext)");
-        }
+    if let Some(req) = &profile.fulltext_required
+        && !content.contains(req.as_str())
+    {
+        anyhow::bail!("abstract-only (no fulltext)");
     }
-    if let Some(marker) = &profile.no_content_marker {
-        if content.contains(marker.as_str()) {
-            if let Some(ok) = &profile.content_marker {
-                if !content.contains(ok.as_str()) {
-                    anyhow::bail!("no-content page (abstract only)");
-                }
-            } else {
+    if let Some(marker) = &profile.no_content_marker
+        && content.contains(marker.as_str())
+    {
+        if let Some(ok) = &profile.content_marker {
+            if !content.contains(ok.as_str()) {
                 anyhow::bail!("no-content page (abstract only)");
             }
+        } else {
+            anyhow::bail!("no-content page (abstract only)");
         }
     }
 
@@ -93,35 +93,32 @@ pub fn extract_meta_tags(doc: &Html) -> Metadata {
                     meta.doi = Some(content.to_string());
                 }
             }
-            "citation_journal_title" => {
-                if meta.journal.is_none() {
-                    meta.journal = Some(content.to_string());
-                }
+            "citation_journal_title" if meta.journal.is_none() => {
+                meta.journal = Some(content.to_string());
             }
             _ => {}
         }
     }
 
     // Fallback title from <title> tag
-    if meta.title.is_none() {
-        if let Some(title_sel) = Selector::parse("title").ok() {
-            if let Some(title_el) = doc.select(&title_sel).next() {
-                let t = element_text(&title_el);
-                let t = markdown::normalize_text(&t);
-                // Strip common suffixes
-                let t = t
-                    .split(" | ")
-                    .next()
-                    .unwrap_or(&t)
-                    .split(" - ")
-                    .next()
-                    .unwrap_or(&t)
-                    .trim()
-                    .to_string();
-                if !t.is_empty() {
-                    meta.title = Some(t);
-                }
-            }
+    if meta.title.is_none()
+        && let Ok(title_sel) = Selector::parse("title")
+        && let Some(title_el) = doc.select(&title_sel).next()
+    {
+        let t = element_text(&title_el);
+        let t = markdown::normalize_text(&t);
+        // Strip common suffixes
+        let t = t
+            .split(" | ")
+            .next()
+            .unwrap_or(&t)
+            .split(" - ")
+            .next()
+            .unwrap_or(&t)
+            .trim()
+            .to_string();
+        if !t.is_empty() {
+            meta.title = Some(t);
         }
     }
 
@@ -198,16 +195,16 @@ pub fn walk_element(el: &ElementRef, cruft: &[Selector], out: &mut String, depth
         // Lists
         "ul" | "ol" => {
             for (i, child) in el.children().enumerate() {
-                if let Some(child_el) = ElementRef::wrap(child) {
-                    if child_el.value().name() == "li" {
-                        let text = inline_markdown(&child_el, cruft);
-                        let text = markdown::normalize_text(&text);
-                        if !text.is_empty() {
-                            if tag == "ol" {
-                                out.push_str(&format!("{}. {text}\n", i + 1));
-                            } else {
-                                out.push_str(&format!("- {text}\n"));
-                            }
+                if let Some(child_el) = ElementRef::wrap(child)
+                    && child_el.value().name() == "li"
+                {
+                    let text = inline_markdown(&child_el, cruft);
+                    let text = markdown::normalize_text(&text);
+                    if !text.is_empty() {
+                        if tag == "ol" {
+                            out.push_str(&format!("{}. {text}\n", i + 1));
+                        } else {
+                            out.push_str(&format!("- {text}\n"));
                         }
                     }
                 }
@@ -259,15 +256,14 @@ pub fn walk_element(el: &ElementRef, cruft: &[Selector], out: &mut String, depth
                     walk_element(&child_el, cruft, out, depth + 1);
                 }
             }
-            Node::Text(text) => {
+            Node::Text(text)
                 // Only emit loose text at reasonable depth (avoid nav text etc.)
-                if depth < 20 {
+                if depth < 20 => {
                     let t = text.text.trim();
                     if !t.is_empty() && t.len() > 2 {
                         // Heuristic: skip very short text nodes (likely cruft)
                     }
                 }
-            }
             _ => {}
         }
     }
