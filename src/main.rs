@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use clap::Parser;
+use librebar::cli::clap::{self, Parser};
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -16,7 +16,10 @@ mod wiley_xml;
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 #[derive(Parser)]
-#[command(about = "Extract clean markdown from publisher HTML/XML/ePub academic papers")]
+#[command(
+    version,
+    about = "Extract clean markdown from publisher HTML/XML/ePub academic papers"
+)]
 struct Cli {
     #[command(flatten)]
     common: librebar::cli::CommonArgs,
@@ -46,7 +49,7 @@ struct Cli {
 }
 
 fn main() -> Result<()> {
-    let cli = Cli::parse();
+    let cli: Cli = librebar::cli::parse();
 
     if cli.common.apply(VERSION)?.is_exit() {
         return Ok(());
@@ -55,10 +58,13 @@ fn main() -> Result<()> {
     let cwd = std::env::current_dir()?;
     let cwd_utf8 = cwd.to_str().context("cwd is not valid UTF-8")?;
 
-    // Load config: struct defaults → user config → project config
-    let (cfg, _sources) = librebar::config::ConfigLoader::new("fte")
-        .with_project_search(cwd_utf8)
-        .load::<config::Config>()?;
+    // Load config: struct defaults → user config → project config.
+    // An explicit `-c/--config` file is layered on top of whatever discovery finds.
+    let mut loader = librebar::config::ConfigLoader::new("fte").with_project_search(cwd_utf8);
+    if let Some(path) = cli.common.config_path()? {
+        loader = loader.with_file(&path);
+    }
+    let (cfg, _sources) = loader.load::<config::Config>()?;
 
     // Resolve directories: CLI > config > defaults
     let input_dir = cli.indir.unwrap_or_else(|| PathBuf::from(&cfg.input_dir));

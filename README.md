@@ -31,6 +31,16 @@ fte --force --indir path/to/html-files --outdir path/to/output
 
 When run without `--indir`, fte looks for a config file (`.fte.yaml`, `.config/fte.yaml`, etc.) walking up from the current directory to find input/output paths.
 
+### Shell completions and machine-readable help
+
+```bash
+# Generate completions (bash, zsh, fish, elvish, powershell)
+fte completions zsh > ~/.zfunc/_fte
+
+# Print the CLI Spec schema for tooling and agents
+fte schema
+```
+
 ## Supported Formats
 
 | Format | Detection | Handler |
@@ -51,11 +61,15 @@ When run without `--indir`, fte looks for a config file (`.fte.yaml`, `.config/f
 
 fte uses [librebar](https://crates.io/crates/librebar) for config discovery. Config files are found by walking up from the working directory, checking for `.fte.yaml`, `.config/fte.yaml`, or `fte.yaml` (also `.toml` and `.json`). User-level config lives at `~/.config/fte/config.yaml`.
 
+Pass `-c/--config FILE` to load a specific file instead of relying on discovery. An explicit file is a deliberate selection, so it outranks both discovered files and environment variables.
+
 Merge order (lowest to highest precedence):
 1. Compiled defaults (all 8 publishers built in)
 2. User config (`~/.config/fte/config.yaml`)
 3. Project config (`.fte.yaml` in repo root)
-4. CLI flags (`--indir`, `--outdir`)
+4. Environment variables (`FTE_INPUT_DIR`, `FTE_OUTPUT_DIR`, …)
+5. Explicit config file (`-c/--config`)
+6. CLI flags (`--indir`, `--outdir`)
 
 ### Minimal project config
 
