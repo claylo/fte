@@ -62,9 +62,7 @@ fn main() -> Result<()> {
 
     // Resolve directories: CLI > config > defaults
     let input_dir = cli.indir.unwrap_or_else(|| PathBuf::from(&cfg.input_dir));
-    let output_dir = cli
-        .outdir
-        .unwrap_or_else(|| PathBuf::from(&cfg.output_dir));
+    let output_dir = cli.outdir.unwrap_or_else(|| PathBuf::from(&cfg.output_dir));
 
     if !cli.stdout && !cli.detect_only {
         fs::create_dir_all(&output_dir)?;
@@ -82,10 +80,7 @@ fn main() -> Result<()> {
             .and_then(|s| s.to_str())
             .unwrap_or("unknown");
 
-        let ext = path
-            .extension()
-            .and_then(|e| e.to_str())
-            .unwrap_or("");
+        let ext = path.extension().and_then(|e| e.to_str()).unwrap_or("");
 
         // ePub: handle before reading to string (it's a zip)
         if ext == "epub" {

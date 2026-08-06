@@ -63,9 +63,7 @@ pub fn extract(id: &str, content: &str) -> Result<String> {
             // Get citation text from mixed-citation or element-citation
             let cite = ref_el
                 .children()
-                .find(|n| {
-                    n.has_tag_name("mixed-citation") || n.has_tag_name("element-citation")
-                })
+                .find(|n| n.has_tag_name("mixed-citation") || n.has_tag_name("element-citation"))
                 .map(|n| markdown::normalize_text(&text_content(&n)))
                 .unwrap_or_else(|| markdown::normalize_text(&text_content(&ref_el)));
 
@@ -116,8 +114,8 @@ fn extract_metadata(root: &Node) -> Metadata {
                     continue;
                 }
                 // Try string-name first, then name
-                let name_node = find_child(&contrib, "string-name")
-                    .or_else(|| find_child(&contrib, "name"));
+                let name_node =
+                    find_child(&contrib, "string-name").or_else(|| find_child(&contrib, "name"));
                 if let Some(nn) = name_node {
                     let given = find_child(&nn, "given-names")
                         .map(|n| text_content(&n))
@@ -254,10 +252,7 @@ fn extract_figure(fig: &Node, out: &mut String) {
         })
         .unwrap_or_default();
     if !label.is_empty() || !caption.is_empty() {
-        out.push_str(&format!(
-            "**{label}** {caption}\n\n",
-            label = label.trim()
-        ));
+        out.push_str(&format!("**{label}** {caption}\n\n", label = label.trim()));
     }
 }
 

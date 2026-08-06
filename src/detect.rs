@@ -40,10 +40,7 @@ impl fmt::Display for Format {
 }
 
 pub fn detect_format(path: &Path, content: &str, config: &Config) -> Format {
-    let ext = path
-        .extension()
-        .and_then(|e| e.to_str())
-        .unwrap_or("");
+    let ext = path.extension().and_then(|e| e.to_str()).unwrap_or("");
 
     match ext {
         "epub" => Format::Epub,
@@ -157,12 +154,18 @@ mod tests {
 
         let config = Config::default();
         // Must not panic. No publisher matches, so the fallback profile is used.
-        assert!(matches!(detect_html(&content, &config), Format::Html { .. }));
+        assert!(matches!(
+            detect_html(&content, &config),
+            Format::Html { .. }
+        ));
     }
 
     #[test]
     fn xml_detection_still_reads_markers_inside_the_sample() {
-        let content = format!(r#"<?xml version="1.0"?><article xmlns:jats="JATS">{}"#, "x".repeat(4096));
+        let content = format!(
+            r#"<?xml version="1.0"?><article xmlns:jats="JATS">{}"#,
+            "x".repeat(4096)
+        );
         assert!(matches!(detect_xml(&content), Format::Jats));
     }
 
@@ -182,7 +185,11 @@ mod tests {
         // An emoji is 4 bytes; every interior index must floor to 0.
         let s = "😀";
         for i in 0..4 {
-            assert_eq!(char_safe_prefix(s, i), "", "index {i} should floor to empty");
+            assert_eq!(
+                char_safe_prefix(s, i),
+                "",
+                "index {i} should floor to empty"
+            );
         }
         assert_eq!(char_safe_prefix(s, 4), s);
     }

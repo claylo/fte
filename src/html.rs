@@ -37,10 +37,11 @@ pub fn extract_html(
     let meta = extract_meta_tags(&doc);
 
     // Find the body content container
-    let body_el = profile
-        .body_selectors
-        .iter()
-        .find_map(|sel| Selector::parse(sel).ok().and_then(|s| doc.select(&s).next()));
+    let body_el = profile.body_selectors.iter().find_map(|sel| {
+        Selector::parse(sel)
+            .ok()
+            .and_then(|s| doc.select(&s).next())
+    });
 
     let body_el = match body_el {
         Some(el) => el,

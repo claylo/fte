@@ -20,9 +20,7 @@ pub fn extract(id: &str, path: &Path) -> Result<String> {
     // Append any table overflow files (table*.xhtml)
     let table_names: Vec<String> = archive
         .file_names()
-        .filter(|n| {
-            n.starts_with("EPUB/xhtml/table") && n.ends_with(".xhtml")
-        })
+        .filter(|n| n.starts_with("EPUB/xhtml/table") && n.ends_with(".xhtml"))
         .map(String::from)
         .collect();
 
@@ -39,9 +37,7 @@ pub fn extract(id: &str, path: &Path) -> Result<String> {
     // Also grab figure overflow files
     let fig_names: Vec<String> = archive
         .file_names()
-        .filter(|n| {
-            n.starts_with("EPUB/xhtml/fig") && n.ends_with(".xhtml")
-        })
+        .filter(|n| n.starts_with("EPUB/xhtml/fig") && n.ends_with(".xhtml"))
         .map(String::from)
         .collect();
 
@@ -209,9 +205,7 @@ fn extract_epub_metadata(doc: &Html) -> Metadata {
     }
 
     // Journal from span[property="name"] inside span[property="isPartOf"][typeof="Periodical"]
-    if let Ok(sel) =
-        Selector::parse(r#"span[typeof="Periodical"] span[property="name"]"#)
-    {
+    if let Ok(sel) = Selector::parse(r#"span[typeof="Periodical"] span[property="name"]"#) {
         if let Some(el) = doc.select(&sel).next() {
             let j = markdown::normalize_text(&html::element_text(&el));
             if !j.is_empty() {
@@ -264,8 +258,8 @@ mod tests {
     use std::io::Write;
 
     fn temp_zip(tag: &str, name: &str, data: &[u8]) -> std::path::PathBuf {
-        let path = std::env::temp_dir()
-            .join(format!("fte-epub-{}-{}.zip", std::process::id(), tag));
+        let path =
+            std::env::temp_dir().join(format!("fte-epub-{}-{}.zip", std::process::id(), tag));
         let f = std::fs::File::create(&path).unwrap();
         let mut w = zip::ZipWriter::new(f);
         w.start_file(name, zip::write::SimpleFileOptions::default())

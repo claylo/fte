@@ -237,10 +237,7 @@ fn extract_figure(fig: &Node, out: &mut String) {
         .map(|n| markdown::normalize_text(&text_content(&n)))
         .unwrap_or_default();
     if !label.is_empty() || !caption.is_empty() {
-        out.push_str(&format!(
-            "**{label}** {caption}\n\n",
-            label = label.trim()
-        ));
+        out.push_str(&format!("**{label}** {caption}\n\n", label = label.trim()));
     }
 }
 
@@ -270,8 +267,7 @@ fn format_wiley_citation(citation: &Node) -> String {
     if let Some(year) = find_child(citation, "pubYear") {
         parts.push(format!(
             "({})",
-            year.attribute("year")
-                .unwrap_or(&text_content(&year))
+            year.attribute("year").unwrap_or(&text_content(&year))
         ));
     }
 
