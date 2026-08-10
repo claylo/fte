@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<article article-type="research-article" dtd-version="1.2">
+<front>
+<journal-meta>
+<journal-title-group>
+<journal-title>BMC Infectious Diseases</journal-title>
+</journal-title-group>
+</journal-meta>
+<article-meta>
+<article-id pub-id-type="doi">10.1186/s12879-024-09876-5</article-id>
+<title-group>
+<article-title>Epidemiology of Hospital-Acquired Infections in Sub-Saharan Africa</article-title>
+</title-group>
+<contrib-group>
+<contrib contrib-type="author">
+<name><given-names>Kwame</given-names><surname>Asante</surname></name>
+</contrib>
+<contrib contrib-type="author">
+<name><given-names>Amina</given-names><surname>Diallo</surname></name>
+</contrib>
+</contrib-group>
+<abstract>
+<sec>
+<title>Background</title>
+<p>Hospital-acquired infections (HAIs) are a major burden in resource-limited settings.</p>
+</sec>
+<sec>
+<title>Methods</title>
+<p>We conducted a prospective surveillance study across 12 hospitals in Ghana and Senegal.</p>
+</sec>
+<sec>
+<title>Results</title>
+<p>The overall HAI rate was 14.2 per 100 admissions, with surgical site infections accounting for 38%.</p>
+</sec>
+</abstract>
+</article-meta>
+</front>
+<body>
+<sec>
+<title>Introduction</title>
+<p>Healthcare-associated infections remain a <italic>critical</italic> challenge in low- and middle-income countries, where infection prevention resources are limited.</p>
+</sec>
+<sec>
+<title>Results</title>
+<p>The most common pathogens were <italic>Klebsiella pneumoniae</italic> (28%), <italic>Staphylococcus aureus</italic> (22%), and <italic>Escherichia coli</italic> (18%).</p>
+</sec>
+</body>
+<back>
+<ref-list>
+<ref id="r1">
+<label>1</label>
+<element-citation publication-type="journal">
+<person-group person-group-type="author">
+<name><surname>Allegranzi</surname><given-names>B</given-names></name>
+<name><surname>Bagheri Nejad</surname><given-names>S</given-names></name>
+</person-group>
+<article-title>Burden of endemic health-care-associated infection in developing countries</article-title>
+<source>Lancet</source>
+<year>2011</year>
+<volume>377</volume>
+<fpage>228</fpage>
+<lpage>241</lpage>
+</element-citation>
+</ref>
+</ref-list>
+</back>
+</article>

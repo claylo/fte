@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="citation_title" content="Real-Time Object Detection on FPGA Accelerators">
+<meta name="citation_author" content="Takahashi, Yuto">
+<meta name="citation_doi" content="10.1109/CVPR.2024.00456">
+<meta name="citation_journal_title" content="IEEE/CVF Conference on Computer Vision and Pattern Recognition">
+</head>
+<body>
+<!-- ieeexplore-ieee-org marker -->
+<div class="article-content">
+<section>
+<h2>Abstract</h2>
+<p>We demonstrate <b>real-time object detection</b> at 120 fps on a low-power FPGA using quantized neural networks.</p>
+</section>
+<section>
+<h2>Architecture</h2>
+<p>The detector uses a <i>single-shot</i> architecture with depthwise separable convolutions, mapped to fixed-point arithmetic on the FPGA fabric.</p>
+<h3>Quantization Strategy</h3>
+<p>Weights are quantized to 4 bits and activations to 8 bits, achieving 6.2× compression over FP32.</p>
+</section>
+<section>
+<h2>Results</h2>
+<p>Performance comparison on COCO val2017:</p>
+<table>
+<thead>
+<tr><th>Model</th><th>mAP</th><th>FPS</th><th>Power (W)</th></tr>
+</thead>
+<tbody>
+<tr><td>YOLOv8-n (GPU)</td><td>37.3</td><td>450</td><td>75</td></tr>
+<tr><td>YOLOv8-n (FPGA)</td><td>35.1</td><td>120</td><td>8.2</td></tr>
+<tr><td>Ours (FPGA)</td><td>36.8</td><td>120</td><td>5.7</td></tr>
+</tbody>
+</table>
+</section>
+</div>
+</body>
+</html>

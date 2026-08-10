@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns:wiley="http://www.wiley.com/namespaces/wiley">
+<header>
+<contentMeta>
+<titleGroup>
+<title type="main">Machine Learning in Drug Discovery: A Comprehensive Review</title>
+</titleGroup>
+<creators>
+<creator creatorRole="author">
+<personName>
+<givenNames>Priya</givenNames>
+<familyName>Sharma</familyName>
+</personName>
+</creator>
+</creators>
+</contentMeta>
+<publicationMeta level="unit">
+<doi>10.1002/minf.202400567</doi>
+</publicationMeta>
+<publicationMeta level="product">
+<titleGroup>
+<title type="main">Molecular Informatics</title>
+</titleGroup>
+</publicationMeta>
+</header>
+<body>
+<abstractGroup>
+<abstract>
+<section>
+<title>Background</title>
+<p>Machine learning methods are increasingly used in drug discovery pipelines.</p>
+</section>
+<section>
+<title>Scope</title>
+<p>This review covers applications from target identification to <bold>ADMET</bold> prediction.</p>
+</section>
+</abstract>
+</abstractGroup>
+<section>
+<title>Virtual Screening</title>
+<p>Deep learning models for virtual screening have shown <italic>significant improvements</italic> over traditional docking methods.</p>
+</section>
+<section>
+<title>De Novo Design</title>
+<p>Generative models can propose novel molecular structures with desired properties. Key architectures include:</p>
+<figure>
+<label>Figure 1</label>
+<caption><p>Overview of generative model architectures for molecular design</p></caption>
+</figure>
+</section>
+</body>
+</component>

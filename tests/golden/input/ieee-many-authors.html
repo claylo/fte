@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="citation_title" content="A Survey of Large Language Models for Code Generation">
+<meta name="citation_author" content="Chen, Mark">
+<meta name="citation_author" content="Tworek, Jerry">
+<meta name="citation_author" content="Jun, Heewoo">
+<meta name="citation_author" content="Yuan, Qiming">
+<meta name="citation_author" content="Pinto, Henrique">
+<meta name="citation_author" content="Kaplan, Jared">
+<meta name="citation_author" content="Edwards, Harrison">
+<meta name="citation_author" content="Burda, Yuri">
+<meta name="citation_doi" content="10.1109/TSE.2024.3456789">
+<meta name="citation_journal_title" content="IEEE Transactions on Software Engineering">
+</head>
+<body>
+<!-- ieeexplore.ieee.org marker -->
+<div id="article-content">
+<section>
+<h2>Abstract</h2>
+<p>We survey <b>72 large language models</b> for code generation, evaluating performance across six programming languages on the HumanEval and MBPP benchmarks.</p>
+</section>
+<section>
+<h2>Introduction</h2>
+<p>Code generation using neural language models has advanced rapidly since the introduction of <i>Codex</i> and its successors.</p>
+</section>
+<section>
+<h2>Taxonomy of Models</h2>
+<p>We categorize models along three axes:</p>
+<ol>
+<li>Architecture: encoder-decoder vs decoder-only</li>
+<li>Training data: natural language + code vs code-only</li>
+<li>Fine-tuning: instruction-tuned vs base models</li>
+</ol>
+</section>
+<section>
+<h2>Benchmark Results</h2>
+<table>
+<thead>
+<tr><th>Model</th><th>Params (B)</th><th>HumanEval</th><th>MBPP</th></tr>
+</thead>
+<tbody>
+<tr><td>GPT-4</td><td>—</td><td>67.0</td><td>—</td></tr>
+<tr><td>Claude 3.5</td><td>—</td><td>64.0</td><td>—</td></tr>
+<tr><td>CodeLlama</td><td>34</td><td>53.7</td><td>56.2</td></tr>
+<tr><td>StarCoder2</td><td>15</td><td>46.3</td><td>52.8</td></tr>
+<tr><td>DeepSeek-Coder</td><td>33</td><td>56.1</td><td>58.4</td></tr>
+</tbody>
+</table>
+</section>
+<section>
+<h2>Discussion</h2>
+<p>Model scale alone does not determine performance; <b>training data quality</b> and instruction tuning have outsized effects on benchmark scores.</p>
+</section>
+</div>
+</body>
+</html>

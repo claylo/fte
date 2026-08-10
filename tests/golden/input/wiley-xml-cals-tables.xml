@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns:wiley="http://www.wiley.com/namespaces/wiley">
+<header>
+<contentMeta>
+<titleGroup>
+<title type="main">Pharmacokinetics of Novel Anticoagulants in Renal Impairment</title>
+</titleGroup>
+<creators>
+<creator creatorRole="author">
+<personName>
+<givenNames>Henrik</givenNames>
+<familyName>Eriksson</familyName>
+</personName>
+</creator>
+<creator creatorRole="author">
+<personName>
+<givenNames>Atsuko</givenNames>
+<familyName>Tanaka</familyName>
+</personName>
+</creator>
+<creator creatorRole="editor">
+<personName>
+<givenNames>Editor</givenNames>
+<familyName>ShouldNotAppear</familyName>
+</personName>
+</creator>
+</creators>
+</contentMeta>
+<publicationMeta level="unit">
+<doi>10.1111/bcp.16789</doi>
+</publicationMeta>
+<publicationMeta level="product">
+<titleGroup>
+<title type="main">British Journal of Clinical Pharmacology</title>
+</titleGroup>
+</publicationMeta>
+</header>
+<body>
+<abstractGroup>
+<abstract>
+<p>We conducted a systematic review and meta-analysis of pharmacokinetic studies of <bold>direct oral anticoagulants</bold> (DOACs) in patients with varying degrees of renal impairment.</p>
+</abstract>
+</abstractGroup>
+<section>
+<title>Introduction</title>
+<p>DOACs are increasingly used as alternatives to warfarin for thromboembolic disease prevention. However, all DOACs undergo some degree of renal elimination, raising concerns about drug accumulation in <italic>chronic kidney disease</italic> (CKD).</p>
+</section>
+<section>
+<title>Results</title>
+<section>
+<title>Pharmacokinetic Parameters</title>
+<tabular>
+<label>Table 1</label>
+<title>AUC fold-change relative to normal renal function (eGFR &gt;80)</title>
+<table>
+<tgroup cols="5">
+<thead>
+<row><entry>Drug</entry><entry>Renal Elim. (%)</entry><entry>Mild (50–80)</entry><entry>Moderate (30–50)</entry><entry>Severe (&lt;30)</entry></row>
+</thead>
+<tbody>
+<row><entry>Dabigatran</entry><entry>80</entry><entry>1.5×</entry><entry>3.2×</entry><entry>6.3×</entry></row>
+<row><entry>Rivaroxaban</entry><entry>36</entry><entry>1.1×</entry><entry>1.6×</entry><entry>2.0×</entry></row>
+<row><entry>Apixaban</entry><entry>27</entry><entry>1.2×</entry><entry>1.3×</entry><entry>1.4×</entry></row>
+<row><entry>Edoxaban</entry><entry>50</entry><entry>1.3×</entry><entry>1.7×</entry><entry>2.1×</entry></row>
+</tbody>
+</tgroup>
+</table>
+</tabular>
+</section>
+<section>
+<title>Dose Adjustments</title>
+<p>Based on the pharmacokinetic data, we propose the following dose modifications:</p>
+<tabular>
+<label>Table 2</label>
+<title>Recommended dose adjustments in renal impairment</title>
+<table>
+<tgroup cols="4">
+<thead>
+<row><entry>Drug</entry><entry>Standard Dose</entry><entry>Moderate CKD</entry><entry>Severe CKD</entry></row>
+</thead>
+<tbody>
+<row><entry>Dabigatran</entry><entry>150 mg BID</entry><entry>110 mg BID</entry><entry>Contraindicated</entry></row>
+<row><entry>Rivaroxaban</entry><entry>20 mg QD</entry><entry>15 mg QD</entry><entry>Avoid</entry></row>
+<row><entry>Apixaban</entry><entry>5 mg BID</entry><entry>5 mg BID</entry><entry>2.5 mg BID</entry></row>
+<row><entry>Edoxaban</entry><entry>60 mg QD</entry><entry>30 mg QD</entry><entry>30 mg QD</entry></row>
+</tbody>
+</tgroup>
+</table>
+</tabular>
+</section>
+</section>
+<section>
+<title>Conclusions</title>
+<p>Apixaban demonstrates the most favorable pharmacokinetic profile in CKD due to its <bold>low renal dependence</bold>. Dabigatran should be avoided in severe renal impairment.</p>
+</section>
+<bibliography>
+<bib id="b1">
+<citation type="journal">
+<author><familyName>Connolly</familyName><givenNames>SJ</givenNames></author>
+<author><familyName>Ezekowitz</familyName><givenNames>MD</givenNames></author>
+<pubYear year="2009"/>
+<articleTitle>Dabigatran versus warfarin in patients with atrial fibrillation</articleTitle>
+<journalTitle>New England Journal of Medicine</journalTitle>
+<vol>361</vol>
+<pageFirst>1139</pageFirst>
+<pageLast>1151</pageLast>
+</citation>
+</bib>
+<bib id="b2">
+<citation type="journal">
+<author><familyName>Granger</familyName><givenNames>CB</givenNames></author>
+<pubYear year="2011"/>
+<articleTitle>Apixaban versus warfarin in patients with atrial fibrillation</articleTitle>
+<journalTitle>New England Journal of Medicine</journalTitle>
+<vol>365</vol>
+<pageFirst>981</pageFirst>
+<pageLast>992</pageLast>
+</citation>
+</bib>
+</bibliography>
+</body>
+</component>

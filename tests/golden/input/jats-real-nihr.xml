@@ -1,0 +1,840 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<article xml:lang="en" article-type="research-article" dtd-version="1.4"><processing-meta base-tagset="archiving" mathml-version="3.0" table-model="xhtml" tagset-family="jats"><restricted-by>pmc</restricted-by></processing-meta><front><journal-meta><journal-id journal-id-type="nlm-ta">NIHR Open Res</journal-id><journal-id journal-id-type="iso-abbrev">NIHR Open Res</journal-id><journal-id journal-id-type="pmc-domain-id">4490</journal-id><journal-id journal-id-type="pmc-domain">nihror</journal-id><journal-id journal-id-type="nlm-id">9918333281906676</journal-id><journal-title-group><journal-title>NIHR Open Research</journal-title></journal-title-group><issn pub-type="epub">2633-4402</issn><publisher><publisher-name>Department of Health and Social Care (UK)</publisher-name></publisher></journal-meta><article-meta><article-id pub-id-type="pmcid">PMC7612280</article-id><article-id pub-id-type="pmcid-ver">PMC7612280.1</article-id><article-id pub-id-type="pmcaid">7612280</article-id><article-id pub-id-type="pmcaiid">10593249</article-id><article-id pub-id-type="pmid">35098131</article-id><article-id pub-id-type="doi">10.3310/nihropenres.13215.1</article-id><article-version article-version-type="pmc-version">1</article-version><article-categories><subj-group subj-group-type="heading"><subject>Research Article</subject></subj-group><subj-group><subject>Articles</subject></subj-group></article-categories><title-group><article-title>A multicentre review comparing long term outcomes of endoscopic vein harvesting versus open vein harvesting for coronary artery bypass surgery</article-title><fn-group content-type="pub-status"><fn><p>[version 1; peer review: 1 approved, 2 approved with reservations]</p></fn></fn-group></title-group><contrib-group><contrib contrib-type="author" corresp="yes"><name name-style="western"><surname>Krishnamoorthy</surname><given-names initials="B">Bhuvaneswari</given-names></name><role content-type="http://credit.niso.org/">Conceptualization</role><role content-type="http://credit.niso.org/">Data Curation</role><role content-type="http://credit.niso.org/">Methodology</role><role content-type="http://credit.niso.org/">Project Administration</role><role content-type="http://credit.niso.org/">Resources</role><role content-type="http://credit.niso.org/">Supervision</role><role content-type="http://credit.niso.org/">Writing – Original Draft Preparation</role><role content-type="http://credit.niso.org/">Writing – Review &amp; Editing</role><contrib-id contrib-id-type="orcid" authenticated="false">https://orcid.org/0000-0001-5250-1104</contrib-id><xref rid="c1" ref-type="corresp">a</xref><xref rid="a1" ref-type="aff">1</xref><xref rid="a2" ref-type="aff">2</xref><xref rid="a3" ref-type="aff">3</xref></contrib><contrib contrib-type="author"><name name-style="western"><surname>Zacharias</surname><given-names initials="J">Joesph</given-names></name><role content-type="http://credit.niso.org/">Conceptualization</role><role content-type="http://credit.niso.org/">Writing – Review &amp; Editing</role><xref rid="a4" ref-type="aff">4</xref></contrib><contrib contrib-type="author"><name name-style="western"><surname>Critchley</surname><given-names initials="WR">William R.</given-names></name><role content-type="http://credit.niso.org/">Writing – Review &amp; Editing</role><xref rid="a5" ref-type="aff">5</xref></contrib><contrib contrib-type="author"><name name-style="western"><surname>Rochon</surname><given-names initials="M">Melissa</given-names></name><role content-type="http://credit.niso.org/">Data Curation</role><role content-type="http://credit.niso.org/">Writing – Review &amp; Editing</role><contrib-id contrib-id-type="orcid" authenticated="false">https://orcid.org/0000-0002-1101-2256</contrib-id><xref rid="a6" ref-type="aff">6</xref></contrib><contrib contrib-type="author"><name name-style="western"><surname>Stalpinskaya</surname><given-names initials="I">Iryna</given-names></name><role content-type="http://credit.niso.org/">Data Curation</role><xref rid="a4" ref-type="aff">4</xref></contrib><contrib contrib-type="author"><name name-style="western"><surname>Rajai</surname><given-names initials="A">Azita</given-names></name><role content-type="http://credit.niso.org/">Formal Analysis</role><role content-type="http://credit.niso.org/">Writing – Review &amp; Editing</role><contrib-id contrib-id-type="orcid" authenticated="false">https://orcid.org/0000-0002-0376-9945</contrib-id><xref rid="a7" ref-type="aff">7</xref></contrib><contrib contrib-type="author"><name name-style="western"><surname>Venkateswaran</surname><given-names initials="RV">Rajamiyer V.</given-names></name><role content-type="http://credit.niso.org/">Writing – Review &amp; Editing</role><xref rid="a2" ref-type="aff">2</xref></contrib><contrib contrib-type="author"><name name-style="western"><surname>Raja</surname><given-names initials="SG">Shahzad G.</given-names></name><role content-type="http://credit.niso.org/">Writing – Review &amp; Editing</role><xref rid="a6" ref-type="aff">6</xref></contrib><contrib contrib-type="author"><name name-style="western"><surname>Bahrami</surname><given-names initials="T">Toufan</given-names></name><role content-type="http://credit.niso.org/">Supervision</role><role content-type="http://credit.niso.org/">Writing – Review &amp; Editing</role><xref rid="a6" ref-type="aff">6</xref></contrib><aff id="a1">
+<label>1</label>Department of Cardiovascular Sciences, Faculty of Health, Biology and Medicine, The University of Manchester, Manchester, UK</aff><aff id="a2">
+<label>2</label>Department of Allied Health Professions, Faculty of Health and Social Service, Edge hill University, Ormskirk, UK</aff><aff id="a3">
+<label>3</label>Department of Cardiothoracic surgery, Manchester Foundation Trust, Wythenshawe Hospital, Manchester, UK</aff><aff id="a4">
+<label>4</label>Department of Cardiothoracic surgery, Blackpool Victoria NHS trust, Blackpool, UK</aff><aff id="a5">
+<label>5</label>Endothelial Cell Biology, School of Molecular Medicine, University of Leeds, Leeds, England, UK</aff><aff id="a6">
+<label>6</label>Department of Cardiothoracic surgery, Royal Brompton &amp; Harefield NHS Trust, London, UK</aff><aff id="a7">
+<label>7</label>Centre for Biostatitics, Division of Population Health, University of Manchester, Manchester, UK</aff></contrib-group><author-notes><corresp id="c1">
+<label>a</label>
+<email xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="mailto:honey223@hotmail.com">honey223@hotmail.com</email>
+</corresp><fn fn-type="COI-statement"><p>No competing interests were disclosed.</p></fn></author-notes><pub-date pub-type="epub"><day>8</day><month>7</month><year>2021</year></pub-date><pub-date pub-type="collection"><year>2021</year></pub-date><volume>1</volume><issue-id pub-id-type="pmc-issue-id">447760</issue-id><elocation-id>11</elocation-id><history><date date-type="accepted"><day>24</day><month>6</month><year>2021</year></date></history><pub-history><event event-type="pmc-release"><date><day>08</day><month>07</month><year>2021</year></date></event><event event-type="pmc-live"><date><day>28</day><month>01</month><year>2022</year></date></event><event event-type="pmc-last-change"><date iso-8601-date="2026-05-12 15:25:15.703"><day>12</day><month>05</month><year>2026</year></date></event><event event-type="pmc-published-version" specific-use="live"><article-id pub-id-type="pmcaiid">10593249</article-id><article-id pub-id-type="doi">10.3310/nihropenres.13215.1</article-id><article-version>1</article-version><pub-date><day>08</day><month>07</month><year>2021</year></pub-date></event><event event-type="pmc-version" specific-use="live"><article-id pub-id-type="pmcaiid">7612280</article-id><article-id pub-id-type="manuscript-id">EMS140789</article-id><article-version>358</article-version><pub-date><day>08</day><month>07</month><year>2021</year></pub-date></event></pub-history><permissions><copyright-statement>Copyright: © 2021 Krishnamoorthy B et al.</copyright-statement><copyright-year>2021</copyright-year><license><ali:license_ref xmlns:ali="http://www.niso.org/schemas/ali/1.0/" specific-use="textmining" content-type="ccbylicense">https://creativecommons.org/licenses/by/4.0/</ali:license_ref><license-p>This is an open access article distributed under the terms of the Creative Commons Attribution Licence, which permits unrestricted use, distribution, and reproduction in any medium, provided the original work is properly cited.</license-p></license></permissions><self-uri xmlns:xlink="http://www.w3.org/1999/xlink" content-type="pmc-pdf" xlink:href="nihropenres-1-14331.pdf"/><self-uri xmlns:xlink="http://www.w3.org/1999/xlink" content-type="pdf" xlink:href="nihropenres-1-14331.pdf"/><abstract><sec><title>Background:</title><p>Utilisation of the Endoscopic Vein Harvesting (EVH) technique has been increasing for coronary artery bypass grafting (CABG) for the last two decades. Some surgeons remain concerned about the long-term patency of the long saphenous vein harvested endoscopically compared to traditional Open Vein Harvesting (OVH). The aim of this study was to perform a retrospective analysis of the outcomes between EVH and OVH from three UK centres with 10 years follow-up.</p></sec><sec><title>Methods:</title><p>27,024 patients underwent CABG with long saphenous vein harvested by EVH (n=13,794) or OVH (n=13,230) in three UK centres between 2007 and 2019. Propensity modelling was used to calculate the Inverse Probability of Treatment Weights (IPTW). The primary endpoint was mortality from all causes and secondary endpoints were length of hospital stay, postoperative complications, and incidence of repeat coronary re-vascularisation for symptomatic patients. IPTW was used to balance the two intervention groups for baseline and preoperative co-morbidities.</p></sec><sec><title>Results:</title><p>Median follow-up time was 4.54 years for EVH and 6.00 years for OVH. Death from any cause occurred in 13.8% of the EVH group versus 20.8% in the OVH group over the follow-up period. The hazard ratio of death (EVH to OVH) was 0.823 (95% CI: 0.767, 0.884). Length of hospital stay was similar between the groups (p=0.86). Post-operative pulmonary complications were more common in EVH vs OVH (14.7% vs. 12.8%, p&lt;0.001), but repeat coronary re-vascularisation was similar between the groups.</p></sec><sec><title>Conclusions:</title><p>This large retrospective multicentre analysis indicates that EVH has a lower risk of mortality compared with OVH during the follow-up period of the study. The observed benefits of EVH may outweigh the risks but should be considered on a case-by-case basis. We hope this review gives confidence to other cardiac centres that offering an EVH approach to conduit harvesting does not affect long term patient outcomes.</p></sec></abstract><abstract abstract-type="plain-language-summary"><title>Plain language summary</title><p>Use of keyhole vein removal technique has been increasing for coronary artery bypass surgery for last two decades. However, some surgeons remain worried about the quality and long-term effect of the vein tube removed using keyhole method compared to traditional Open Vein Harvesting (OVH). The aim of this study was to perform a retrospective analysis of the outcomes between keyhole and OVH from three UK centres with 10 years follow-up. In total, 27,024 patients underwent coronary artery bypass surgery with long saphenous vein harvested by either keyhole (n=13,794) or OVH (n=13,230) over a period of 2007–2019. The median follow-up time was 4.54 years for keyhole method and 6.00 years for OVH. Death from any cause occurred in 13.8% of the keyhole group versus 20.8% in the OVH group over the follow-up period. In conclusion, the keyhole surgery survival is not as bad as we hypothesised.</p></abstract><kwd-group kwd-group-type="author"><kwd>Open vein harvesting</kwd><kwd>survival</kwd><kwd>endoscopic vein harvesting</kwd><kwd>major adverse cardiac events</kwd><kwd>coronary artery bypass graft</kwd><kwd>clinical outcomes.</kwd></kwd-group><funding-group><award-group id="fund-1"><funding-source>National Institute of Health Research</funding-source><award-id>PDF-2018-11-ST2-001</award-id></award-group><funding-statement>Bhuvaneswari Krishnamoorthy, Postdoctoral Research Fellow, PDF-2018-11-ST2-001 is funded by the National Institute for Health Research (NIHR) for this research project. The views expressed in this publication are those of the author(s) and not necessarily those of the NIHR, NHS or the UK Department of Health and Social Care.</funding-statement><funding-statement>
+<italic toggle="yes">The funders had no role in study design, data collection and analysis, decision to publish, or preparation of the manuscript.</italic>
+</funding-statement></funding-group><custom-meta-group><custom-meta><meta-name>pmc-status-qastatus</meta-name><meta-value>0</meta-value></custom-meta><custom-meta><meta-name>pmc-status-live</meta-name><meta-value>yes</meta-value></custom-meta><custom-meta><meta-name>pmc-status-embargo</meta-name><meta-value>no</meta-value></custom-meta><custom-meta><meta-name>pmc-status-released</meta-name><meta-value>yes</meta-value></custom-meta><custom-meta><meta-name>pmc-prop-open-access</meta-name><meta-value>yes</meta-value></custom-meta><custom-meta><meta-name>pmc-prop-olf</meta-name><meta-value>no</meta-value></custom-meta><custom-meta><meta-name>pmc-prop-manuscript</meta-name><meta-value>no</meta-value></custom-meta><custom-meta><meta-name>pmc-prop-legally-suppressed</meta-name><meta-value>no</meta-value></custom-meta><custom-meta><meta-name>pmc-prop-has-pdf</meta-name><meta-value>yes</meta-value></custom-meta><custom-meta><meta-name>pmc-prop-has-supplement</meta-name><meta-value>no</meta-value></custom-meta><custom-meta><meta-name>pmc-prop-pdf-only</meta-name><meta-value>no</meta-value></custom-meta><custom-meta><meta-name>pmc-prop-suppress-copyright</meta-name><meta-value>no</meta-value></custom-meta><custom-meta><meta-name>pmc-prop-is-real-version</meta-name><meta-value>yes</meta-value></custom-meta><custom-meta><meta-name>pmc-prop-is-scanned-article</meta-name><meta-value>no</meta-value></custom-meta><custom-meta><meta-name>pmc-prop-preprint</meta-name><meta-value>no</meta-value></custom-meta><custom-meta><meta-name>pmc-prop-in-epmc</meta-name><meta-value>yes</meta-value></custom-meta><custom-meta><meta-name>pmc-license-ref</meta-name><meta-value>CC BY</meta-value></custom-meta></custom-meta-group></article-meta></front><body><sec sec-type="intro"><title>Introduction</title><p>Coronary artery bypass grafting (CABG) surgery with the long saphenous vein conduit is widely used to treat multiple coronary artery disease
+<sup>
+<xref rid="ref-1" ref-type="bibr">1</xref>
+</sup>. The long saphenous vein grafts have a reported higher incidence of early and late failure compared to arterial grafts due their different structural and functional properties
+<sup>
+<xref rid="ref-2" ref-type="bibr">2</xref>–
+<xref rid="ref-4" ref-type="bibr">4</xref>
+</sup>. One of the main factors contributing to early vein graft failure is damage to the endothelium, impact on the vasa vasorum and vascular nerves in the adventitia during harvesting
+<sup>
+<xref rid="ref-5" ref-type="bibr">5</xref>
+</sup>. Endoscopic vein harvesting performed by experienced practitioners provide good quality grafts compared to those obtained by those still learning the technique
+<sup>
+<xref rid="ref-3" ref-type="bibr">3</xref>,
+<xref rid="ref-6" ref-type="bibr">6</xref>,
+<xref rid="ref-7" ref-type="bibr">7</xref>
+</sup>. Current literature supports that handling during harvesting has an impact on the quality of the vein grafts if it is harvested by an inexperienced practitioner
+<sup>
+<xref rid="ref-2" ref-type="bibr">2</xref>,
+<xref rid="ref-8" ref-type="bibr">8</xref>
+</sup>. However, there are other factors which also have strong influence on the success of these vein grafts, including target vessels, progressive native artery atherosclerosis, patient co-morbidities, experience of the surgeon grafting and patient lifestyle
+<sup>
+<xref rid="ref-9" ref-type="bibr">9</xref>,
+<xref rid="ref-10" ref-type="bibr">10</xref>
+</sup>. Currently, there are no studies with long term follow-up of patients with comparison of outcomes between EVH and OVH in the United Kingdom (UK). We have analysed outcomes data from surgery performed at three cardiac centres in the UK over a 12-year period. Our primary endpoint was mortality from all causes and secondary endpoints were postoperative complications, length of hospital stays, and reinterventions for symptomatic patients.</p></sec><sec sec-type="methods"><title>Methods</title><sec sec-type="subjects"><title>Patients</title><p>Between January 2007 and December 2019, 27,024 patients (OVH, n=13,230; EVH, n=13,794) who had CABG surgery with at least one long saphenous vein from Royal Brompton and Harefield (n=14,717), Wythenshawe (n=6,360) and Blackpool (n=5,947) hospitals were included in this study (
+<xref rid="f1" ref-type="fig">Figure 1</xref>). All patients’ demographics, intraoperative and postoperative details were prospectively collected and entered into the database by healthcare practitioners. Data was obtained from a prospectively maintained institutional registry (Dendrite Clinical Systems, Henley-on Thames, UK) and NICOR UK database. In addition to this database, some of the intervention details were obtained from local cardiology centres and General Practitioner letters. All mortality and survival data were obtained from the national censor database, UK.</p><fig position="float" fig-type="figure" id="f1" orientation="portrait"><label>Figure 1. </label><caption><title>Patient recruitment and flow chart.</title></caption><graphic xmlns:xlink="http://www.w3.org/1999/xlink" position="float" orientation="portrait" xlink:href="nihropenres-1-14331-g0000.jpg"/></fig></sec><sec><title>Ethical approval</title><p>The Edge Hill University Health Research ethical committee (University REC ref: ETH2021-0066) approved this audit study protocol, which is in accordance with the principles of the Declaration of Helsinki. The ethical committee waived the need to obtain informed consent from the patients. In addition, the use of these data for this study was approved by the Manchester Foundation NHS Trust hospital institutional review board (registration no: 9477) and it was registered in the clinical governance audit departments. Only symptomatic patients who came back to hospital for reintervention were analysed as a secondary analysis for this study. All three centres cover large geographical areas and patients who get treated outside of the territory were unable to be included in this analysis.</p></sec><sec><title>Surgical techniques</title><p>Data was included from patients whose vein was retrieved by experienced practitioners (previous experience of a minimum of 100 OVH cases and 50 EVH cases) at three hospitals. However, the Blackpool EVH dataset included patients’ outcomes following surgery by harvesters transitioning from OVH to EVH during the period of this study. The surgical techniques for open vein and endoscopic vein harvesting are standard surgical practice, as explained in previous publications
+<sup>
+<xref rid="ref-3" ref-type="bibr">3</xref>,
+<xref rid="ref-11" ref-type="bibr">11</xref>
+</sup>. All EVH patients received at least 2500 to 5000iu heparin before the start of EVH to avoid any intra-luminal clot formation
+<sup>
+<xref rid="ref-11" ref-type="bibr">11</xref>
+</sup>. Harefield and Wythenshawe hospitals used the Maquet Vasoview® Hemopro 1 and 2 (MAQUET, Inc, Wayne, NJ) vein harvesting systems. Blackpool hospitals have also used Maquet® Vasoview Hemopro 1 and 2 for 60% of their retrievals, and the remaining 40% were using the Terumo® VirtuoSaph (Terumo Cardiovascular, Ann Arbor, Mich).</p></sec><sec><title>Study end point</title><p>The primary end points of this study were mortality, and the secondary end points were postoperative complications, length of hospital stay and repeat revascularisation for symptomatic patients.</p></sec><sec><title>Statistical analyses</title><p>All patient characteristics were described by using count (percentage) for categorial variables and mean (standard deviation) for continuous variables. The primary outcome measure was death from any cause after surgery. Patients were followed from the date of surgery until the date of death. All statistical analyses and data management were performed by an independent statistician using R- software (Rx64 version 4.0.3)
+<sup>
+<xref rid="ref-12" ref-type="bibr">12</xref>,
+<xref rid="ref-13" ref-type="bibr">13</xref>
+</sup>. The population were divided into EVH vs OVH and data was coded for analysis to blind the statistician. To investigate the effect of the two surgical techniques (OVH vs EVH) on mortality, we used Inverse Probability of Treatment Weights (IPTW) to balance demographics and preoperative comorbidities between the two groups.</p><p>Missing variables were imputed with multiple imputation using all baseline variables in
+<xref rid="T1" ref-type="table">Table 1</xref>, plus intervention (open/endoscopic), duration in the study (days), year of operation and survival status in February 2020 (dead/alive). Ten multiply imputed data were created. To assess the intervention effect, each imputed data was weighted using IPTW, intervention effect was calculated in each weighted dataset using cox proportional hazard regression in which time to event was regressed against intervention. Results were pooled using Rubin’s rule.</p><table-wrap position="anchor" id="T1" orientation="portrait"><label>Table 1. </label><caption><title>Demographics and pre-operative variables.</title></caption><table frame="hsides" rules="groups" content-type="article-table"><thead><tr><th colspan="1" rowspan="1"/><th align="left" colspan="1" rowspan="1" valign="top">EVH (n=13794)</th><th align="left" colspan="1" rowspan="1" valign="top">OVH (n=13230)</th><th align="left" colspan="1" rowspan="1" valign="top">Absolute
+<break/> standardised
+<break/>differences
+<break/> (original data)</th><th align="left" colspan="1" rowspan="1" valign="top">Maximum Absolute
+<break/> standardised
+<break/> differences
+<break/> (weighted imputed
+<break/>data)</th></tr></thead><tbody><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<bold>Hospital, n (%)</bold>
+</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/><td align="left" colspan="1" rowspan="1" valign="top">0.726</td><td align="left" colspan="1" rowspan="1" valign="top">0.029</td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Blackpool</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">1920 (13.9)</td><td align="left" colspan="1" rowspan="1" valign="top">4027 (30.4)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Harefield</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">9808 (71.1)</td><td align="left" colspan="1" rowspan="1" valign="top">4909 (37.1)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Wythenshawe</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">2066 (15.0)</td><td align="left" colspan="1" rowspan="1" valign="top">4294 (32.5)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<bold>Age, mean (SD)</bold>
+</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/><td align="left" colspan="1" rowspan="1" valign="top">0.006</td><td align="left" colspan="1" rowspan="1" valign="top">0.009</td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<bold>
+<italic toggle="yes">EVH+OVH:</italic> 66.73 (10.09)</bold>
+</td><td align="left" colspan="1" rowspan="1" valign="top">66.76 (10.17)</td><td align="left" colspan="1" rowspan="1" valign="top">66.70 (10.02)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<bold>BMI, mean (SD)</bold>
+</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/><td align="left" colspan="1" rowspan="1" valign="top">0.014</td><td align="left" colspan="1" rowspan="1" valign="top">0.009</td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<bold>
+<italic toggle="yes">EVH+OVH:</italic> 28.29 (4.85)</bold>
+</td><td align="left" colspan="1" rowspan="1" valign="top">28.32 (4.91)</td><td align="left" colspan="1" rowspan="1" valign="top">28.26 (4.80)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<bold>Log (Add Euro Score), mean (SD)</bold>
+</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/><td align="left" colspan="1" rowspan="1" valign="top">0.049</td><td align="left" colspan="1" rowspan="1" valign="top">0.012</td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<bold>
+<italic toggle="yes">EVH+OVH:</italic> 1.39 (0.76)</bold>
+<break/>
+<bold>n=1629 missing</bold>
+</td><td align="left" colspan="1" rowspan="1" valign="top">1.41 (0.73)
+<break/>n=985 missing</td><td align="left" colspan="1" rowspan="1" valign="top">1.37 (0.78)
+<break/>n=644 missing</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<bold>Sex, n (%)</bold>
+</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/><td align="left" colspan="1" rowspan="1" valign="top">0.014</td><td align="left" colspan="1" rowspan="1" valign="top">0.005</td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Male</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">11122 (80.6)</td><td align="left" colspan="1" rowspan="1" valign="top">10595 (80.1)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Female</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">2672 (19.4)</td><td align="left" colspan="1" rowspan="1" valign="top">2635 (19.9)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<bold>Urgency, n (%)</bold>
+</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/><td align="left" colspan="1" rowspan="1" valign="top">0.034</td><td align="left" colspan="1" rowspan="1" valign="top">0.009</td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Elective</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">8866 (64.3)</td><td align="left" colspan="1" rowspan="1" valign="top">8378 (63.3)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Urgent or Salvage</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">218 (1.6)</td><td align="left" colspan="1" rowspan="1" valign="top">264 (2)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Emergency</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">4710 (34.1)</td><td align="left" colspan="1" rowspan="1" valign="top">4588 (34.7)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<bold>Smoking, n (%)</bold>
+</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/><td align="left" colspan="1" rowspan="1" valign="top">0.090</td><td align="left" colspan="1" rowspan="1" valign="top">0.004</td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Never</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">5553 (40.3)</td><td align="left" colspan="1" rowspan="1" valign="top">4757 (36)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Ex-smoker</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">6881 (49.9)</td><td align="left" colspan="1" rowspan="1" valign="top">7143 (54)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Current smoker</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">1360 (9.9)</td><td align="left" colspan="1" rowspan="1" valign="top">1330 (10.1)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<bold>Diabetic, n (%)</bold>
+</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/><td align="left" colspan="1" rowspan="1" valign="top">0.138</td><td align="left" colspan="1" rowspan="1" valign="top">0.016</td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">No</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">9326 (67.6)</td><td align="left" colspan="1" rowspan="1" valign="top">9669 (73.1)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Diet therapy</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">457 (3.3)</td><td align="left" colspan="1" rowspan="1" valign="top">501 (3.8)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Oral therapy</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">2918 (21.2)</td><td align="left" colspan="1" rowspan="1" valign="top">2168 (16.4)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Insulin therapy</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">1093 (7.9)</td><td align="left" colspan="1" rowspan="1" valign="top">892 (6.7)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<bold>Hypertension</bold>
+</td><td align="left" colspan="1" rowspan="1" valign="top">10320 (74.8)</td><td align="left" colspan="1" rowspan="1" valign="top">7896 (59.7)</td><td align="left" colspan="1" rowspan="1" valign="top">0.327</td><td align="left" colspan="1" rowspan="1" valign="top">0.033</td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<bold>Ventilated preoperatively</bold>
+</td><td align="left" colspan="1" rowspan="1" valign="top">25 (0.2)</td><td align="left" colspan="1" rowspan="1" valign="top">59 (0.4)</td><td align="left" colspan="1" rowspan="1" valign="top">0.047</td><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<bold>CCS, n (%)</bold>
+</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/><td align="left" colspan="1" rowspan="1" valign="top">0.144</td><td align="left" colspan="1" rowspan="1" valign="top">0.011</td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">No angina</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">2040 (14.8)</td><td align="left" colspan="1" rowspan="1" valign="top">1846 (14)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">No limitation of physical activity</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">951 (6.9)</td><td align="left" colspan="1" rowspan="1" valign="top">1356 (10.2)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Slight limitation of physical activity</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">5377 (39)</td><td align="left" colspan="1" rowspan="1" valign="top">5400 (40.8)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Marked limitation of ordinary physical activity</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">3909 (28.3)</td><td align="left" colspan="1" rowspan="1" valign="top">3448 (26.1)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Symptoms at rest or minimal activity</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">1517 (11)</td><td align="left" colspan="1" rowspan="1" valign="top">1180 (8.9)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<bold>NYHA, n (%)</bold>
+</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/><td align="left" colspan="1" rowspan="1" valign="top">0.128</td><td align="left" colspan="1" rowspan="1" valign="top">0.014</td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">No limitation of physical activity</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">3302 (23.9)</td><td align="left" colspan="1" rowspan="1" valign="top">3902 (29.5)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Slight limitation of physical activity</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">6582 (47.7)</td><td align="left" colspan="1" rowspan="1" valign="top">5775 (43.7)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Marked limitation of physical activity</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">3359 (24.4)</td><td align="left" colspan="1" rowspan="1" valign="top">3101 (23.4)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Symptoms at rest or minimal activity</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">551 (4)</td><td align="left" colspan="1" rowspan="1" valign="top">452 (3.4)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<bold>Previous MI, n (%)</bold>
+</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/><td align="left" colspan="1" rowspan="1" valign="top">0.043</td><td align="left" colspan="1" rowspan="1" valign="top">0.011</td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">No MI</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">8348 (60.5)</td><td align="left" colspan="1" rowspan="1" valign="top">8184 (61.9)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">One episode of MI</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">4708 (34.1)</td><td align="left" colspan="1" rowspan="1" valign="top">4320 (32.7)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Two or more episode</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">632 (4.6)</td><td align="left" colspan="1" rowspan="1" valign="top">693 (5.2)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<bold>Previous PCI, n (%)</bold>
+</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/><td align="left" colspan="1" rowspan="1" valign="top">0.096</td><td align="left" colspan="1" rowspan="1" valign="top">0.010</td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">No previous PCI</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">11314 (82)</td><td align="left" colspan="1" rowspan="1" valign="top">11023 (83.3)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">PCI&gt;24 hours before surgery</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">2208 (16)</td><td align="left" colspan="1" rowspan="1" valign="top">1833 (13.9)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">PCI&lt;24 hours before surgery</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">80 (0.6)</td><td align="left" colspan="1" rowspan="1" valign="top">176 (1.3)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">PCI &gt; 24 hours before surgery</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">192 (1.4)</td><td align="left" colspan="1" rowspan="1" valign="top">198 (1.5)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<bold>Renal disease, n (%)</bold>
+</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/><td align="left" colspan="1" rowspan="1" valign="top">0.696</td><td align="left" colspan="1" rowspan="1" valign="top">0.023</td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Normal</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">9455 (68.5)</td><td align="left" colspan="1" rowspan="1" valign="top">12456 (94.1)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Moderate</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">3471 (25.2)</td><td align="left" colspan="1" rowspan="1" valign="top">606 (4.6)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Severe</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">868 (6.3)</td><td align="left" colspan="1" rowspan="1" valign="top">168 (1.3)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<bold>Pulmonary disease, n (%)</bold>
+</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/><td align="left" colspan="1" rowspan="1" valign="top">0.110</td><td align="left" colspan="1" rowspan="1" valign="top">0.012</td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">No chronic pulmonary disease</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">12054 (87.4)</td><td align="left" colspan="1" rowspan="1" valign="top">11538 (87.2)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Asthma</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">89 (0.6)</td><td align="left" colspan="1" rowspan="1" valign="top">169 (1.3)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">COPD/emphysema</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">88 (0.6)</td><td align="left" colspan="1" rowspan="1" valign="top">193 (1.5)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Chronic pulmonary disease require treatment</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">1563 (11.3)</td><td align="left" colspan="1" rowspan="1" valign="top">1330 (10.1)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<bold>Neurological past medical history, n (%)</bold>
+</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/><td align="left" colspan="1" rowspan="1" valign="top">0.012</td><td align="left" colspan="1" rowspan="1" valign="top">0.004</td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">No history of neurological disease</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">12819 (92.9)</td><td align="left" colspan="1" rowspan="1" valign="top">12257 (92.6)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">TIA</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">525 (3.8)</td><td align="left" colspan="1" rowspan="1" valign="top">517 (3.9)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">CVA</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">450 (3.3)</td><td align="left" colspan="1" rowspan="1" valign="top">456 (3.4)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<bold>Peripheral vascular disease, n (%)</bold>
+</td><td align="left" colspan="1" rowspan="1" valign="top">1475 (10.7)</td><td align="left" colspan="1" rowspan="1" valign="top">1562 (11.8)</td><td align="left" colspan="1" rowspan="1" valign="top">0.035</td><td align="left" colspan="1" rowspan="1" valign="top">0.002</td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<bold>Extent of Coronary Artery Disease Pre</bold>
+<break/>
+<bold>surgery, n (%)</bold>
+</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/><td align="left" colspan="1" rowspan="1" valign="top">0.079</td><td align="left" colspan="1" rowspan="1" valign="top">0.036</td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">No vessel &gt;50% diameter stenosis</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">161 (1.2)</td><td align="left" colspan="1" rowspan="1" valign="top">130 (1)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">One vessel with &gt;50% diameter stenosis</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">1666 (12.1)</td><td align="left" colspan="1" rowspan="1" valign="top">1385 (10.5)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Two vessels with &gt;50% diameter stenosis</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">3343 (24.2)</td><td align="left" colspan="1" rowspan="1" valign="top">2960 (22.4)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Three vessels with &gt; 50% diameter stenosis</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">8624 (62.5)</td><td align="left" colspan="1" rowspan="1" valign="top">8755 (66.2)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<bold>LVEF, n (%)</bold>
+</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/><td align="left" colspan="1" rowspan="1" valign="top">0.059</td><td align="left" colspan="1" rowspan="1" valign="top">0.013</td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Good LVEF &gt; 50%</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">10644 (77.2)</td><td align="left" colspan="1" rowspan="1" valign="top">9884 (74.7)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Moderate LVEF 30–49%</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">2656 (19.3)</td><td align="left" colspan="1" rowspan="1" valign="top">2789 (21.1)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Poor LVEF &lt;30%</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">494 (3.6)</td><td align="left" colspan="1" rowspan="1" valign="top">557 (4.2)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<bold>Inotropes given preoperatively, n (%)</bold>
+</td><td align="left" colspan="1" rowspan="1" valign="top">75 (0.5)</td><td align="left" colspan="1" rowspan="1" valign="top">122 (0.9)</td><td align="left" colspan="1" rowspan="1" valign="top">0.044</td><td align="left" colspan="1" rowspan="1" valign="top">0.009</td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<bold>Left Main Stem disease, n (%)</bold>
+</td><td align="left" colspan="1" rowspan="1" valign="top">3380 (24.5)</td><td align="left" colspan="1" rowspan="1" valign="top">3408 (25.8)</td><td align="left" colspan="1" rowspan="1" valign="top">0.029</td><td align="left" colspan="1" rowspan="1" valign="top">0.004</td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<bold>Pre surgery Nitrates administration, n (%)</bold>
+</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/><td align="left" colspan="1" rowspan="1" valign="top">0.144</td><td align="left" colspan="1" rowspan="1" valign="top">0.008</td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">No</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">13228 (95.9)</td><td align="left" colspan="1" rowspan="1" valign="top">12696 (96)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Until day of operation</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">535 (3.9)</td><td align="left" colspan="1" rowspan="1" valign="top">355 (2.7)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Within one week of operation</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">31 (0.2)</td><td align="left" colspan="1" rowspan="1" valign="top">179 (1.4)</td><td colspan="1" rowspan="1"/><td colspan="1" rowspan="1"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<bold>Preoperative cardiogenic shock, n (%)</bold>
+</td><td align="left" colspan="1" rowspan="1" valign="top">60 (0.4)</td><td align="left" colspan="1" rowspan="1" valign="top">90 (0.7)</td><td align="left" colspan="1" rowspan="1" valign="top">0.033</td><td align="left" colspan="1" rowspan="1" valign="top">0.003</td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<bold>Use of preoperative IABP, n (%)</bold>
+</td><td align="left" colspan="1" rowspan="1" valign="top">283 (2.1)</td><td align="left" colspan="1" rowspan="1" valign="top">213 (1.6)</td><td align="left" colspan="1" rowspan="1" valign="top">0.033</td><td align="left" colspan="1" rowspan="1" valign="top">0.003</td></tr></tbody></table></table-wrap><p>
+<bold>
+<italic toggle="yes">IPTW model.</italic>
+</bold> The propensity scores
+<sup>
+<xref rid="ref-14" ref-type="bibr">14</xref>
+</sup> were estimated using a logistic regression model in which intervention assignment (OVH or EVH) was regressed on the 25 covariates and their pairwise interactions, as listed in
+<xref rid="T1" ref-type="table">Table 1</xref>. Also restricted cubic splines with 5 knots were entered for age, BMI and logistic EuroSCORE. Pairwise interactions between multi-level (more than 2 levels) categorical variables were removed as they had very low balance at some levels and created large weights. Stabilised weights to assess Average Treatment Effect (ATE) were calculated for each imputed set.</p><p>
+<bold>
+<italic toggle="yes">Balance diagnostics in weighted datasets.</italic>
+</bold> It has been suggested that standardised differences in excess of 10% may be indicative of meaningful imbalance in a covariate between the two groups and less than 10% is negligible imbalance
+<sup>
+<xref rid="ref-15" ref-type="bibr">15</xref>
+</sup>. Balancing criteria were considered as standardised mean difference less than 10%, variance ratio between treatment groups for continuous variables less than 2 and Kolmogorov–Smirnov threshold of less than 4% for equality of the continuous variables between treatment groups. The balance was assessed for each variable in
+<xref rid="T1" ref-type="table">Table 1</xref>, squared and cubic order of continuous variables and 2x2 interaction between continuous variables
+<sup>
+<xref rid="ref-16" ref-type="bibr">16</xref>
+</sup>.</p></sec></sec><sec sec-type="results"><title>Results</title><sec><title>Pre-operative data</title><p>During the study period, a total of 13,794 patients underwent EVH and 13,230 underwent OVH for CABG surgery. Patient characteristics and pre-operative data are included in
+<xref rid="T1" ref-type="table">Table 1</xref>. The majority of patients in the EVH group underwent surgery at Harefield hospital, although the ratio of OVH cases was more evenly split between hospitals.
+<xref rid="T1" ref-type="table">Table 1</xref> is the summary of baseline and pre-operative comorbidities. Add EuroSCORE had a skewed distribution and therefore logistic (Add EuroSCORE) was used. Continuous variables are reported by mean(SD) and categorical variables with count (percentage). A total of 7 out of 25 preoperative variables had standardised difference above 10%, indicating imbalance between the two groups (
+<xref rid="T1" ref-type="table">Table 1</xref>). IPTW was applied to 10 imputed datasets. Mean stabilized weights for the 10 imputed data were 1.006-1.007 with standard deviations 0.66-0.67. Stabilized weights were all smaller than 10. Maximum absolute standardized differences between the two intervention groups in weighted datasets was 0.036 (
+<xref rid="T1" ref-type="table">Table 1</xref>), maximum KS difference for continuous variables was 0.017 and maximum variance ratio for continuous variables was 1.04.</p></sec><sec><title>Peri-operative data</title><p>Peri-operative details are displayed in
+<xref rid="T2" ref-type="table">Table 2</xref>. The length of hospital stay is similar for both groups at median 6 days (p=0.86). Significant differences are observed in the type of surgery undertaken, with a greater number of EVH patients also receiving valve surgery or additional other cardiac surgery compared to the OVH group (p&lt;0.001). A greater number of EVH patients also had the mammary artery used compared to the OVH group (p=0.009).</p><table-wrap position="anchor" id="T2" orientation="portrait"><label>Table 2. </label><caption><title>Perioperative data.</title></caption><table frame="hsides" rules="groups" content-type="article-table"><thead><tr><th colspan="1" rowspan="1"/><th align="left" colspan="1" rowspan="1" valign="top">EVH (n=13,794)</th><th align="left" colspan="1" rowspan="1" valign="top">OVH (n=13,230)</th><th align="left" colspan="1" rowspan="1" valign="top">p-value</th></tr></thead><tbody><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<bold>Cardiopulmonary bypass time, mean (SD)</bold>
+</td><td align="left" colspan="1" rowspan="1" valign="top">71.60 (65.56)
+<break/>n=5 missing</td><td align="left" colspan="1" rowspan="1" valign="top">76.43 (57.13)
+<break/>n=7 missing</td><td align="left" colspan="1" rowspan="1" valign="top">&lt;0.001
+<sup>
+<xref rid="FN1" ref-type="other">^</xref>
+</sup>
+</td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<bold>Aortic cross clamp time, mean (SD)</bold>
+</td><td align="left" colspan="1" rowspan="1" valign="top">47.40 (43.73)
+<break/>n=9 missing</td><td align="left" colspan="1" rowspan="1" valign="top">47.99 (40.26)
+<break/>n=14 missing</td><td align="left" colspan="1" rowspan="1" valign="top">0.49
+<sup>
+<xref rid="FN1" ref-type="other">^</xref>
+</sup>
+</td></tr><tr><td align="left" colspan="4" rowspan="1" valign="top">
+<bold>Type of surgery, n (%)</bold>
+</td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">CABG</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">11118 (80.6)</td><td align="left" colspan="1" rowspan="1" valign="top">11341 (85.7)</td><td align="left" colspan="1" rowspan="1" valign="top">&lt;0.001
+<sup>
+<xref rid="FN1" ref-type="other">*</xref>
+</sup>
+</td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">CABG+valve</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">2000 14.5)</td><td align="left" colspan="1" rowspan="1" valign="top">1605 (12.1)</td><td align="left" colspan="1" rowspan="1" valign="top"> </td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">CABG + valve + other</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">365 (2.6)</td><td align="left" colspan="1" rowspan="1" valign="top">137 (1.0)</td><td align="left" colspan="1" rowspan="1" valign="top"> </td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">CABG + Other</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">311 (2.3)</td><td align="left" colspan="1" rowspan="1" valign="top">147 (1.1)</td><td align="left" colspan="1" rowspan="1" valign="top"> </td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<bold>Mammary artery used, n (%)</bold>
+</td><td align="left" colspan="1" rowspan="1" valign="top">12863 (93.3)</td><td align="left" colspan="1" rowspan="1" valign="top">12229 (92.4)</td><td align="left" colspan="1" rowspan="1" valign="top">0.00983</td></tr><tr><td align="left" colspan="4" rowspan="1" valign="top">
+<bold>Heart valves, n (%)</bold>
+</td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Not used</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">11460 (83.1)</td><td align="left" colspan="1" rowspan="1" valign="top">11490 (86.8)</td><td align="left" colspan="1" rowspan="1" valign="top">&lt;0.001
+<sup>
+<xref rid="FN1" ref-type="other">*</xref>
+</sup>
+</td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">One valve replaced</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">2151 (15.6)</td><td align="left" colspan="1" rowspan="1" valign="top">1629 (12.3)</td><td align="left" colspan="1" rowspan="1" valign="top"> </td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Two valves replaced</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">183 (1.3)</td><td align="left" colspan="1" rowspan="1" valign="top">111 (0.8)</td><td align="left" colspan="1" rowspan="1" valign="top"> </td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<bold>Cardiopulmonary bypass used, n (%)</bold>
+</td><td align="left" colspan="1" rowspan="1" valign="top">9379 (68.0)</td><td align="left" colspan="1" rowspan="1" valign="top">10296 (77.8)</td><td align="left" colspan="1" rowspan="1" valign="top">&lt;0.001
+<sup>
+<xref rid="FN1" ref-type="other">*</xref>
+</sup>
+</td></tr></tbody></table><table-wrap-foot><fn><p id="FN1">*Chi
+<sup>2</sup> test. ^Mann-Whitney U test. Continuous variables are median (IQ) [range]. EVH: Endoscopic Vein Harvesting; OVH: Open Vein Harvesting</p></fn></table-wrap-foot></table-wrap></sec><sec><title>Mortality</title><p>The primary outcome measure for the study was post-operative mortality. Across the follow-up period of the study (median 1656 days for EVH and 2191 days for OVH), deaths from any cause occurred for 13.8% of EVH patients and 20.8% of OVH patients. In-hospital death occurred at similar rates (2.3% EVH vs. 2.1% OVH, p=0.12;
+<xref rid="T3" ref-type="table">Table 3</xref>). The crude hazard ratio of death (EVH to OVH, HR (95% CI)) was computed as 0.902 (0.850, 0.957) for raw sample data, 0.892 (0.839, 0.948) for complete case data and 0.851 (0.789, 0.919) for weighted complete case data. Kaplan-Meier plots for the raw data, complete case data and weight complete case data are depicted in
+<xref rid="f2" ref-type="fig">Figure 2</xref>, with greater survival in the EVH group compared to the OVH group (p&lt;0.001 for all).</p><table-wrap position="anchor" id="T3" orientation="portrait"><label>Table 3. </label><caption><title>Secondary outcomes.</title></caption><table frame="hsides" rules="groups" content-type="article-table"><thead><tr><th align="center" colspan="1" rowspan="1"/><th align="left" colspan="1" rowspan="1" valign="top">EVH</th><th align="left" colspan="1" rowspan="1" valign="top">OVH</th><th align="left" colspan="1" rowspan="1" valign="top">p-value
+<xref rid="TFN2" ref-type="other">*</xref>
+</th></tr></thead><tbody><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<bold>Length of stay (days), mean (SD)</bold>
+</td><td align="left" colspan="1" rowspan="1" valign="top">9.19 (9.81)</td><td align="left" colspan="1" rowspan="1" valign="top">9.09 (9.70)</td><td align="left" colspan="1" rowspan="1" valign="top">0.86
+<xref rid="TFN2" ref-type="other">^</xref>
+</td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<bold>Hospital death, n (%)</bold>
+</td><td align="left" colspan="1" rowspan="1" valign="top">324 (2.3)</td><td align="left" colspan="1" rowspan="1" valign="top">273 (2.1)</td><td align="left" colspan="1" rowspan="1" valign="top">0.120</td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<bold>Surgical site infection, n (%)</bold>
+</td><td align="left" colspan="1" rowspan="1" valign="top"/><td align="left" colspan="1" rowspan="1" valign="top"/><td align="left" colspan="1" rowspan="1" valign="top"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">None</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">13281 (96.3)</td><td align="left" colspan="1" rowspan="1" valign="top">12557 (94.9)</td><td align="left" colspan="1" rowspan="1" valign="top">&lt;0.001
+<xref rid="TFN2" ref-type="other">*</xref>
+</td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Superficial sternal wound infection</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">266 (1.9)</td><td align="left" colspan="1" rowspan="1" valign="top">194 (1.5)</td><td align="left" colspan="1" rowspan="1" valign="top"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Leg wound infection</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">55 (0.4)</td><td align="left" colspan="1" rowspan="1" valign="top">341 (2.6)</td><td align="left" colspan="1" rowspan="1" valign="top"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Not specified</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">45 (0.3)</td><td align="left" colspan="1" rowspan="1" valign="top">38 (0.3)</td><td align="left" colspan="1" rowspan="1" valign="top"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Superficial sternal and leg wound infection</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">0 (0.0)</td><td align="left" colspan="1" rowspan="1" valign="top">2 (0.0)</td><td align="left" colspan="1" rowspan="1" valign="top"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Deep sternal and leg wound infection</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">5 (0.0)</td><td align="left" colspan="1" rowspan="1" valign="top">23 (0.2)</td><td align="left" colspan="1" rowspan="1" valign="top"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Deep sternal wound infection</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">106 (0.8)</td><td align="left" colspan="1" rowspan="1" valign="top">50 (0.4)</td><td align="left" colspan="1" rowspan="1" valign="top"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Radial artery site harvest infection</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">1 (0.0)</td><td align="left" colspan="1" rowspan="1" valign="top">2 (0.0)</td><td align="left" colspan="1" rowspan="1" valign="top"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Mediastinal wound infection</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">35 (0.3)</td><td align="left" colspan="1" rowspan="1" valign="top">23 (0.2)</td><td align="left" colspan="1" rowspan="1" valign="top"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<bold>Repeat operation, n (%)</bold>
+</td><td align="left" colspan="1" rowspan="1" valign="top"/><td align="left" colspan="1" rowspan="1" valign="top"/><td align="left" colspan="1" rowspan="1" valign="top"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Not necessary</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">13260 (96.1)</td><td align="left" colspan="1" rowspan="1" valign="top">12879 (97.3)</td><td align="left" colspan="1" rowspan="1" valign="top">&lt;0.001
+<xref rid="TFN2" ref-type="other">*</xref>
+</td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Reoperation for bleeding or cardiac tamponade</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">383 (2.8)</td><td align="left" colspan="1" rowspan="1" valign="top">260 (2)</td><td align="left" colspan="1" rowspan="1" valign="top"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Sternum re-suturing</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">28 (0.2)</td><td align="left" colspan="1" rowspan="1" valign="top">15 (0.1)</td><td align="left" colspan="1" rowspan="1" valign="top"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Surgery for deep sternum wound infection</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">36 (0.3)</td><td align="left" colspan="1" rowspan="1" valign="top">16 (0.1)</td><td align="left" colspan="1" rowspan="1" valign="top"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Re-operation for other and cardiac valve problems</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">78 (0.6)</td><td align="left" colspan="1" rowspan="1" valign="top">38 (0.3)</td><td align="left" colspan="1" rowspan="1" valign="top"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Redo surgery for graft occlusion</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">8 (0.1)</td><td align="left" colspan="1" rowspan="1" valign="top">21 (0.2)</td><td align="left" colspan="1" rowspan="1" valign="top"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Sternum re-suturing and Surgery for deep sternum wound infection</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">0 (0.0)</td><td align="left" colspan="1" rowspan="1" valign="top">1 (0.0)</td><td align="left" colspan="1" rowspan="1" valign="top"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Surgery for deep sternum wound infection and Re-operation for</italic>
+<break/>
+<italic toggle="yes">other and cardiac valve problems</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">1 (0.0)</td><td align="left" colspan="1" rowspan="1" valign="top">0 (0.0)</td><td align="left" colspan="1" rowspan="1" valign="top"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<bold>Post arrhythmias, n (%)</bold>
+</td><td align="left" colspan="1" rowspan="1" valign="top"/><td align="left" colspan="1" rowspan="1" valign="top"/><td align="left" colspan="1" rowspan="1" valign="top"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">No</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">10975 (79.6)</td><td align="left" colspan="1" rowspan="1" valign="top">10524 (79.5)</td><td align="left" colspan="1" rowspan="1" valign="top">&lt;0.001</td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Atrial fibrillation/flutter required intervention</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">2435 (17.7)</td><td align="left" colspan="1" rowspan="1" valign="top">2393 (18.1)</td><td align="left" colspan="1" rowspan="1" valign="top"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Supraventricular tachycardia required intervention</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">82 (0.6)</td><td align="left" colspan="1" rowspan="1" valign="top">88 (0.7)</td><td align="left" colspan="1" rowspan="1" valign="top"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Ventricular Fibrillation/Tachycardia required intervention</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">109 (0.8)</td><td align="left" colspan="1" rowspan="1" valign="top">111 (0.8)</td><td align="left" colspan="1" rowspan="1" valign="top"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Permanent Pacing required</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">193 (1.4)</td><td align="left" colspan="1" rowspan="1" valign="top">114 (0.9)</td><td align="left" colspan="1" rowspan="1" valign="top"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<bold>Post Pulmonary complications, n (%)</bold>
+</td><td align="left" colspan="1" rowspan="1" valign="top"/><td align="left" colspan="1" rowspan="1" valign="top"/><td align="left" colspan="1" rowspan="1" valign="top"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">No</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">11769 (85.3)</td><td align="left" colspan="1" rowspan="1" valign="top">11541 (87.2)</td><td align="left" colspan="1" rowspan="1" valign="top">&lt;0.001</td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Not specified</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">301 (2.2)</td><td align="left" colspan="1" rowspan="1" valign="top">461 (3.5)</td><td align="left" colspan="1" rowspan="1" valign="top"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Full tracheostomy</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">118 (0.9)</td><td align="left" colspan="1" rowspan="1" valign="top">113 (0.9)</td><td align="left" colspan="1" rowspan="1" valign="top"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Reintubation &amp; ventilation</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">259 (1.9)</td><td align="left" colspan="1" rowspan="1" valign="top">189 (1.4)</td><td align="left" colspan="1" rowspan="1" valign="top"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Pulmonary embolism</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">33 (0.2)</td><td align="left" colspan="1" rowspan="1" valign="top">8 (0.1)</td><td align="left" colspan="1" rowspan="1" valign="top"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Chest infection</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">492 (3.6)</td><td align="left" colspan="1" rowspan="1" valign="top">525 (4)</td><td align="left" colspan="1" rowspan="1" valign="top"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Collapse &amp; consolidation</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">805 (5.8)</td><td align="left" colspan="1" rowspan="1" valign="top">379 (2.9)</td><td align="left" colspan="1" rowspan="1" valign="top"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Acute Respiratory Distress Syndrome</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">17 (0.1)</td><td align="left" colspan="1" rowspan="1" valign="top">14 (0.1)</td><td align="left" colspan="1" rowspan="1" valign="top"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<bold>Post Gastrointestinal complications, n (%)</bold>
+</td><td align="left" colspan="1" rowspan="1" valign="top"/><td align="left" colspan="1" rowspan="1" valign="top"/><td align="left" colspan="1" rowspan="1" valign="top"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">No</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">13551 (98.2)</td><td align="left" colspan="1" rowspan="1" valign="top">12996 (98.2)</td><td align="left" colspan="1" rowspan="1" valign="top">0.00337</td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Other not specified</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">125 (0.9)</td><td align="left" colspan="1" rowspan="1" valign="top">160 (1.2)</td><td align="left" colspan="1" rowspan="1" valign="top"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Pancreatitis</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">24 (0.2)</td><td align="left" colspan="1" rowspan="1" valign="top">16 (0.1)</td><td align="left" colspan="1" rowspan="1" valign="top"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Peptic ulceration</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">10 (0.1)</td><td align="left" colspan="1" rowspan="1" valign="top">10 (0.1)</td><td align="left" colspan="1" rowspan="1" valign="top"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Bleeding but not specified</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">55 (0.4)</td><td align="left" colspan="1" rowspan="1" valign="top">25 (0.2)</td><td align="left" colspan="1" rowspan="1" valign="top"/></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">
+<italic toggle="yes">Ischaemic bowel, laparotomy</italic>
+</td><td align="left" colspan="1" rowspan="1" valign="top">29 (0.2)</td><td align="left" colspan="1" rowspan="1" valign="top">23 (0.2)</td><td align="left" colspan="1" rowspan="1" valign="top"/></tr></tbody></table><table-wrap-foot><fn><p id="TFN2">*Chi
+<sup>2</sup> test and ^Mann-Whitney U test. EVH: Endoscopic Vein Harvesting; OVH: Open Vein Harvesting</p></fn></table-wrap-foot></table-wrap><fig position="float" fig-type="figure" id="f2" orientation="portrait"><label>Figure 2. </label><caption><title>Kaplan-Meier survival curves for the study cohort.</title></caption><graphic xmlns:xlink="http://www.w3.org/1999/xlink" position="float" orientation="portrait" xlink:href="nihropenres-1-14331-g0001.jpg"/></fig><p>Since the missing data was not completely at random, multiple imputation was used to impute missing data for Euroscore and previous MI. Each imputed set was weighted and hazard ratio for mortality was obtained for each weighted dataset. Results were pooled using Rubin’s rule.</p><p>Overall hazard ratio (95% CI) of death EVH:OVH was 0.823 (0.767, 0.884). As a sensitivity analyses for unmeasured confounders, once those with weights outside overlapped region and once those with weights above 99 percentile and below 1 percentile of all weights were excluded, remaining data were re-weighted and hazard ratios were calculated and pooled again. Hazard ratio (95% CI) from excluding non-overlapped weights was 0.829 (0.772, 0.889). Hazard ratio (95% CI) from excluding lower and upper 1% weights was 0.837 (0.778, 0.900). There seem to be a slight bias for unmeasured confounder, but nevertheless the difference between the two interventions stays significant.</p></sec><sec><title>Secondary outcome measures</title><p>Post-operative complications and requirement for repeat operation is displayed in
+<xref rid="T3" ref-type="table">Table 3</xref>. Repeat operation was required more frequently in the EVH group (3.9% vs. 2.7%, p&lt;0.001), however this was not as a result of graft occlusion (EVH vs. OVH: 0.1% vs. 0.2%). There was a significant difference in post-operative arrhythmias between the groups (p&lt;0.001). Whilst a similar proportion of patients were free of arrhythmias in each group (EVH vs. OVH: 79.6% vs. 79.5%, respectively), there was a difference in the nature of arrhythmias recorded between the groups, with a greater requirement for permanent pacing in the EVH group (1.4% vs. 0.9%). A similar effect was observed in post-operative gastrointestinal complications with 98.2% free from problems in both groups. However, the nature of the complications observed differed between the groups (p=0.003). Finally, pulmonary complications were observed at a higher rate in the EVH group compared to OVH (14.7% vs. 12.8%, p&lt;0.001), driven predominantly by a more common occurrence of collapse and consolidation (5.8% vs. 2.9%). Importantly, there were also a significantly greater number of surgical site infections in the OVH group, driven primarily by leg wound infection (p&lt;0.001).</p></sec></sec><sec sec-type="discussion"><title>Discussion</title><p>Endoscopic conduit harvesting has become the preferred surgical technique for the harvesting long saphenous vein and radial artery harvesting in many cardiac surgery centres. A meta-analysis of 43 randomised controlled trials and observational studies of 27,789 patients supported the superiority of the EVH technique for multiple endpoints including wound infection, cosmetic healing, patient satisfaction, myocardial infarction and mortality
+<sup>
+<xref rid="ref-17" ref-type="bibr">17</xref>
+</sup>.</p><p>Primarily, our study indicates that EVH is non-inferior to OVH over a mean follow-up time of 1656 and 2191 days for EVH and OVH respectively, with hazard of all-cause mortality significantly lower in the EVH group. Dacey and colleagues reported for 4 years mortality outcome (n=8,542) that the use of EVH was associated with a significantly reduced risk of mortality (HR 0.74; 95% CI 0.60 to 0.92; p=0.007) after adjusting for relevant covariates, and this finding endured even after propensity score analysis
+<sup>
+<xref rid="ref-18" ref-type="bibr">18</xref>
+</sup>. Furthermore, a recent publication from Zenati and colleagues reported no significant difference in their study randomised control trial between EVH and OVH mortality (12.0% vs. 13.2% respectively), at 4.7 years median follow up (HR: 0.90; 95% CI, 0.65-1.25; p=0.52)
+<sup>
+<xref rid="ref-19" ref-type="bibr">19</xref>
+</sup>. The PREVENT-IV trial reported that EVH patients had increased mortality compared to OVH group (HR 1.52; 95% CI 1.13 to 2.04; p=0.01)
+<sup>
+<xref rid="ref-20" ref-type="bibr">20</xref>
+</sup>, but that was not the case in our study or those previously referenced
+<sup>
+<xref rid="ref-3" ref-type="bibr">3</xref>,
+<xref rid="ref-5" ref-type="bibr">5</xref>,
+<xref rid="ref-19" ref-type="bibr">19</xref>,
+<xref rid="ref-21" ref-type="bibr">21</xref>
+</sup>. Sadly, we were unable to collect the exact cause of death for our cohort of patients due to the geographical catchment area and patients who moved out of the area.</p><p>As part of the secondary analysis in our study, the surgical site wound infection rates were compared between the groups. Two hospitals have an established wound clinic, and all patients are followed up until 6 to 8 weeks. Our results demonstrated that EVH patients have fewer leg wound infections than those in the OVH group (0.4% vs 2.6%). Similar results regarding leg wound infections have been reported in the literature indicating that EVH is far superior to OVH
+<sup>
+<xref rid="ref-6" ref-type="bibr">6</xref>,
+<xref rid="ref-9" ref-type="bibr">9</xref>,
+<xref rid="ref-11" ref-type="bibr">11</xref>,
+<xref rid="ref-18" ref-type="bibr">18</xref>,
+<xref rid="ref-19" ref-type="bibr">19</xref>,
+<xref rid="ref-22" ref-type="bibr">22</xref>,
+<xref rid="ref-23" ref-type="bibr">23</xref>
+</sup>. Only symptomatic patients who have returned to the source hospital were included for the analysis of repeat graft surgery data analysis (n=8 patients in the EVH group and n=21 in the OVH group). These findings align strongly with the recent publication by Zenati and colleagues, who also demonstrate that there is no significant difference in rate of repeat re-vascularisation post CABG surgery between the EVH and OVH groups (HR, 0.79; 95% CI, 0.54 – 1.17; p=0.25)
+<sup>
+<xref rid="ref-19" ref-type="bibr">19</xref>
+</sup>. Current evidence supports the use of endoscopic vein harvesting in multi vessel coronary artery disease
+<sup>
+<xref rid="ref-6" ref-type="bibr">6</xref>,
+<xref rid="ref-9" ref-type="bibr">9</xref>,
+<xref rid="ref-24" ref-type="bibr">24</xref>
+</sup> and it is based on the effectiveness of these techniques, that the International Society of Minimally Invasive Cardiac Surgery consensus statements now recommend (class 1, Level B) that endoscopic vein harvesting should be standard of care for patients
+<sup>
+<xref rid="ref-25" ref-type="bibr">25</xref>
+</sup>. </p><p>There are many concerns regarding EVH, and the initial ones are related to the practitioner experience and their ability. There are further concerns regarding the creation of a carbon dioxide tunnel around the harvest conduit
+<sup>
+<xref rid="ref-26" ref-type="bibr">26</xref>–
+<xref rid="ref-28" ref-type="bibr">28</xref>
+</sup> and our previous study has demonstrated that there was no impact by the tunnel
+<sup>
+<xref rid="ref-29" ref-type="bibr">29</xref>
+</sup>. The final concerns are regarding the more likely use of thigh vein compared to the calf vein and its possible impact on long-term graft patency, but it is not proved yet. A few studies have suggested a reduction in vein graft patency on angiographic follow up
+<sup>
+<xref rid="ref-20" ref-type="bibr">20</xref>,
+<xref rid="ref-30" ref-type="bibr">30</xref>
+</sup> and it causes concerns among many surgeons. We hope our study and others will reassure surgeons and referring cardiologists that the use of EVH does not impact on hard outcome measures from patient standpoint. We do not have angiographic data to allay fears on that point of graft patency, but this could only be answered by a large, randomised control trials which is unlikely to be funded in this financial climate and patients are most interested in survival and lack of need for reintervention and less interested in angiogram findings. Our study captures a real-world experience from three large volume centres over a long-time frame and we hope this helps with a gradual acceptance with this approach in the UK and Europe.</p><p>A single centre experience with 10 years outcomes has been published
+<sup>
+<xref rid="ref-21" ref-type="bibr">21</xref>
+</sup> but this is the first multicentre case series with a survival follow-up until 10 years. We do believe the transition from OVH to EVH should be managed in each institution carefully and would support the development of training standards as there is increasing evidence that practitioner experience and techniques do affect outcomes
+<sup>
+<xref rid="ref-6" ref-type="bibr">6</xref>–
+<xref rid="ref-8" ref-type="bibr">8</xref>,
+<xref rid="ref-19" ref-type="bibr">19</xref>
+</sup> and unless these are standardised there will be likely to be a variation in outcomes.</p><sec><title>Study limitations</title><p>This is an observational retrospective study rather than a prospective randomised controlled trial. Propensity score matching requires that the sample of untreated subjects be larger than the sample of treated subjects. Ideally, there should be substantially more untreated subjects than treated subjects. Therefore, for this study we have used IPTW, which considered weights based on the propensity score to create a synthetic sample in which the distribution of measured baseline covariates is independent of treatment assignment. A subject’s weight is equal to the inverse of the probability of receiving the treatment that the subject received. Propensity score weighting assumes that there is no unmeasured confounding factor (e.g. all confounding factors have been considered in the model).</p><p>Another important limitation is that there are not angiographic details for the entire cohort of patients. Limited angiographic data was available only for symptomatic patients who have come back to the base hospital for reintervention, and these are listed on the
+<xref rid="T4" ref-type="table">Table 4</xref>. Patients who have attended peripheral hospitals were not captured due to large geographical catchment areas. It is difficult to accurately capture major adverse cardiac events in both groups due to lack of routine planned follow up in specialist cardiac centres. Importantly, we need to take into consideration that it is a multicentre observational study where there is likely to be a degree of variations in vein harvesting and surgical techniques by different operators.</p><table-wrap position="anchor" id="T4" orientation="portrait"><label>Table 4. </label><caption><title>Number of angiograms, graft occlusions and percutaneous coronary interventions.</title><p>Data available for Wythenshawe and Blackpool symptomatic patients who had follow up.</p></caption><table frame="hsides" rules="groups" content-type="article-table"><thead><tr><th align="center" colspan="1" rowspan="1"/><th align="left" colspan="1" rowspan="1" valign="top">OVH, n (%) (N=8321)</th><th align="left" colspan="1" rowspan="1" valign="top">EVH, n (%) (N=3986)</th><th align="left" colspan="1" rowspan="1" valign="top">P*</th></tr></thead><tbody><tr><td align="left" colspan="1" rowspan="1" valign="top">Angiogram </td><td align="left" colspan="1" rowspan="1" valign="top">203/8321 (2.4)</td><td align="left" colspan="1" rowspan="1" valign="top">160/3986 (4)</td><td align="left" colspan="1" rowspan="1" valign="top">&lt;0.001</td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">Percutaneous coronary Intervention</td><td align="left" colspan="1" rowspan="1" valign="top">121/203 (59.6)</td><td align="left" colspan="1" rowspan="1" valign="top">93/160 (58.1)</td><td align="left" colspan="1" rowspan="1" valign="top">0.972</td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">Vein graft blockage </td><td align="left" colspan="1" rowspan="1" valign="top">87/203 (42.9)</td><td align="left" colspan="1" rowspan="1" valign="top">70/160 (43.8)</td><td align="left" colspan="1" rowspan="1" valign="top">1</td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">LIMA blocked </td><td align="left" colspan="1" rowspan="1" valign="top">38/203 (18.7)</td><td align="left" colspan="1" rowspan="1" valign="top">37/160 (23.1)</td><td align="left" colspan="1" rowspan="1" valign="top">0.399</td></tr><tr><td align="left" colspan="1" rowspan="1" valign="top">Medical therapy </td><td align="left" colspan="1" rowspan="1" valign="top">184/203 (90.6)</td><td align="left" colspan="1" rowspan="1" valign="top">154/160 (96.3)</td><td align="left" colspan="1" rowspan="1" valign="top">0.177</td></tr></tbody></table><table-wrap-foot><fn><p>EVH: Endoscopic Vein Harvesting; OVH: Open Vein Harvesting</p></fn></table-wrap-foot></table-wrap></sec></sec><sec sec-type="conclusions"><title>Conclusion</title><p>Our study has concluded that the use of endoscopic vein harvesting does not appear to adversely affect survival out to 10 years compared to the open vein harvesting and in this non-randomised group the long-term survival appears to be better with EVH. As the early results related to wound infection and cosmesis favour EVH, we do believe that this approach should be adopted more widely in the interest of patients.</p></sec><sec sec-type="data-availability"><title>Data availability</title><sec><title>Underlying data</title><p>The raw patient data were obtained from the Royal Brompton and Harefield, Wythenshawe and Blackpool hospitals. The hospitals and Edgehill University gave permission to conduct analysis on the data for this study only and not future studies. For further research using these datasets, additional permission must be sought from these hospitals. Researchers who require access to the raw data will need to contact the audit/research department of each hospital; contact details are available as follows: Royal Brompton and Harefield Research office,
+<ext-link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://www.rbht.nhs.uk/research/research-office" ext-link-type="uri">https://www.rbht.nhs.uk/research/research-office</ext-link>, Wythenshawe,
+<email xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="mailto:mft.rd@manchester.ac.uk">mft.rd@manchester.ac.uk</email>; Blackpool,
+<ext-link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://www.bfwh.nhs.uk/onehr/research-development/" ext-link-type="uri">https://www.bfwh.nhs.uk/onehr/research-development/</ext-link>. Intermediary data can be found in the article.</p></sec></sec></body><back><ack><title>Acknowledgements</title><p>The authors thank Miss. Cathy Malpas, Mr. Pradeep Varghese (database managers), all cardiothoracic surgeons and vein harvesters for their support on this study. All authors have given permission for this final manuscript publication.</p></ack><ref-list><ref id="ref-1"><label>1</label><mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<name name-style="western"><surname>Antonopoulos</surname><given-names>AS</given-names></name>
+<name name-style="western"><surname>Odutayo</surname><given-names>A</given-names></name>
+<name name-style="western"><surname>Oikonomou</surname><given-names>EK</given-names></name>
+<etal/>
+</person-group>:
+<article-title>Development of a risk score for early saphenous vein graft failure: An individual patient data meta-analysis.</article-title>
+<source>
+<italic toggle="yes">J Thorac Cardiovasc Surg.</italic>
+</source>
+<year>2020</year>;<volume>160</volume>(<issue>1</issue>):<fpage>116</fpage>–<lpage>127.e4</lpage>.
+<pub-id pub-id-type="doi">10.1016/j.jtcvs.2019.07.086</pub-id>
+
+<pub-id pub-id-type="pmid">31606176</pub-id><pub-id pub-id-type="pmcid">PMC7322547</pub-id></mixed-citation></ref><ref id="ref-2"><label>2</label><mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<name name-style="western"><surname>Krishnamoorthy</surname><given-names>B</given-names></name>
+<name name-style="western"><surname>Critchley</surname><given-names>WR</given-names></name>
+<name name-style="western"><surname>Venkateswaran</surname><given-names>RV</given-names></name>
+<etal/>
+</person-group>:
+<article-title>A comprehensive review on learning curve associated problems in endoscopic vein harvesting and the requirement for a standardised training programme.</article-title>
+<source>
+<italic toggle="yes">J Cardiothorac Surg.</italic>
+</source>
+<year>2016</year>;<volume>11</volume>:<fpage>45</fpage>.
+<pub-id pub-id-type="doi">10.1186/s13019-016-0442-y</pub-id>
+
+<pub-id pub-id-type="pmid">27059309</pub-id><pub-id pub-id-type="pmcid">PMC4825086</pub-id></mixed-citation></ref><ref id="ref-3"><label>3</label><mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<name name-style="western"><surname>Krishnamoorthy</surname><given-names>B</given-names></name>
+<name name-style="western"><surname>Critchley</surname><given-names>WR</given-names></name>
+<name name-style="western"><surname>Thompson</surname><given-names>AJ</given-names></name>
+<etal/>
+</person-group>:
+<article-title>Study Comparing Vein Integrity and Clinical Outcomes in Open Vein Harvesting and 2 Types of Endoscopic Vein Harvesting for Coronary Artery Bypass Grafting: The VICO Randomized Clinical Trial (Vein Integrity and Clinical Outcomes).</article-title>
+<source>
+<italic toggle="yes">Circulation.</italic>
+</source>
+<year>2017</year>;<volume>136</volume>(<issue>18</issue>):<fpage>1688</fpage>–<lpage>1702</lpage>.
+<pub-id pub-id-type="doi">10.1161/CIRCULATIONAHA.117.028261</pub-id>
+
+<pub-id pub-id-type="pmid">28637880</pub-id><pub-id pub-id-type="pmcid">PMC5768238</pub-id></mixed-citation></ref><ref id="ref-4"><label>4</label><mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<name name-style="western"><surname>Harky</surname><given-names>A</given-names></name>
+<name name-style="western"><surname>MacCarthy-Ofosu</surname><given-names>B</given-names></name>
+<name name-style="western"><surname>Grafton-Clarke</surname><given-names>C</given-names></name>
+<etal/>
+</person-group>:
+<article-title>Long saphenous vein harvesting techniques and their effect on graft patency.</article-title>
+<source>
+<italic toggle="yes">J Card Surg.</italic>
+</source>
+<year>2019</year>;<volume>34</volume>(<issue>9</issue>):<fpage>821</fpage>–<lpage>828</lpage>.
+<pub-id pub-id-type="doi">10.1111/jocs.14153</pub-id>
+<pub-id pub-id-type="pmid">31299105</pub-id></mixed-citation></ref><ref id="ref-5"><label>5</label><mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<name name-style="western"><surname>Caliskan</surname><given-names>E</given-names></name>
+<name name-style="western"><surname>de Souza</surname><given-names>DR</given-names></name>
+<name name-style="western"><surname>Boning</surname><given-names>A</given-names></name>
+<etal/>
+</person-group>:
+<article-title>Saphenous vein grafts in contemporary coronary artery bypass graft surgery.</article-title>
+<source>
+<italic toggle="yes">Nat Rev Cardiol.</italic>
+</source>
+<year>2020</year>;<volume>17</volume>(<issue>3</issue>):<fpage>155</fpage>–<lpage>169</lpage>.
+<pub-id pub-id-type="doi">10.1038/s41569-019-0249-3</pub-id>
+<pub-id pub-id-type="pmid">31455868</pub-id></mixed-citation></ref><ref id="ref-6"><label>6</label><mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<name name-style="western"><surname>Zenati</surname><given-names>MA</given-names></name>
+<name name-style="western"><surname>Bhatt</surname><given-names>DL</given-names></name>
+<name name-style="western"><surname>Bakaeen</surname><given-names>FG</given-names></name>
+<etal/>
+</person-group>:
+<article-title>Randomized Trial of Endoscopic or Open Vein-Graft Harvesting for Coronary-Artery Bypass.</article-title>
+<source>
+<italic toggle="yes">N Engl J Med.</italic>
+</source>
+<year>2019</year>;<volume>380</volume>(<issue>2</issue>):<fpage>132</fpage>–<lpage>141</lpage>.
+<pub-id pub-id-type="doi">10.1056/NEJMoa1812390</pub-id>
+<pub-id pub-id-type="pmid">30417737</pub-id></mixed-citation></ref><ref id="ref-7"><label>7</label><mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<name name-style="western"><surname>Krishnamoorthy</surname><given-names>B</given-names></name>
+<name name-style="western"><surname>Critchley</surname><given-names>WR</given-names></name>
+<name name-style="western"><surname>Bhinda</surname><given-names>P</given-names></name>
+<etal/>
+</person-group>:
+<article-title>Does the introduction of a comprehensive structured training programme for endoscopic vein harvesting improve conduit quality? A multicentre pilot study.</article-title>
+<source>
+<italic toggle="yes">Interact Cardiovasc Thorac Surg.</italic>
+</source>
+<year>2015</year>;<volume>20</volume>(<issue>2</issue>):<fpage>186</fpage>–<lpage>93</lpage>.
+<pub-id pub-id-type="doi">10.1093/icvts/ivu354</pub-id>
+<pub-id pub-id-type="pmid">25415312</pub-id></mixed-citation></ref><ref id="ref-8"><label>8</label><mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<name name-style="western"><surname>Desai</surname><given-names>P</given-names></name>
+<name name-style="western"><surname>Kiani</surname><given-names>S</given-names></name>
+<name name-style="western"><surname>Thiruvanthan</surname><given-names>N</given-names></name>
+<etal/>
+</person-group>:
+<article-title>Impact of the learning curve for endoscopic vein harvest on conduit quality and early graft patency.</article-title>
+<source>
+<italic toggle="yes">Ann Thorac Surg.</italic>
+</source>
+<year>2011</year>;<volume>91</volume>(<issue>5</issue>):<fpage>1385</fpage>–<lpage>91</lpage>; discussion 1391-2.
+<pub-id pub-id-type="doi">10.1016/j.athoracsur.2011.01.079</pub-id>
+
+<pub-id pub-id-type="pmid">21524447</pub-id><pub-id pub-id-type="pmcid">PMC4146432</pub-id></mixed-citation></ref><ref id="ref-9"><label>9</label><mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<name name-style="western"><surname>Kroeze</surname><given-names>VJ</given-names></name>
+<name name-style="western"><surname>Lam</surname><given-names>KY</given-names></name>
+<name name-style="western"><surname>van Straten</surname><given-names>AHM</given-names></name>
+<etal/>
+</person-group>:
+<article-title>Benefits of Endoscopic Vein Harvesting in Coronary Artery Bypass Grafting.</article-title>
+<source>
+<italic toggle="yes">Ann Thorac Surg.</italic>
+</source>
+<year>2019</year>;<volume>108</volume>(<issue>6</issue>):<fpage>1793</fpage>–<lpage>1799</lpage>.
+<pub-id pub-id-type="doi">10.1016/j.athoracsur.2019.04.065</pub-id>
+<pub-id pub-id-type="pmid">31185203</pub-id></mixed-citation></ref><ref id="ref-10"><label>10</label><mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<name name-style="western"><surname>Janiec</surname><given-names>M</given-names></name>
+<name name-style="western"><surname>Friberg</surname><given-names>O</given-names></name>
+<name name-style="western"><surname>Thelin</surname><given-names>S</given-names></name>
+</person-group>:
+<article-title>Long-term clinical outcomes after coronary artery bypass grafting with pedicled saphenous vein grafts.</article-title>
+<source>
+<italic toggle="yes">J Cardiothorac Surg.</italic>
+</source>
+<year>2018</year>;<volume>13</volume>(<issue>1</issue>):<fpage>122</fpage>.
+<pub-id pub-id-type="doi">10.1186/s13019-018-0800-z</pub-id>
+
+<pub-id pub-id-type="pmid">30477543</pub-id><pub-id pub-id-type="pmcid">PMC6258143</pub-id></mixed-citation></ref><ref id="ref-11"><label>11</label><mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<name name-style="western"><surname>Krishnamoorthy</surname><given-names>B</given-names></name>
+<name name-style="western"><surname>Critchley</surname><given-names>WR</given-names></name>
+<name name-style="western"><surname>Glover</surname><given-names>AT</given-names></name>
+<etal/>
+</person-group>:
+<article-title>A randomized study comparing three groups of vein harvesting methods for coronary artery bypass grafting: endoscopic harvest versus standard bridging and open techniques.</article-title>
+<source>
+<italic toggle="yes">Interact Cardiovasc Thorac Surg.</italic>
+</source>
+<year>2012</year>;<volume>15</volume>(<issue>2</issue>):<fpage>224</fpage>–<lpage>8</lpage>.
+<pub-id pub-id-type="doi">10.1093/icvts/ivs164</pub-id>
+
+<pub-id pub-id-type="pmid">22611182</pub-id><pub-id pub-id-type="pmcid">PMC3397746</pub-id></mixed-citation></ref><ref id="ref-12"><label>12</label><mixed-citation publication-type="journal">
+<article-title>R: A language and environment for statistical computing</article-title>.
+<ext-link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://www.gbif.org/tool/81287/r-a-language-and-environment-for-statistical-computing" ext-link-type="uri">Reference Source</ext-link>
+</mixed-citation></ref><ref id="ref-13"><label>13</label><mixed-citation publication-type="journal">
+<collab>Cobalt: </collab>
+<article-title>Covariate Balance Tables and Plots</article-title>. [computer program].<year>2020</year>.
+<ext-link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://cran.r-project.org/web/packages/cobalt/index.html" ext-link-type="uri">Reference Source</ext-link>
+</mixed-citation></ref><ref id="ref-14"><label>14</label><mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<name name-style="western"><surname>Austin</surname><given-names>PC</given-names></name>
+</person-group>:
+<article-title>An Introduction to Propensity Score Methods for Reducing the Effects of Confounding in Observational Studies.</article-title>
+<source>
+<italic toggle="yes">Multivariate Behav Res.</italic>
+</source>
+<year>2011</year>;<volume>46</volume>(<issue>3</issue>):<fpage>399</fpage>–<lpage>424</lpage>.
+<pub-id pub-id-type="doi">10.1080/00273171.2011.568786</pub-id>
+
+<pub-id pub-id-type="pmid">21818162</pub-id><pub-id pub-id-type="pmcid">PMC3144483</pub-id></mixed-citation></ref><ref id="ref-15"><label>15</label><mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<name name-style="western"><surname>Austin</surname><given-names>PC</given-names></name>
+</person-group>:
+<article-title>The use of propensity score methods with survival or time-to-event outcomes: reporting measures of effect similar to those used in randomized experiments.</article-title>
+<source>
+<italic toggle="yes">Stat Med.</italic>
+</source>
+<year>2014</year>;<volume>33</volume>(<issue>7</issue>):<fpage>1242</fpage>–<lpage>58</lpage>.
+<pub-id pub-id-type="doi">10.1002/sim.5984</pub-id>
+
+<pub-id pub-id-type="pmid">24122911</pub-id><pub-id pub-id-type="pmcid">PMC4285179</pub-id></mixed-citation></ref><ref id="ref-16"><label>16</label><mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<name name-style="western"><surname>Austin</surname><given-names>PC</given-names></name>
+<name name-style="western"><surname>Stuart</surname><given-names>EA</given-names></name>
+</person-group>:
+<article-title>Moving towards best practice when using inverse probability of treatment weighting (IPTW) using the propensity score to estimate causal treatment effects in observational studies.</article-title>
+<source>
+<italic toggle="yes">Stat Med.</italic>
+</source>
+<year>2015</year>;<volume>34</volume>(<issue>28</issue>):<fpage>3661</fpage>–<lpage>79</lpage>.
+<pub-id pub-id-type="doi">10.1002/sim.6607</pub-id>
+
+<pub-id pub-id-type="pmid">26238958</pub-id><pub-id pub-id-type="pmcid">PMC4626409</pub-id></mixed-citation></ref><ref id="ref-17"><label>17</label><mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<name name-style="western"><surname>Deppe</surname><given-names>AC</given-names></name>
+<name name-style="western"><surname>Liakopoulos</surname><given-names>OJ</given-names></name>
+<name name-style="western"><surname>Choi</surname><given-names>YH</given-names></name>
+<etal/>
+</person-group>:
+<article-title>Endoscopic vein harvesting for coronary artery bypass grafting: a systematic review with meta-analysis of 27,789 patients.</article-title>
+<source>
+<italic toggle="yes">J Surg Res.</italic>
+</source>
+<year>2013</year>;<volume>180</volume>(<issue>1</issue>):<fpage>114</fpage>–<lpage>24</lpage>.
+<pub-id pub-id-type="doi">10.1016/j.jss.2012.11.013</pub-id>
+<pub-id pub-id-type="pmid">23218736</pub-id></mixed-citation></ref><ref id="ref-18"><label>18</label><mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<name name-style="western"><surname>Dacey</surname><given-names>LJ</given-names></name>
+<name name-style="western"><surname>Braxton JH</surname><given-names>Jr</given-names></name>
+<name name-style="western"><surname>Kramer</surname><given-names>RS</given-names></name>
+<etal/>
+</person-group>:
+<article-title>Long-term outcomes of endoscopic vein harvesting after coronary artery bypass grafting.</article-title>
+<source>
+<italic toggle="yes">Circulation.</italic>
+</source>
+<year>2011</year>;<volume>123</volume>(<issue>2</issue>):<fpage>147</fpage>–<lpage>53</lpage>.
+<pub-id pub-id-type="doi">10.1161/CIRCULATIONAHA.110.960765</pub-id>
+<pub-id pub-id-type="pmid">21200010</pub-id></mixed-citation></ref><ref id="ref-19"><label>19</label><mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<name name-style="western"><surname>Zenati</surname><given-names>MA</given-names></name>
+<name name-style="western"><surname>Bhatt</surname><given-names>DL</given-names></name>
+<name name-style="western"><surname>Stock</surname><given-names>EM</given-names></name>
+<etal/>
+</person-group>:
+<article-title>Intermediate-Term Outcomes of Endoscopic or Open Vein Harvesting for Coronary Artery Bypass Grafting: The REGROUP Randomized Clinical Trial.</article-title>
+<source>
+<italic toggle="yes">JAMA Netw Open.</italic>
+</source>
+<year>2021</year>;<volume>4</volume>(<issue>3</issue>):<fpage>e211439</fpage>.
+<pub-id pub-id-type="doi">10.1001/jamanetworkopen.2021.1439</pub-id>
+
+<pub-id pub-id-type="pmid">33720367</pub-id><pub-id pub-id-type="pmcid">PMC7961312</pub-id></mixed-citation></ref><ref id="ref-20"><label>20</label><mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<name name-style="western"><surname>Lopes</surname><given-names>RD</given-names></name>
+<name name-style="western"><surname>Hafley</surname><given-names>GE</given-names></name>
+<name name-style="western"><surname>Allen</surname><given-names>KB</given-names></name>
+<etal/>
+</person-group>:
+<article-title>Endoscopic versus open vein-graft harvesting in coronary-artery bypass surgery.</article-title>
+<source>
+<italic toggle="yes">N Engl J Med.</italic>
+</source>
+<year>2009</year>;<volume>361</volume>(<issue>3</issue>):<fpage>235</fpage>–<lpage>44</lpage>.
+<pub-id pub-id-type="doi">10.1056/NEJMoa0900708</pub-id>
+<pub-id pub-id-type="pmid">19605828</pub-id></mixed-citation></ref><ref id="ref-21"><label>21</label><mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<name name-style="western"><surname>Kirmani</surname><given-names>BH</given-names></name>
+<name name-style="western"><surname>Power</surname><given-names>S</given-names></name>
+<name name-style="western"><surname>Zacharias</surname><given-names>J</given-names></name>
+</person-group>:
+<article-title>Long-term survival after endoscopic vein harvest for coronary artery bypass grafting.</article-title>
+<source>
+<italic toggle="yes">Ann R Coll Surg Engl.</italic>
+</source>
+<year>2020</year>;<volume>102</volume>(<issue>6</issue>):<fpage>422</fpage>–<lpage>428</lpage>.
+<pub-id pub-id-type="doi">10.1308/rcsann.2020.0063</pub-id>
+
+<pub-id pub-id-type="pmid">32326723</pub-id><pub-id pub-id-type="pmcid">PMC7388957</pub-id></mixed-citation></ref><ref id="ref-22"><label>22</label><mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<name name-style="western"><surname>Carpino</surname><given-names>PA</given-names></name>
+<name name-style="western"><surname>Khabbaz</surname><given-names>KR</given-names></name>
+<name name-style="western"><surname>Bojar</surname><given-names>RM</given-names></name>
+<etal/>
+</person-group>:
+<article-title>Clinical benefits of endoscopic vein harvesting in patients with risk factors for saphenectomy wound infections undergoing coronary artery bypass grafting.</article-title>
+<source>
+<italic toggle="yes">J Thorac Cardiovasc Surg.</italic>
+</source>
+<year>2000</year>;<volume>119</volume>(<issue>1</issue>):<fpage>69</fpage>–<lpage>75</lpage>.
+<pub-id pub-id-type="doi">10.1016/s0022-5223(00)70219-4</pub-id>
+<pub-id pub-id-type="pmid">10612763</pub-id></mixed-citation></ref><ref id="ref-23"><label>23</label><mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<name name-style="western"><surname>Raja</surname><given-names>SG</given-names></name>
+<name name-style="western"><surname>Sarang</surname><given-names>Z</given-names></name>
+</person-group>:
+<article-title>Endoscopic vein harvesting: technique, outcomes, concerns &amp; controversies.</article-title>
+<source>
+<italic toggle="yes">J Thorac Dis.</italic>
+</source>
+<year>2013</year>;<volume>5 Suppl 6</volume>(<issue>Suppl 6</issue>):<fpage>S630</fpage>–<lpage>7</lpage>.
+<pub-id pub-id-type="doi">10.3978/j.issn.2072-1439.2013.10.01</pub-id>
+
+<pub-id pub-id-type="pmid">24251019</pub-id><pub-id pub-id-type="pmcid">PMC3831843</pub-id></mixed-citation></ref><ref id="ref-24"><label>24</label><mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<name name-style="western"><surname>Aziz</surname><given-names>O</given-names></name>
+<name name-style="western"><surname>Athanasiou</surname><given-names>T</given-names></name>
+<name name-style="western"><surname>Darzi</surname><given-names>A</given-names></name>
+</person-group>:
+<article-title>Minimally invasive conduit harvesting: a systematic review.</article-title>
+<source>
+<italic toggle="yes">Eur J Cardiothorac Surg.</italic>
+</source>
+<year>2006</year>;<volume>29</volume>(<issue>3</issue>):<fpage>324</fpage>–<lpage>33</lpage>.
+<pub-id pub-id-type="doi">10.1016/j.ejcts.2005.11.032</pub-id>
+<pub-id pub-id-type="pmid">16387505</pub-id></mixed-citation></ref><ref id="ref-25"><label>25</label><mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<name name-style="western"><surname>Ferdinand</surname><given-names>FD</given-names></name>
+<name name-style="western"><surname>MacDonald</surname><given-names>JK</given-names></name>
+<name name-style="western"><surname>Balkhy</surname><given-names>HH</given-names></name>
+<etal/>
+</person-group>:
+<article-title>Endoscopic Conduit Harvest in Coronary Artery Bypass Grafting Surgery: An ISMICS Systematic Review and Consensus Conference Statements.</article-title>
+<source>
+<italic toggle="yes">Innovations (Phila).</italic>
+</source>
+<year>2017</year>;<volume>12</volume>(<issue>5</issue>):<fpage>301</fpage>–<lpage>319</lpage>.
+<pub-id pub-id-type="doi">10.1097/IMI.0000000000000410</pub-id>
+<pub-id pub-id-type="pmid">29028651</pub-id></mixed-citation></ref><ref id="ref-26"><label>26</label><mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<name name-style="western"><surname>Vitali</surname><given-names>RM</given-names></name>
+<name name-style="western"><surname>Reddy</surname><given-names>RC</given-names></name>
+<name name-style="western"><surname>Molinaro</surname><given-names>PJ</given-names></name>
+<etal/>
+</person-group>:
+<article-title>Hemodynamic effects of carbon dioxide insufflation during endoscopic vein harvesting.</article-title>
+<source>
+<italic toggle="yes">Ann Thorac Surg.</italic>
+</source>
+<year>2000</year>;<volume>70</volume>(<issue>3</issue>):<fpage>1098</fpage>–<lpage>9</lpage>.
+<pub-id pub-id-type="doi">10.1016/s0003-4975(00)01780-x</pub-id>
+<pub-id pub-id-type="pmid">11016386</pub-id></mixed-citation></ref><ref id="ref-27"><label>27</label><mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<name name-style="western"><surname>Lin</surname><given-names>TY</given-names></name>
+<name name-style="western"><surname>Chiu</surname><given-names>KM</given-names></name>
+<name name-style="western"><surname>Wang</surname><given-names>MJ</given-names></name>
+<etal/>
+</person-group>:
+<article-title>Carbon dioxide embolism during endoscopic saphenous vein harvesting in coronary artery bypass surgery.</article-title>
+<source>
+<italic toggle="yes">J Thorac Cardiovasc Surg.</italic>
+</source>
+<year>2003</year>;<volume>126</volume>(<issue>6</issue>):<fpage>2011</fpage>–<lpage>5</lpage>.
+<pub-id pub-id-type="doi">10.1016/s0022-5223(03)01323-0</pub-id>
+<pub-id pub-id-type="pmid">14688720</pub-id></mixed-citation></ref><ref id="ref-28"><label>28</label><mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<name name-style="western"><surname>Zingaro</surname><given-names>C</given-names></name>
+<name name-style="western"><surname>Pierri</surname><given-names>MD</given-names></name>
+<name name-style="western"><surname>Massi</surname><given-names>F</given-names></name>
+<etal/>
+</person-group>:
+<article-title>Absorption of carbon dioxide during endoscopic vein harvest.</article-title>
+<source>
+<italic toggle="yes">Interact Cardiovasc Thorac Surg.</italic>
+</source>
+<year>2012</year>;<volume>15</volume>(<issue>4</issue>):<fpage>661</fpage>–<lpage>4</lpage>.
+<pub-id pub-id-type="doi">10.1093/icvts/ivs255</pub-id>
+
+<pub-id pub-id-type="pmid">22761115</pub-id><pub-id pub-id-type="pmcid">PMC3445359</pub-id></mixed-citation></ref><ref id="ref-29"><label>29</label><mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<name name-style="western"><surname>Krishnamoorthy</surname><given-names>B</given-names></name>
+<name name-style="western"><surname>Critchley</surname><given-names>WR</given-names></name>
+<name name-style="western"><surname>Nair</surname><given-names>J</given-names></name>
+<etal/>
+</person-group>:
+<article-title>Randomized Study Comparing the Effect of Carbon Dioxide Insufflation on Veins Using 2 Types of Endoscopic and Open Vein Harvesting.</article-title>
+<source>
+<italic toggle="yes">Innovations (Phila).</italic>
+</source>
+<year>2017</year>;<volume>12</volume>(<issue>5</issue>):<fpage>320</fpage>–<lpage>328</lpage>.
+<pub-id pub-id-type="doi">10.1097/IMI.0000000000000405</pub-id>
+
+<pub-id pub-id-type="pmid">29016381</pub-id><pub-id pub-id-type="pmcid">PMC5768240</pub-id></mixed-citation></ref><ref id="ref-30"><label>30</label><mixed-citation publication-type="journal">
+<person-group person-group-type="author">
+<name name-style="western"><surname>Zenati</surname><given-names>MA</given-names></name>
+<name name-style="western"><surname>Shroyer</surname><given-names>AL</given-names></name>
+<name name-style="western"><surname>Collins</surname><given-names>JF</given-names></name>
+<etal/>
+</person-group>:
+<article-title>Impact of endoscopic versus open saphenous vein harvest technique on late coronary artery bypass grafting patient outcomes in the ROOBY (Randomized On/Off Bypass) Trial.</article-title>
+<source>
+<italic toggle="yes">J Thorac Cardiovasc Surg.</italic>
+</source>
+<year>2011</year>;<volume>141</volume>(<issue>2</issue>):<fpage>338</fpage>–<lpage>44</lpage>.
+<pub-id pub-id-type="doi">10.1016/j.jtcvs.2010.10.004</pub-id>
+<pub-id pub-id-type="pmid">21130476</pub-id></mixed-citation></ref></ref-list></back><sub-article article-type="reviewer-report" id="report28424"><front-stub><article-id pub-id-type="doi">10.3310/nihropenres.14331.r28424</article-id><title-group><article-title>Reviewer response for version 1</article-title></title-group><contrib-group><contrib contrib-type="author"><name name-style="western"><surname>Rathinam</surname><given-names initials="S">Sridhar</given-names></name><xref rid="r28424a1" ref-type="aff">1</xref><role>Referee</role></contrib><aff id="r28424a1">
+<label>1</label>Department of Thoracic Surgery, Glenfield Hospital, University Hospitals of Leicester Trust, Leicester, UK</aff></contrib-group><author-notes><fn fn-type="COI-statement"><p>
+<bold>Competing interests: </bold>No competing interests were disclosed.</p></fn></author-notes><pub-date pub-type="epub"><day>15</day><month>11</month><year>2021</year></pub-date><permissions><copyright-statement>Copyright: © 2021 Rathinam S</copyright-statement><copyright-year>2021</copyright-year><license><ali:license_ref xmlns:ali="http://www.niso.org/schemas/ali/1.0/" specific-use="textmining" content-type="ccbylicense">https://creativecommons.org/licenses/by/4.0/</ali:license_ref><license-p>This is an open access peer review report distributed under the terms of the Creative Commons Attribution Licence, which permits unrestricted use, distribution, and reproduction in any medium, provided the original work is properly cited.</license-p></license></permissions><related-article xmlns:xlink="http://www.w3.org/1999/xlink" related-article-type="peer-reviewed-article" ext-link-type="doi" id="relatedArticleReport28424" xlink:href="10.3310/nihropenres.13215.1">Version 1</related-article><custom-meta-group><custom-meta><meta-name>recommendation</meta-name><meta-value>approve-with-reservations</meta-value></custom-meta></custom-meta-group></front-stub><body><p>Thank you for an interesting article looking at an important aspect of cardiac surgical care. Congratulations to the authors for investigating the LSV harvesting by EVH and OVH in the United Kingdom.</p><p> May I seek a few clarifications as well as suggest some revisions:
+<list list-type="order"><list-item><p>The authors declare registration in Edgehill and Wythensawe, was this study not registered in the other two hospitals whilst sharing patient data even anonymized into a pooled analysis. This needs clarification.</p></list-item><list-item><p>For a study of this significant impact, it would be ideal to have the interventions done in the peripheral hospitals as this will offer a true re intervention data.</p></list-item><list-item><p>Please use hospitals names consistently.</p></list-item><list-item><p>Can the authors clarify why there was less IMA use in OLV group was it higher risk or elderly patients as this may have an impact on the results?</p></list-item><list-item><p>The authors state challenges in declaring cause of death, surely this data is available with the GPs?</p></list-item><list-item><p>Please briefly describe or reference the difference in the anatomical sites of harvest between OLV and EVH which is described in discussion but not in the methods.</p></list-item><list-item><p>Can the authors describe the percentage of harvest done by trainee surgeons and trainee SCPs as the experience impacts on outcomes?</p></list-item><list-item><p> Have the authors done a subgroup analysis of patients seen in base hospital to confirm the conclusion (i.e full angiographic and symptom data)?</p></list-item><list-item><p>Please consider naming the  the institution eg Blackpool Victoria Hospital. </p></list-item><list-item><p>Do the authors mean National census rather than censor?</p></list-item><list-item><p>Surgical technique: Suggest change to "patients who had their veins retrieved by...".</p></list-item><list-item><p>Discussion: Suggest change "We do not have angiographic data to allay fears on that point of graft patency, but this could only be answered by a large, randomised control trials which is
+<bold>challenging in this </bold>financial climate."</p></list-item><list-item><p>Consider rephrasing the following "...patients are most interested in survival and lack of need for reintervention and less interested in angiogram findings." - the presence and lack of symptoms and reintervention are highlighted by the angiogram findings so this is a bold statement.</p></list-item></list> I hope these queries and suggestions are useful. Thank you for the opportunity.</p><p>Is the work clearly and accurately presented and does it cite the current literature?</p><p>Partly</p><p>If applicable, is the statistical analysis and its interpretation appropriate?</p><p>Yes</p><p>Are all the source data underlying the results available to ensure full reproducibility?</p><p>No source data required</p><p>Is the study design appropriate and is the work technically sound?</p><p>Yes</p><p>Are the conclusions drawn adequately supported by the results?</p><p>Partly</p><p>Are sufficient details of methods and analysis provided to allow replication by others?</p><p>Yes</p><p>Reviewer Expertise:</p><p>Cardiothoracic trials. Lung cancer, Device and intervention RCTs, LVRS</p><p>I confirm that I have read this submission and believe that I have an appropriate level of expertise to confirm that it is of an acceptable scientific standard, however I have significant reservations, as outlined above.</p></body></sub-article><sub-article article-type="reviewer-report" id="report28407"><front-stub><article-id pub-id-type="doi">10.3310/nihropenres.14331.r28407</article-id><title-group><article-title>Reviewer response for version 1</article-title></title-group><contrib-group><contrib contrib-type="author"><name name-style="western"><surname>Dunning</surname><given-names initials="J">Joel</given-names></name><xref rid="r28407a1" ref-type="aff">1</xref><role>Referee</role></contrib><aff id="r28407a1">
+<label>1</label>Department of Cardiothoracic Surgery, The James Cook University Hospital, Middlesbrough, UK</aff></contrib-group><author-notes><fn fn-type="COI-statement"><p>
+<bold>Competing interests: </bold>No competing interests were disclosed.</p></fn></author-notes><pub-date pub-type="epub"><day>11</day><month>10</month><year>2021</year></pub-date><permissions><copyright-statement>Copyright: © 2021 Dunning J</copyright-statement><copyright-year>2021</copyright-year><license><ali:license_ref xmlns:ali="http://www.niso.org/schemas/ali/1.0/" specific-use="textmining" content-type="ccbylicense">https://creativecommons.org/licenses/by/4.0/</ali:license_ref><license-p>This is an open access peer review report distributed under the terms of the Creative Commons Attribution Licence, which permits unrestricted use, distribution, and reproduction in any medium, provided the original work is properly cited.</license-p></license></permissions><related-article xmlns:xlink="http://www.w3.org/1999/xlink" related-article-type="peer-reviewed-article" ext-link-type="doi" id="relatedArticleReport28407" xlink:href="10.3310/nihropenres.13215.1">Version 1</related-article><custom-meta-group><custom-meta><meta-name>recommendation</meta-name><meta-value>approve</meta-value></custom-meta></custom-meta-group></front-stub><body><p>This is an excellent and very large study by a well respected group of surgeons from 3 leading hospitals in the UK. There is very long term follow up and this in my view is the absolute best study that could be performed without randomisation or angiography. This does very much support the safety of EVH and provides potential evidence for superiority for this technique without any additional risk to the patient. </p><p> There are some important systematic biases between the groups and in the selection of patients for EVH or OVH but the authors have addressed this and this would be the case in any cohort study such as this. </p><p> I think that this should provide the basis for an NIHR application for a Randomised Study in this area as this is certainly the best that could possibly be done as a study with the non-randomised data currently available.</p><p>Is the work clearly and accurately presented and does it cite the current literature?</p><p>Yes</p><p>If applicable, is the statistical analysis and its interpretation appropriate?</p><p>Yes</p><p>Are all the source data underlying the results available to ensure full reproducibility?</p><p>Yes</p><p>Is the study design appropriate and is the work technically sound?</p><p>Yes</p><p>Are the conclusions drawn adequately supported by the results?</p><p>Yes</p><p>Are sufficient details of methods and analysis provided to allow replication by others?</p><p>Yes</p><p>Reviewer Expertise:</p><p>Cardiothoracic Surgery</p><p>I confirm that I have read this submission and believe that I have an appropriate level of expertise to confirm that it is of an acceptable scientific standard.</p></body></sub-article><sub-article article-type="reviewer-report" id="report28409"><front-stub><article-id pub-id-type="doi">10.3310/nihropenres.14331.r28409</article-id><title-group><article-title>Reviewer response for version 1</article-title></title-group><contrib-group><contrib contrib-type="author"><name name-style="western"><surname>Cheung</surname><given-names initials="A">Anson</given-names></name><xref rid="r28409a1" ref-type="aff">1</xref><role>Referee</role></contrib><aff id="r28409a1">
+<label>1</label>Centre for Heart Valve Innovation, St. Paul’s Hospital, University of British Columbia, Vancouver, BC, Canada</aff></contrib-group><author-notes><fn fn-type="COI-statement"><p>
+<bold>Competing interests: </bold>No competing interests were disclosed.</p></fn></author-notes><pub-date pub-type="epub"><day>27</day><month>9</month><year>2021</year></pub-date><permissions><copyright-statement>Copyright: © 2021 Cheung A</copyright-statement><copyright-year>2021</copyright-year><license><ali:license_ref xmlns:ali="http://www.niso.org/schemas/ali/1.0/" specific-use="textmining" content-type="ccbylicense">https://creativecommons.org/licenses/by/4.0/</ali:license_ref><license-p>This is an open access peer review report distributed under the terms of the Creative Commons Attribution Licence, which permits unrestricted use, distribution, and reproduction in any medium, provided the original work is properly cited.</license-p></license></permissions><related-article xmlns:xlink="http://www.w3.org/1999/xlink" related-article-type="peer-reviewed-article" ext-link-type="doi" id="relatedArticleReport28409" xlink:href="10.3310/nihropenres.13215.1">Version 1</related-article><custom-meta-group><custom-meta><meta-name>recommendation</meta-name><meta-value>approve-with-reservations</meta-value></custom-meta></custom-meta-group></front-stub><body><p>Congratulations to the authors for the interesting study which investigate the benefits of minimally invasive SVG harvesting over open harvesting in patients undergoing CABG.</p><p> I have few minor revisions:
+<list list-type="order"><list-item><p>Tables can be improved, data could be better reported limiting to the most important ones, making the table more self-explanatory.</p></list-item><list-item><p>Authors correctly state that operator's expertise can make a difference in terms of long term results since the manipulation of the graft might affect its patency. However the authors do not investigate this important aspect. I believe operators' experience should be included in the analysis.</p></list-item><list-item><p>The reported death rate is not cardiovascular death, it is not clear if patients died in relation to the surgery or for not surgery related causes. Since one of the main issues related to EVH is possible excessive manipulation of the graft that could cause anticipated graft occlusion authors should report CV death also, specifically MI deaths and HF deaths.</p></list-item></list>
+</p><p>Is the work clearly and accurately presented and does it cite the current literature?</p><p>Partly</p><p>If applicable, is the statistical analysis and its interpretation appropriate?</p><p>Yes</p><p>Are all the source data underlying the results available to ensure full reproducibility?</p><p>No source data required</p><p>Is the study design appropriate and is the work technically sound?</p><p>Yes</p><p>Are the conclusions drawn adequately supported by the results?</p><p>Partly</p><p>Are sufficient details of methods and analysis provided to allow replication by others?</p><p>Yes</p><p>Reviewer Expertise:</p><p>Off-pump CABG with minimally invasive SVG and radial artery harvesting, LVAD, heart transplant, TAVR</p><p>I confirm that I have read this submission and believe that I have an appropriate level of expertise to confirm that it is of an acceptable scientific standard, however I have significant reservations, as outlined above.</p></body></sub-article></article>

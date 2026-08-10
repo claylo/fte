@@ -254,5 +254,136 @@ fn default_publishers() -> BTreeMap<String, PublisherProfile> {
         },
     );
 
+    m.insert(
+        "acs".into(),
+        PublisherProfile {
+            detect_any: vec![
+                "pubs.acs.org".into(),
+                "pubs-acs-org".into(),
+                "NLM_sec_level".into(),
+            ],
+            body_selectors: vec![
+                "div.article_content-left".into(),
+                "div.article_content".into(),
+                "div.NLM_sec_level_1".into(),
+            ],
+            cruft_selectors: vec![
+                "div.article_header".into(),
+                "div.article_citation".into(),
+                "div.articleMetrics".into(),
+                "div.support-info".into(),
+                "div.article-tools".into(),
+                "script".into(),
+                "style".into(),
+                "nav".into(),
+            ],
+            ref_selector: Some("div.article_references".into()),
+            ..Default::default()
+        },
+    );
+
+    m.insert(
+        "elsevier".into(),
+        PublisherProfile {
+            detect_any: vec![
+                "sciencedirect.com".into(),
+                "sciencedirect-com".into(),
+                "sd-article".into(),
+            ],
+            body_selectors: vec![
+                "div#body".into(),
+                "div.Body".into(),
+                "section.Body".into(),
+                "div.article-body".into(),
+            ],
+            cruft_selectors: vec![
+                "div.sidebar".into(),
+                "div.RelatedContent".into(),
+                "div.Appendices".into(),
+                "div.article-tools".into(),
+                "div.author-info".into(),
+                "div.publication-history".into(),
+                "script".into(),
+                "style".into(),
+                "nav".into(),
+            ],
+            ref_selector: Some("div.References".into()),
+            ..Default::default()
+        },
+    );
+
+    m.insert(
+        "frontiers".into(),
+        PublisherProfile {
+            detect_any: vec!["frontiersin.org".into(), "frontiersin-org".into()],
+            body_selectors: vec![
+                "div.JournalFullText".into(),
+                "div.article-section".into(),
+                "article.article-text".into(),
+            ],
+            cruft_selectors: vec![
+                "div.AbstractSummary".into(),
+                "div.article-header".into(),
+                "div.article-footer".into(),
+                "div.notes-section".into(),
+                "script".into(),
+                "style".into(),
+                "nav".into(),
+            ],
+            ref_selector: Some("div.References".into()),
+            ..Default::default()
+        },
+    );
+
+    m.insert(
+        "ieee".into(),
+        PublisherProfile {
+            detect_any: vec![
+                "ieeexplore.ieee.org".into(),
+                "ieeexplore-ieee-org".into(),
+            ],
+            body_selectors: vec![
+                "div#article-content".into(),
+                "div.article-content".into(),
+                "section.article-content".into(),
+            ],
+            cruft_selectors: vec![
+                "div.stats-document-abstract-publishedIn".into(),
+                "div.document-header".into(),
+                "div.document-footer".into(),
+                "div.article-action-toolbar".into(),
+                "div.metrics-section".into(),
+                "script".into(),
+                "style".into(),
+                "nav".into(),
+            ],
+            ref_selector: Some("div.reference-container".into()),
+            ..Default::default()
+        },
+    );
+
+    m.insert(
+        "mdpi".into(),
+        PublisherProfile {
+            detect_any: vec!["mdpi.com".into(), "mdpi-com".into()],
+            body_selectors: vec![
+                "div.html-body".into(),
+                "div#html-article-content".into(),
+                "article.article".into(),
+            ],
+            cruft_selectors: vec![
+                "div.article-icons".into(),
+                "div.art-supplementary".into(),
+                "div.article-metrics".into(),
+                "section.SupplementaryMaterial".into(),
+                "script".into(),
+                "style".into(),
+                "nav".into(),
+            ],
+            ref_selector: Some("section.html-references".into()),
+            ..Default::default()
+        },
+    );
+
     m
 }

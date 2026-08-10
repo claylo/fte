@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<article xmlns:xlink="http://www.w3.org/1999/xlink" article-type="research-article" dtd-version="1.2">
+<front>
+<journal-meta>
+<journal-title-group>
+<journal-title>Ecology</journal-title>
+</journal-title-group>
+</journal-meta>
+<article-meta>
+<article-id pub-id-type="doi">10.1002/ecy.4321</article-id>
+<title-group>
+<article-title>Species Richness Along Elevational Gradients in Tropical Mountains</article-title>
+</title-group>
+<contrib-group>
+<contrib contrib-type="author">
+<string-name><given-names>Carlos</given-names><surname>Quintero</surname></string-name>
+</contrib>
+<contrib contrib-type="author">
+<string-name><given-names>Nalini</given-names><surname>Nadkarni</surname></string-name>
+</contrib>
+</contrib-group>
+<abstract>
+<p>We document a <bold>mid-elevation peak</bold> in species richness for vascular plants, birds, and insects across eight tropical mountains spanning three continents.</p>
+</abstract>
+</article-meta>
+</front>
+<body>
+<sec>
+<title>Introduction</title>
+<p>The relationship between elevation and species richness has been debated since <italic>Humboldt</italic> first documented vegetational zones on equatorial peaks (<xref ref-type="bibr" rid="r1">Humboldt, 1807</xref>). Two competing patterns — monotonic decline vs. mid-elevation peak — dominate the literature.</p>
+</sec>
+<sec>
+<title>Methods</title>
+<p>Standardized surveys were conducted at 200 m elevational intervals from 200 to 4000 m asl on each mountain.</p>
+</sec>
+<sec>
+<title>Results</title>
+<p>The mid-elevation peak was statistically supported in 22 of 24 taxon × mountain combinations:</p>
+<table-wrap>
+<label>Table 1</label>
+<caption><p>Peak elevation and richness by taxon group</p></caption>
+<table>
+<thead>
+<tr><th>Taxon</th><th>Peak Elevation (m)</th><th>Peak Richness</th><th>Pattern</th></tr>
+</thead>
+<tbody>
+<tr><td>Vascular plants</td><td>1200–1800</td><td>142 ± 28</td><td>Mid-peak</td></tr>
+<tr><td>Birds</td><td>1000–1600</td><td>98 ± 19</td><td>Mid-peak</td></tr>
+<tr><td>Insects</td><td>800–1400</td><td>234 ± 67</td><td>Mid-peak</td></tr>
+</tbody>
+</table>
+</table-wrap>
+</sec>
+</body>
+<back>
+<ref-list>
+<ref id="r1">
+<label>1</label>
+<element-citation publication-type="book">
+<person-group person-group-type="author">
+<name><surname>Humboldt</surname><given-names>A</given-names></name>
+<name><surname>Bonpland</surname><given-names>A</given-names></name>
+</person-group>
+<source>Essay on the Geography of Plants</source>
+<year>1807</year>
+<publisher-name>Levrault, Schoell et Compagnie</publisher-name>
+<publisher-loc>Paris</publisher-loc>
+</element-citation>
+</ref>
+<ref id="r2">
+<label>2</label>
+<element-citation publication-type="journal">
+<person-group person-group-type="author">
+<name><surname>Rahbek</surname><given-names>C</given-names></name>
+</person-group>
+<article-title>The role of spatial scale and the perception of large-scale species-richness patterns</article-title>
+<source>Ecology Letters</source>
+<year>2005</year>
+<volume>8</volume>
+<fpage>224</fpage>
+<lpage>239</lpage>
+</element-citation>
+</ref>
+<ref id="r3">
+<label>3</label>
+<element-citation publication-type="journal">
+<person-group person-group-type="author">
+<name><surname>McCain</surname><given-names>CM</given-names></name>
+<name><surname>Grytnes</surname><given-names>JA</given-names></name>
+</person-group>
+<article-title>Elevational gradients in species richness</article-title>
+<source>Encyclopedia of Life Sciences</source>
+<year>2010</year>
+</element-citation>
+</ref>
+</ref-list>
+</back>
+</article>

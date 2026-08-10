@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns:wiley="http://www.wiley.com/namespaces/wiley">
+<header>
+<contentMeta>
+<titleGroup>
+<title type="main">Catalytic Asymmetric Synthesis of Chiral Amines</title>
+</titleGroup>
+<creators>
+<creator creatorRole="author">
+<personName>
+<givenNames>Kenji</givenNames>
+<familyName>Yamamoto</familyName>
+</personName>
+</creator>
+<creator creatorRole="author">
+<personName>
+<givenNames>Laura</givenNames>
+<familyName>Fischer</familyName>
+</personName>
+</creator>
+</creators>
+</contentMeta>
+<publicationMeta level="unit">
+<doi>10.1002/anie.202401234</doi>
+</publicationMeta>
+<publicationMeta level="product">
+<titleGroup>
+<title type="main">Angewandte Chemie International Edition</title>
+</titleGroup>
+</publicationMeta>
+</header>
+<body>
+<abstractGroup>
+<abstract>
+<p>A new iridium-catalyzed method enables the <italic>enantioselective</italic> synthesis of chiral amines with up to 99% ee.</p>
+</abstract>
+</abstractGroup>
+<section>
+<title>Introduction</title>
+<p>Chiral amines are ubiquitous in pharmaceuticals and agrochemicals. Despite advances in asymmetric catalysis, many transformations still require <bold>stoichiometric</bold> chiral auxiliaries.</p>
+</section>
+<section>
+<title>Results and Discussion</title>
+<section>
+<title>Catalyst Optimization</title>
+<p>We screened a library of 24 phosphine-oxazoline ligands for the iridium-catalyzed amination.</p>
+</section>
+<section>
+<title>Substrate Scope</title>
+<p>The optimized catalyst system tolerated a range of functional groups:</p>
+<tabular>
+<label>Table 1</label>
+<title>Substrate scope for the asymmetric amination</title>
+<table>
+<tgroup cols="3">
+<thead>
+<row><entry>Substrate</entry><entry>Yield (%)</entry><entry>ee (%)</entry></row>
+</thead>
+<tbody>
+<row><entry>Aryl ketone</entry><entry>95</entry><entry>99</entry></row>
+<row><entry>Alkyl ketone</entry><entry>82</entry><entry>94</entry></row>
+<row><entry>Cyclic imine</entry><entry>91</entry><entry>97</entry></row>
+</tbody>
+</tgroup>
+</table>
+</tabular>
+</section>
+</section>
+<bibliography>
+<bib id="b1">
+<citation type="journal">
+<author><familyName>Xie</familyName><givenNames>J-H</givenNames></author>
+<author><familyName>Zhou</familyName><givenNames>Q-L</givenNames></author>
+<pubYear year="2008"/>
+<articleTitle>Chiral diphosphine and monodentate phosphorus ligands on a spiro scaffold</articleTitle>
+<journalTitle>Accounts of Chemical Research</journalTitle>
+<vol>41</vol>
+<pageFirst>581</pageFirst>
+<pageLast>593</pageLast>
+</citation>
+</bib>
+<bib id="b2">
+<citation type="journal">
+<author><familyName>Nugent</familyName><givenNames>T C</givenNames></author>
+<pubYear year="2010"/>
+<articleTitle>Chiral amine synthesis</articleTitle>
+<journalTitle>Chemical Reviews</journalTitle>
+<vol>110</vol>
+<pageFirst>5891</pageFirst>
+<pageLast>5960</pageLast>
+</citation>
+</bib>
+</bibliography>
+</body>
+</component>

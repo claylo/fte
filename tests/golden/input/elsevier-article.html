@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="citation_title" content="Deep Reinforcement Learning for Autonomous Navigation">
+<meta name="citation_author" content="Müller, Hans">
+<meta name="citation_author" content="Kapoor, Ananya">
+<meta name="citation_doi" content="10.1016/j.robot.2024.104567">
+<meta name="citation_journal_title" content="Robotics and Autonomous Systems">
+</head>
+<body>
+<!-- sciencedirect.com sd-article markers -->
+<div id="body">
+<section>
+<h2>Abstract</h2>
+<p>We present a <b>deep reinforcement learning</b> framework for autonomous robot navigation in unstructured environments.</p>
+</section>
+<section>
+<h2>Introduction</h2>
+<p>Autonomous navigation requires agents to make sequential decisions under uncertainty. Traditional approaches rely on <i>simultaneous localization and mapping</i> (SLAM), but learned policies can adapt to novel environments.</p>
+</section>
+<section>
+<h2>Method</h2>
+<h3>State Representation</h3>
+<p>The agent receives a 64×64 depth image and its current velocity vector as input.</p>
+<h3>Reward Design</h3>
+<p>The reward function balances three objectives:</p>
+<ol>
+<li>Progress toward the goal (+1.0 per meter)</li>
+<li>Collision avoidance (−10.0 per contact)</li>
+<li>Smoothness penalty (−0.1 per angular velocity change)</li>
+</ol>
+</section>
+<section>
+<h2>Experiments</h2>
+<p>We evaluated in both simulated and real-world environments:</p>
+<table>
+<thead>
+<tr><th>Environment</th><th>Success Rate (%)</th><th>Avg. Time (s)</th></tr>
+</thead>
+<tbody>
+<tr><td>Indoor (sim)</td><td>94.2</td><td>12.3</td></tr>
+<tr><td>Outdoor (sim)</td><td>87.6</td><td>28.7</td></tr>
+<tr><td>Indoor (real)</td><td>88.1</td><td>15.8</td></tr>
+</tbody>
+</table>
+</section>
+<section>
+<h2>Conclusion</h2>
+<p>Our approach achieves <b>near-human performance</b> in cluttered environments while maintaining real-time inference speeds.</p>
+</section>
+</div>
+<div class="sidebar">
+<p>Related articles sidebar — should be stripped.</p>
+</div>
+</body>
+</html>

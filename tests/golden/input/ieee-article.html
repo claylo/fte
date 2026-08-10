@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="citation_title" content="Energy-Efficient Federated Learning for IoT Edge Devices">
+<meta name="citation_author" content="Kim, Hyunwoo">
+<meta name="citation_author" content="Ramirez, Carlos">
+<meta name="citation_doi" content="10.1109/TPAMI.2024.3401234">
+<meta name="citation_journal_title" content="IEEE Transactions on Pattern Analysis and Machine Intelligence">
+</head>
+<body>
+<!-- ieeexplore.ieee.org marker -->
+<div id="article-content">
+<section>
+<h2>Abstract</h2>
+<p>We propose an <b>energy-aware</b> federated learning protocol that reduces communication costs by 73% while maintaining model accuracy.</p>
+</section>
+<section>
+<h2>Introduction</h2>
+<p>Federated learning enables collaborative model training without sharing raw data. However, the <i>communication overhead</i> between edge devices and the aggregation server remains a bottleneck for resource-constrained IoT deployments.</p>
+</section>
+<section>
+<h2>Proposed Method</h2>
+<h3>Gradient Compression</h3>
+<p>We apply top-k sparsification with adaptive threshold selection based on device battery level.</p>
+<h3>Asynchronous Aggregation</h3>
+<p>Devices contribute updates at heterogeneous intervals without blocking the global model.</p>
+</section>
+<section>
+<h2>Experimental Results</h2>
+<table>
+<thead>
+<tr><th>Method</th><th>Accuracy (%)</th><th>Comm. (MB)</th><th>Energy (J)</th></tr>
+</thead>
+<tbody>
+<tr><td>FedAvg</td><td>91.2</td><td>847</td><td>42.3</td></tr>
+<tr><td>FedProx</td><td>90.8</td><td>847</td><td>41.9</td></tr>
+<tr><td>Ours</td><td>90.5</td><td>229</td><td>11.4</td></tr>
+</tbody>
+</table>
+</section>
+<section>
+<h2>Conclusion</h2>
+<p>Our approach enables <b>practical federated learning</b> on battery-powered devices with minimal accuracy loss.</p>
+</section>
+</div>
+</body>
+</html>

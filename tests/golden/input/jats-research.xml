@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<article xmlns:xlink="http://www.w3.org/1999/xlink" article-type="research-article" dtd-version="1.3">
+<front>
+<journal-meta>
+<journal-title-group>
+<journal-title>Journal of Computational Biology</journal-title>
+</journal-title-group>
+</journal-meta>
+<article-meta>
+<article-id pub-id-type="doi">10.1089/cmb.2024.0123</article-id>
+<title-group>
+<article-title>Graph Neural Networks for Protein Structure Prediction</article-title>
+</title-group>
+<contrib-group>
+<contrib contrib-type="author">
+<name><given-names>Amir</given-names><surname>Hosseini</surname></name>
+</contrib>
+<contrib contrib-type="author">
+<name><given-names>Sarah</given-names><surname>O'Brien</surname></name>
+</contrib>
+</contrib-group>
+<abstract>
+<p>We develop a graph neural network architecture that predicts protein backbone coordinates from sequence with <bold>sub-angstrom accuracy</bold>.</p>
+</abstract>
+</article-meta>
+</front>
+<body>
+<sec>
+<title>Introduction</title>
+<p>Protein structure prediction has been transformed by deep learning approaches. AlphaFold2 (<xref ref-type="bibr" rid="ref1">Jumper et al., 2021</xref>) achieved experimental-level accuracy.</p>
+</sec>
+<sec>
+<title>Methods</title>
+<sec>
+<title>Network Architecture</title>
+<p>Our model uses an <italic>equivariant</italic> graph neural network with SE(3) symmetry.</p>
+</sec>
+<sec>
+<title>Training Data</title>
+<p>We trained on 150,000 structures from the PDB, filtered for resolution better than 2.0 Å.</p>
+</sec>
+</sec>
+<sec>
+<title>Results</title>
+<p>Performance metrics on the CASP15 test set:</p>
+<table-wrap>
+<label>Table 1</label>
+<caption><p>Prediction accuracy on CASP15 targets</p></caption>
+<table>
+<thead>
+<tr><th>Metric</th><th>Our Model</th><th>AlphaFold2</th></tr>
+</thead>
+<tbody>
+<tr><td>GDT-TS</td><td>88.3</td><td>87.1</td></tr>
+<tr><td>TM-score</td><td>0.924</td><td>0.918</td></tr>
+<tr><td>RMSD (Å)</td><td>1.23</td><td>1.31</td></tr>
+</tbody>
+</table>
+</table-wrap>
+<fig>
+<label>Figure 1</label>
+<caption><p>Comparison of predicted and experimental structures for target T1024</p></caption>
+</fig>
+</sec>
+</body>
+<back>
+<ref-list>
+<ref id="ref1">
+<label>1</label>
+<mixed-citation>Jumper J, Evans R, Pritzel A, et al. Highly accurate protein structure prediction with AlphaFold. Nature. 2021;596:583-589.</mixed-citation>
+</ref>
+<ref id="ref2">
+<label>2</label>
+<mixed-citation>Baek M, DiMaio F, Anishchenko I, et al. Accurate prediction of protein structures and interactions using a three-track neural network. Science. 2021;373:871-876.</mixed-citation>
+</ref>
+</ref-list>
+</back>
+</article>

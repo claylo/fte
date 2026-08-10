@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns:wiley="http://www.wiley.com/namespaces/wiley">
+<header>
+<contentMeta>
+<titleGroup>
+<title type="main">Wind Tunnel Testing of Morphing Wing Concepts</title>
+<title type="short">Morphing Wings</title>
+</titleGroup>
+<creators>
+<creator creatorRole="author">
+<personName>
+<givenNames>Sofia</givenNames>
+<familyName>Karakosta</familyName>
+</personName>
+</creator>
+</creators>
+</contentMeta>
+<publicationMeta level="unit">
+<doi>10.1002/asjc.3456</doi>
+</publicationMeta>
+<publicationMeta level="product">
+<titleGroup>
+<title type="main">Asian Journal of Control</title>
+</titleGroup>
+</publicationMeta>
+</header>
+<body>
+<abstractGroup>
+<abstract>
+<p>We present wind tunnel results for a <italic>shape-memory alloy</italic> actuated morphing wing that achieves continuous camber variation from 2% to 8% chord.</p>
+</abstract>
+</abstractGroup>
+<section>
+<title>Experimental Setup</title>
+<p>Tests were conducted in the 2.4 m × 1.8 m closed-circuit wind tunnel at Reynolds numbers from 2×10^5 to 8×10^5.</p>
+<figure>
+<label>Figure 1</label>
+<caption><p>Schematic of the morphing wing test section with SMA actuator locations</p></caption>
+</figure>
+</section>
+<section>
+<title>Results</title>
+<p>Lift coefficient C_L increased by <bold>34%</bold> at α = 5° when camber was morphed from 2% to 8%.</p>
+<tabular>
+<label>Table 1</label>
+<title>Aerodynamic coefficients at Re = 5×10^5</title>
+<table>
+<tgroup cols="4">
+<thead>
+<row><entry>Camber (%)</entry><entry>C_L (α=0°)</entry><entry>C_L (α=5°)</entry><entry>C_D (α=5°)</entry></row>
+</thead>
+<tbody>
+<row><entry>2</entry><entry>0.21</entry><entry>0.68</entry><entry>0.032</entry></row>
+<row><entry>4</entry><entry>0.35</entry><entry>0.78</entry><entry>0.035</entry></row>
+<row><entry>6</entry><entry>0.48</entry><entry>0.85</entry><entry>0.039</entry></row>
+<row><entry>8</entry><entry>0.59</entry><entry>0.91</entry><entry>0.044</entry></row>
+</tbody>
+</tgroup>
+</table>
+</tabular>
+</section>
+</body>
+</component>

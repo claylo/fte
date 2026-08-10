@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="citation_title" content="Hierarchical Organization of the Mammalian Brain Connectome">
+<meta name="citation_author" content="Fernandez, Diego">
+<meta name="citation_doi" content="10.1093/cercor/bhae234">
+<meta name="citation_journal_title" content="Cerebral Cortex">
+</head>
+<body>
+<!-- academic.oup.com marker -->
+<div class="widget-ArticleFulltext">
+<section>
+<h2>Introduction</h2>
+<p>The brain connectome exhibits <b>hierarchical modularity</b> across multiple spatial scales.</p>
+</section>
+<section>
+<h2>Methods</h2>
+<h3>Data Acquisition</h3>
+<h4>Diffusion Tensor Imaging</h4>
+<p>DTI data were acquired at 1.25 mm isotropic resolution using a multiband sequence.</p>
+<h4>Functional MRI</h4>
+<p>Resting-state fMRI was collected over four 15-minute runs per participant.</p>
+<h5>Preprocessing Pipeline</h5>
+<p>Data were processed using fMRIPrep v23.1 with default parameters.</p>
+<h5>Quality Control</h5>
+<p>Participants with mean framewise displacement exceeding 0.3 mm were excluded.</p>
+<h3>Network Construction</h3>
+<h4>Parcellation</h4>
+<p>We used the Schaefer 400-parcel atlas aligned to the MNI152 template.</p>
+<h4>Edge Weights</h4>
+<p>Structural edges were weighted by streamline count; functional edges by Fisher-transformed correlations.</p>
+</section>
+<section>
+<h2>Results</h2>
+<p>Community detection revealed <i>four hierarchical levels</i> of organization, from individual parcels to whole-brain modules.</p>
+<table>
+<thead>
+<tr><th>Level</th><th>Communities</th><th>Modularity Q</th></tr>
+</thead>
+<tbody>
+<tr><td>1 (finest)</td><td>42</td><td>0.71</td></tr>
+<tr><td>2</td><td>12</td><td>0.58</td></tr>
+<tr><td>3</td><td>5</td><td>0.43</td></tr>
+<tr><td>4 (coarsest)</td><td>2</td><td>0.31</td></tr>
+</tbody>
+</table>
+</section>
+</div>
+</body>
+</html>
