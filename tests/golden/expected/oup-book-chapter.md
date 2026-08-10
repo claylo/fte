@@ -17,9 +17,9 @@ The relationship between perception and consciousness has been debated since *De
 
 Three major positions dominate the literature:
 
-2. **Direct realism** — we perceive objects as they are
-4. **Indirect realism** — perception is mediated by mental representations
-6. **Idealism** — objects are mind-dependent
+1. **Direct realism** — we perceive objects as they are
+2. **Indirect realism** — perception is mediated by mental representations
+3. **Idealism** — objects are mind-dependent
 
 ## The Hard Problem
 

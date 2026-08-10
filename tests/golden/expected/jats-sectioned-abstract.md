@@ -23,11 +23,7 @@ journal: "BMC Infectious Diseases"
 
 Healthcare-associated infections remain a *critical* challenge in low- and middle-income countries, where infection prevention resources are limited.
 
-Healthcare-associated infections remain a *critical* challenge in low- and middle-income countries, where infection prevention resources are limited.
-
 ## Results
-
-The most common pathogens were *Klebsiella pneumoniae* (28%), *Staphylococcus aureus* (22%), and *Escherichia coli* (18%).
 
 The most common pathogens were *Klebsiella pneumoniae* (28%), *Staphylococcus aureus* (22%), and *Escherichia coli* (18%).
 

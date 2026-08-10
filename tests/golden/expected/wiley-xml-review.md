@@ -20,13 +20,9 @@ journal: "Molecular Informatics"
 
 Deep learning models for virtual screening have shown *significant improvements* over traditional docking methods.
 
-Deep learning models for virtual screening have shown *significant improvements* over traditional docking methods.
-
 ## De Novo Design
 
 Generative models can propose novel molecular structures with desired properties. Key architectures include:
 
 **Figure 1** Overview of generative model architectures for molecular design
-
-Generative models can propose novel molecular structures with desired properties. Key architectures include:
 

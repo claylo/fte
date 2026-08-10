@@ -71,6 +71,8 @@ pub fn extract_html(
 /// Extract metadata from <meta> tags (universal across publishers).
 pub fn extract_meta_tags(doc: &Html) -> Metadata {
     let mut meta = Metadata::default();
+    let mut has_citation_authors = false;
+    let mut dc_authors = Vec::new();
 
     let meta_sel = Selector::parse("meta").unwrap();
     for el in doc.select(&meta_sel) {
@@ -86,6 +88,7 @@ pub fn extract_meta_tags(doc: &Html) -> Metadata {
                 }
             }
             "citation_author" => {
+                has_citation_authors = true;
                 meta.authors.push(content.to_string());
             }
             "citation_doi" | "DOI" => {
@@ -96,8 +99,18 @@ pub fn extract_meta_tags(doc: &Html) -> Metadata {
             "citation_journal_title" if meta.journal.is_none() => {
                 meta.journal = Some(content.to_string());
             }
+            "dc.Title" | "DC.Title" if meta.title.is_none() => {
+                meta.title = Some(content.to_string());
+            }
+            "dc.Creator" | "DC.Creator" => {
+                dc_authors.push(markdown::normalize_text(content));
+            }
             _ => {}
         }
+    }
+
+    if !has_citation_authors {
+        meta.authors = dc_authors;
     }
 
     // Fallback title from <title> tag
@@ -194,15 +207,17 @@ pub fn walk_element(el: &ElementRef, cruft: &[Selector], out: &mut String, depth
 
         // Lists
         "ul" | "ol" => {
-            for (i, child) in el.children().enumerate() {
+            let mut li_index = 0u32;
+            for child in el.children() {
                 if let Some(child_el) = ElementRef::wrap(child)
                     && child_el.value().name() == "li"
                 {
+                    li_index += 1;
                     let text = inline_markdown(&child_el, cruft);
                     let text = markdown::normalize_text(&text);
                     if !text.is_empty() {
                         if tag == "ol" {
-                            out.push_str(&format!("{}. {text}\n", i + 1));
+                            out.push_str(&format!("{li_index}. {text}\n"));
                         } else {
                             out.push_str(&format!("- {text}\n"));
                         }

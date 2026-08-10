@@ -19,8 +19,6 @@ We performed single-cell RNA sequencing on 120,000 cells from 18 *treatment-naï
 
 Tumor heterogeneity drives treatment resistance and disease progression. Single-cell technologies enable characterization of individual cell states within the tumor ecosystem (Zhang et al., 2020).
 
-Tumor heterogeneity drives treatment resistance and disease progression. Single-cell technologies enable characterization of individual cell states within the tumor ecosystem (Zhang et al., 2020).
-
 ## Results
 
 ### Cell Type Composition
@@ -40,8 +38,6 @@ Unsupervised clustering identified major cell populations:
 
 **Figure 1** UMAP visualization of 120,000 cells colored by cell type annotation
 
-Unsupervised clustering identified major cell populations:
-
 ### T Cell States
 
 Within the T cell compartment, we identified *exhausted* CD8^+ T cells (PD-1^hi, TIM-3^hi, LAG-3^+) enriched in **microsatellite-stable** tumors.
@@ -56,11 +52,7 @@ Within the T cell compartment, we identified *exhausted* CD8^+ T cells (PD-1^hi,
 
 **Figure 2** Pseudotime trajectory analysis of CD8^+ T cell differentiation from naïve to exhausted states
 
-Within the T cell compartment, we identified *exhausted* CD8^+ T cells (PD-1^hi, TIM-3^hi, LAG-3^+) enriched in **microsatellite-stable** tumors.
-
 ## Discussion
-
-Our data reveal that the tumor microenvironment in colorectal cancer is **more heterogeneous** than previously appreciated, with implications for immunotherapy patient stratification.
 
 Our data reveal that the tumor microenvironment in colorectal cancer is **more heterogeneous** than previously appreciated, with implications for immunotherapy patient stratification.
 

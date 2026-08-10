@@ -29,9 +29,9 @@ The agent receives a 64×64 depth image and its current velocity vector as input
 
 The reward function balances three objectives:
 
-2. Progress toward the goal (+1.0 per meter)
-4. Collision avoidance (−10.0 per contact)
-6. Smoothness penalty (−0.1 per angular velocity change)
+1. Progress toward the goal (+1.0 per meter)
+2. Collision avoidance (−10.0 per contact)
+3. Smoothness penalty (−0.1 per angular velocity change)
 
 ## Experiments
 

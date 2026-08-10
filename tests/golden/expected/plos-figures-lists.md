@@ -30,10 +30,10 @@ Miniaturized geolocators (0.65 g, <1% body mass) were attached to leg bands.
 
 Positions were derived using the threshold method with the following steps:
 
-2. Light curves were inspected for shading events
-4. Sunrise and sunset times were identified using a light threshold of 2 lux
-6. Latitude was estimated from day length and longitude from the time of solar noon
-8. An iterative smoothing algorithm removed outliers
+1. Light curves were inspected for shading events
+2. Sunrise and sunset times were identified using a light threshold of 2 lux
+3. Latitude was estimated from day length and longitude from the time of solar noon
+4. An iterative smoothing algorithm removed outliers
 
 ## Results
 

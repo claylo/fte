@@ -148,7 +148,6 @@ fn extract_metadata(root: &Node) -> Metadata {
 fn extract_sections(parent: &Node, depth: u8, out: &mut String) {
     for child in parent.children() {
         if child.has_tag_name("section") {
-            // Section heading
             if let Some(title) = find_child(&child, "title") {
                 let t = markdown::normalize_text(&text_content(&title));
                 if !t.is_empty() {
@@ -157,20 +156,6 @@ fn extract_sections(parent: &Node, depth: u8, out: &mut String) {
                 }
             }
 
-            // Direct paragraphs
-            out.push_str(&collect_paragraphs(&child));
-
-            // Tables (Wiley uses <tabular>)
-            for tab in child.children().filter(|n| n.has_tag_name("tabular")) {
-                extract_tabular(&tab, out);
-            }
-
-            // Figures
-            for fig in child.children().filter(|n| n.has_tag_name("figure")) {
-                extract_figure(&fig, out);
-            }
-
-            // Recurse
             let next_depth = (depth + 1).min(6);
             extract_sections(&child, next_depth, out);
         } else if child.has_tag_name("p") {
@@ -179,8 +164,10 @@ fn extract_sections(parent: &Node, depth: u8, out: &mut String) {
                 out.push_str(&text);
                 out.push_str("\n\n");
             }
-        } else if child.has_tag_name("bibliography") {
-            // Handled separately in the main extract function
+        } else if child.has_tag_name("tabular") {
+            extract_tabular(&child, out);
+        } else if child.has_tag_name("figure") {
+            extract_figure(&child, out);
         }
     }
 }

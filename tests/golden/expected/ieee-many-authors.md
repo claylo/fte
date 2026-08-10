@@ -29,9 +29,9 @@ Code generation using neural language models has advanced rapidly since the intr
 
 We categorize models along three axes:
 
-2. Architecture: encoder-decoder vs decoder-only
-4. Training data: natural language + code vs code-only
-6. Fine-tuning: instruction-tuned vs base models
+1. Architecture: encoder-decoder vs decoder-only
+2. Training data: natural language + code vs code-only
+3. Fine-tuning: instruction-tuned vs base models
 
 ## Benchmark Results
 

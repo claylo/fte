@@ -18,9 +18,9 @@ CRISPR-Cas9 genome editing has **revolutionized** crop improvement by enabling p
 
 Recent developments include:
 
-2. Base editing for single nucleotide changes
-4. Prime editing for insertions and deletions
-6. Multiplexed editing of gene families
+1. Base editing for single nucleotide changes
+2. Prime editing for insertions and deletions
+3. Multiplexed editing of gene families
 
 ### Regulatory Landscape
 

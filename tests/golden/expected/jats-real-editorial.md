@@ -44,5 +44,3 @@ Overall, the research and perspectives presented in this Research Topic undersco
 
 W-JG: Writing – original draft, Writing – review & editing. OG: Writing – review & editing. PG: Writing – review & editing. MD: Writing – review & editing. MS-V: Writing – review & editing.
 
-W-JG: Writing – original draft, Writing – review & editing. OG: Writing – review & editing. PG: Writing – review & editing. MD: Writing – review & editing. MS-V: Writing – review & editing.
-

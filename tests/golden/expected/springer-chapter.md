@@ -17,9 +17,9 @@ This chapter introduces the **Fourier transform** and its applications in digita
 
 The DFT converts a finite sequence of samples into frequency components. For a sequence x[n] of length N:
 
-2. Compute the *real* component
-4. Compute the *imaginary* component
-6. Combine using Euler's formula: e^iθ = cos θ + i sin θ
+1. Compute the *real* component
+2. Compute the *imaginary* component
+3. Combine using Euler's formula: e^iθ = cos θ + i sin θ
 
 ## Applications
 

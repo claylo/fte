@@ -19,8 +19,6 @@ We conducted a systematic review and meta-analysis of pharmacokinetic studies of
 
 DOACs are increasingly used as alternatives to warfarin for thromboembolic disease prevention. However, all DOACs undergo some degree of renal elimination, raising concerns about drug accumulation in *chronic kidney disease* (CKD).
 
-DOACs are increasingly used as alternatives to warfarin for thromboembolic disease prevention. However, all DOACs undergo some degree of renal elimination, raising concerns about drug accumulation in *chronic kidney disease* (CKD).
-
 ## Results
 
 ### Pharmacokinetic Parameters
@@ -47,11 +45,7 @@ Based on the pharmacokinetic data, we propose the following dose modifications:
 | Apixaban | 5 mg BID | 5 mg BID | 2.5 mg BID |
 | Edoxaban | 60 mg QD | 30 mg QD | 30 mg QD |
 
-Based on the pharmacokinetic data, we propose the following dose modifications:
-
 ## Conclusions
-
-Apixaban demonstrates the most favorable pharmacokinetic profile in CKD due to its **low renal dependence**. Dabigatran should be avoided in severe renal impairment.
 
 Apixaban demonstrates the most favorable pharmacokinetic profile in CKD due to its **low renal dependence**. Dabigatran should be avoided in severe renal impairment.
 

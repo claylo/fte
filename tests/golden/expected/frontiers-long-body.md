@@ -46,10 +46,10 @@ Cytokines produced by activated macrophages — particularly *IL-1β*, *IL-6*, a
 
 Bacterial fermentation of dietary fiber produces acetate, propionate, and butyrate. These SCFAs serve multiple functions:
 
-2. Energy source for colonocytes (butyrate)
-4. Histone deacetylase (HDAC) inhibition affecting gene expression
-6. G-protein coupled receptor signaling (GPR41, GPR43)
-8. Blood-brain barrier integrity maintenance
+1. Energy source for colonocytes (butyrate)
+2. Histone deacetylase (HDAC) inhibition affecting gene expression
+3. G-protein coupled receptor signaling (GPR41, GPR43)
+4. Blood-brain barrier integrity maintenance
 
 ### Tryptophan Metabolites
 

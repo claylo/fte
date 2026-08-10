@@ -19,11 +19,7 @@ We document a **mid-elevation peak** in species richness for vascular plants, bi
 
 The relationship between elevation and species richness has been debated since *Humboldt* first documented vegetational zones on equatorial peaks (Humboldt, 1807). Two competing patterns — monotonic decline vs. mid-elevation peak — dominate the literature.
 
-The relationship between elevation and species richness has been debated since *Humboldt* first documented vegetational zones on equatorial peaks (Humboldt, 1807). Two competing patterns — monotonic decline vs. mid-elevation peak — dominate the literature.
-
 ## Methods
-
-Standardized surveys were conducted at 200 m elevational intervals from 200 to 4000 m asl on each mountain.
 
 Standardized surveys were conducted at 200 m elevational intervals from 200 to 4000 m asl on each mountain.
 
@@ -38,8 +34,6 @@ The mid-elevation peak was statistically supported in 22 of 24 taxon × mountain
 | Vascular plants | 1200–1800 | 142 ± 28 | Mid-peak |
 | Birds | 1000–1600 | 98 ± 19 | Mid-peak |
 | Insects | 800–1400 | 234 ± 67 | Mid-peak |
-
-The mid-elevation peak was statistically supported in 22 of 24 taxon × mountain combinations:
 
 ## References
 

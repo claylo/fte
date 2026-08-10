@@ -28,7 +28,7 @@ DREB/CBF transcription factors activate drought-responsive genes without requiri
 
 Plants deploy multiple strategies:
 
-2. Root architecture remodeling for deeper water access
-4. Osmolyte accumulation (proline, glycine betaine)
-6. Cuticular wax deposition to reduce transpiration
+1. Root architecture remodeling for deeper water access
+2. Osmolyte accumulation (proline, glycine betaine)
+3. Cuticular wax deposition to reduce transpiration
 

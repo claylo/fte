@@ -210,8 +210,8 @@ The fine-tuned weights for each model are provided in the NERRE-Llama repository
 
 The fuzzy and complex nature of the entities and relationships detailed in the previous section necessitates the use of several metrics for scoring. We evaluate the performance of all models on two levels:
 
-2. 1. A relation *F*_1 computed on a stringent exact word-match basis (i.e., how many words are correctly linked together exactly as they appear in the source text prompt).
-4. 2. A holistic information extraction *F*_1 based on manual inspection by a domain expert, which doesn’t require words to match exactly.
+1. 1. A relation *F*_1 computed on a stringent exact word-match basis (i.e., how many words are correctly linked together exactly as they appear in the source text prompt).
+2. 2. A holistic information extraction *F*_1 based on manual inspection by a domain expert, which doesn’t require words to match exactly.
 
 We separately provide a sequence-level error analysis in Supplementary Note 7 and Supplementary Discussion 1.
 
@@ -235,9 +235,9 @@ To better address scoring of these fuzzy tasks, we introduce an adjusted score b
 
 We score entities extracted by annotators but not present in the model’s output as false negatives, except when reasonable variations are present. The criteria for a true positive are as follows:
 
-2. 1. The entity comes from the original passage or is a reasonable variation of the entity in the passage (e.g., “silicon" ⟶ “Si"). It is not invented by the model.
-4. 2. The entity is a root entity or is grouped with a valid root entity. For the General-JSON model, a root entity is either a material’s formula or name. If both are present, the formula is used at the root.
-6. 3. The entity is in the correct field in the correct root entity’s group (JSON object).
+1. 1. The entity comes from the original passage or is a reasonable variation of the entity in the passage (e.g., “silicon" ⟶ “Si"). It is not invented by the model.
+2. 2. The entity is a root entity or is grouped with a valid root entity. For the General-JSON model, a root entity is either a material’s formula or name. If both are present, the formula is used at the root.
+3. 3. The entity is in the correct field in the correct root entity’s group (JSON object).
 
 Manual scores are reported per-entity as if they were NER scores. However, the requirements for a true positive implicitly include relational information, since an entity is only correct if is grouped with the correct root entity.
 
@@ -342,5 +342,5 @@ Provided by the Springer Nature SharedIt content-sharing initiative
 
 ### Profiles
 
-2. Alexander Dunn View author profile
+1. Alexander Dunn View author profile
 

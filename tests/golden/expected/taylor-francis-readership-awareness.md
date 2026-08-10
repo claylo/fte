@@ -1,11 +1,14 @@
 ---
 id: taylor-francis-readership-awareness
 source_format: tandf-html
-title: "Full article: Readership Awareness Series – Paper 10: Open Access Publishing"
+title: "Readership Awareness Series – Paper 10: Open Access Publishing"
+authors:
+  - "Mohammad Javed Ali"
+  - "Djalilian Ali"
 journal: "Seminars in Ophthalmology"
 ---
 
-# Full article: Readership Awareness Series – Paper 10: Open Access Publishing
+# Readership Awareness Series – Paper 10: Open Access Publishing
 
 ## INTRODUCTION
 

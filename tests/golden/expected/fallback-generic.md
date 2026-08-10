@@ -18,10 +18,10 @@ The transition to **open access** publishing has accelerated since 2020, driven 
 
 Four primary models exist:
 
-2. **Gold OA** — published openly, often with an APC
-4. **Green OA** — self-archived in a repository
-6. **Diamond OA** — no fees to authors or readers
-8. **Hybrid** — subscription journal with optional OA per article
+1. **Gold OA** — published openly, often with an APC
+2. **Green OA** — self-archived in a repository
+3. **Diamond OA** — no fees to authors or readers
+4. **Hybrid** — subscription journal with optional OA per article
 
 ## Impact on Citation Rates
 

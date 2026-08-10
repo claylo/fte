@@ -49,9 +49,9 @@ DED processes feed powder or wire into a melt pool created by a laser or electro
 
 Post-processing treatments improve biocompatibility:
 
-2. **Anodization** — creates a TiO_2 nanotube layer promoting osseointegration
-4. **Hydroxyapatite coating** — mimics bone mineral composition
-6. **Chemical etching** — produces micro-roughness favorable for cell adhesion
+1. **Anodization** — creates a TiO_2 nanotube layer promoting osseointegration
+2. **Hydroxyapatite coating** — mimics bone mineral composition
+3. **Chemical etching** — produces micro-roughness favorable for cell adhesion
 
 ## Conclusions
 

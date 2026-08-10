@@ -19,13 +19,9 @@ A new iridium-catalyzed method enables the *enantioselective* synthesis of chira
 
 Chiral amines are ubiquitous in pharmaceuticals and agrochemicals. Despite advances in asymmetric catalysis, many transformations still require **stoichiometric** chiral auxiliaries.
 
-Chiral amines are ubiquitous in pharmaceuticals and agrochemicals. Despite advances in asymmetric catalysis, many transformations still require **stoichiometric** chiral auxiliaries.
-
 ## Results and Discussion
 
 ### Catalyst Optimization
-
-We screened a library of 24 phosphine-oxazoline ligands for the iridium-catalyzed amination.
 
 We screened a library of 24 phosphine-oxazoline ligands for the iridium-catalyzed amination.
 
@@ -40,8 +36,6 @@ The optimized catalyst system tolerated a range of functional groups:
 | Aryl ketone | 95 | 99 |
 | Alkyl ketone | 82 | 94 |
 | Cyclic imine | 91 | 97 |
-
-The optimized catalyst system tolerated a range of functional groups:
 
 ## References
 

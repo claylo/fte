@@ -20,8 +20,6 @@ Tests were conducted in the 2.4 m × 1.8 m closed-circuit wind tunnel at Reynold
 
 **Figure 1** Schematic of the morphing wing test section with SMA actuator locations
 
-Tests were conducted in the 2.4 m × 1.8 m closed-circuit wind tunnel at Reynolds numbers from 2×10^5 to 8×10^5.
-
 ## Results
 
 Lift coefficient C_L increased by **34%** at α = 5° when camber was morphed from 2% to 8%.
@@ -34,6 +32,4 @@ Lift coefficient C_L increased by **34%** at α = 5° when camber was morphed fr
 | 4 | 0.35 | 0.78 | 0.035 |
 | 6 | 0.48 | 0.85 | 0.039 |
 | 8 | 0.59 | 0.91 | 0.044 |
-
-Lift coefficient C_L increased by **34%** at α = 5° when camber was morphed from 2% to 8%.
 

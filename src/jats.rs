@@ -149,7 +149,6 @@ fn extract_metadata(root: &Node) -> Metadata {
 fn extract_sections(parent: &Node, depth: u8, out: &mut String) {
     for child in parent.children() {
         if child.has_tag_name("sec") {
-            // Section heading
             if let Some(title) = find_child(&child, "title") {
                 let t = markdown::normalize_text(&text_content(&title));
                 if !t.is_empty() {
@@ -158,29 +157,18 @@ fn extract_sections(parent: &Node, depth: u8, out: &mut String) {
                 }
             }
 
-            // Direct paragraphs in this section
-            out.push_str(&collect_paragraphs(&child));
-
-            // Tables
-            for tw in child.children().filter(|n| n.has_tag_name("table-wrap")) {
-                extract_table(&tw, out);
-            }
-
-            // Figures
-            for fig in child.children().filter(|n| n.has_tag_name("fig")) {
-                extract_figure(&fig, out);
-            }
-
-            // Recurse into subsections
             let next_depth = (depth + 1).min(6);
             extract_sections(&child, next_depth, out);
         } else if child.has_tag_name("p") {
-            // Paragraphs directly under body (no section wrapper)
             let text = markdown::normalize_text(&inline_text(&child));
             if !text.is_empty() {
                 out.push_str(&text);
                 out.push_str("\n\n");
             }
+        } else if child.has_tag_name("table-wrap") {
+            extract_table(&child, out);
+        } else if child.has_tag_name("fig") {
+            extract_figure(&child, out);
         }
     }
 }
