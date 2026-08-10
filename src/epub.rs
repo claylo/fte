@@ -7,50 +7,187 @@ use scraper::{ElementRef, Html, Selector};
 use crate::html;
 use crate::markdown::{self, Metadata};
 
-/// Extract markdown from a Sage ePub file.
+/// Extract markdown from an ePub file.
+///
+/// Discovers content files via the OPF spine (the EPUB standard way) rather
+/// than hardcoding paths. Falls back to scanning for .xhtml files if the
+/// OPF is missing or unparseable.
 pub fn extract(id: &str, path: &Path) -> Result<String> {
     let file = std::fs::File::open(path).with_context(|| format!("opening {}", path.display()))?;
     let mut archive =
         zip::ZipArchive::new(file).with_context(|| format!("reading zip: {}", path.display()))?;
 
-    // Read the main content file
-    let mut main_xhtml = read_entry(&mut archive, "EPUB/xhtml/index.xhtml")
-        .context("reading EPUB/xhtml/index.xhtml")?;
+    let (content_paths, opf_meta) = discover_content_paths(&mut archive)?;
 
-    // Append any table overflow files (table*.xhtml)
-    let table_names: Vec<String> = archive
-        .file_names()
-        .filter(|n| n.starts_with("EPUB/xhtml/table") && n.ends_with(".xhtml"))
-        .map(String::from)
-        .collect();
-
-    for name in &table_names {
-        if let Ok(content) = read_entry(&mut archive, name) {
-            // Extract just the <body> content from overflow files
-            main_xhtml.push_str("\n<!-- overflow: ");
-            main_xhtml.push_str(name);
-            main_xhtml.push_str(" -->\n");
-            main_xhtml.push_str(&content);
+    let mut combined_xhtml = String::new();
+    for entry_path in &content_paths {
+        match read_entry(&mut archive, entry_path) {
+            Ok(content) => {
+                if !combined_xhtml.is_empty() {
+                    combined_xhtml.push_str("\n<!-- epub-part: ");
+                    combined_xhtml.push_str(entry_path);
+                    combined_xhtml.push_str(" -->\n");
+                }
+                combined_xhtml.push_str(&content);
+            }
+            Err(e) => {
+                eprintln!("  WARN skipping {entry_path}: {e}");
+            }
         }
     }
 
-    // Also grab figure overflow files
-    let fig_names: Vec<String> = archive
-        .file_names()
-        .filter(|n| n.starts_with("EPUB/xhtml/fig") && n.ends_with(".xhtml"))
-        .map(String::from)
-        .collect();
+    if combined_xhtml.is_empty() {
+        anyhow::bail!("no readable content files in ePub");
+    }
 
-    for name in &fig_names {
-        if let Ok(content) = read_entry(&mut archive, name) {
-            main_xhtml.push_str("\n<!-- overflow: ");
-            main_xhtml.push_str(name);
-            main_xhtml.push_str(" -->\n");
-            main_xhtml.push_str(&content);
+    parse_epub_xhtml(id, &combined_xhtml, &opf_meta)
+}
+
+/// Discover content XHTML paths from the OPF spine, plus Dublin Core metadata.
+fn discover_content_paths(
+    archive: &mut zip::ZipArchive<std::fs::File>,
+) -> Result<(Vec<String>, Metadata)> {
+    let opf_path = find_opf_path(archive)?;
+    let opf_dir = opf_path
+        .rfind('/')
+        .map(|i| &opf_path[..=i])
+        .unwrap_or("");
+
+    let opf_xml = read_entry(archive, &opf_path)
+        .with_context(|| format!("reading {opf_path}"))?;
+    let doc = roxmltree::Document::parse(&opf_xml)
+        .with_context(|| format!("parsing {opf_path}"))?;
+
+    let opf_meta = extract_opf_metadata(&doc);
+
+    // Build manifest: id → href (resolved relative to OPF directory)
+    let mut manifest = std::collections::HashMap::new();
+    let mut nav_ids = std::collections::HashSet::new();
+
+    for node in doc.descendants() {
+        if node.tag_name().name() == "item"
+            && let (Some(item_id), Some(href)) = (node.attribute("id"), node.attribute("href"))
+        {
+            let props = node.attribute("properties").unwrap_or("");
+            if props.contains("nav") {
+                nav_ids.insert(item_id.to_string());
+            }
+            let full_path = format!("{opf_dir}{href}");
+            manifest.insert(item_id.to_string(), full_path);
         }
     }
 
-    parse_epub_xhtml(id, &main_xhtml)
+    // Walk spine in order, collecting content items
+    let mut paths = Vec::new();
+    for node in doc.descendants() {
+        if node.tag_name().name() == "itemref"
+            && let Some(idref) = node.attribute("idref")
+        {
+            if nav_ids.contains(idref) {
+                continue;
+            }
+            let linear = node.attribute("linear").unwrap_or("yes");
+            if linear == "no" {
+                continue;
+            }
+            if let Some(href) = manifest.get(idref) {
+                let lower = href.to_lowercase();
+                if lower.ends_with("cover.xhtml") || lower.ends_with("cover.html") {
+                    continue;
+                }
+                paths.push(href.clone());
+            }
+        }
+    }
+
+    if paths.is_empty() {
+        anyhow::bail!("OPF spine contains no content items");
+    }
+
+    // Also grab overflow files (tables, figures) not in the spine
+    let xhtml_dir = paths
+        .first()
+        .and_then(|p| p.rfind('/').map(|i| &p[..=i]))
+        .unwrap_or("");
+    let overflow_names: Vec<String> = archive
+        .file_names()
+        .filter(|n| {
+            n.starts_with(xhtml_dir)
+                && n.ends_with(".xhtml")
+                && !paths.contains(&n.to_string())
+        })
+        .filter(|n| {
+            let lower = n.to_lowercase();
+            let fname = lower.rsplit('/').next().unwrap_or(&lower);
+            fname.starts_with("table") || fname.starts_with("fig")
+        })
+        .map(String::from)
+        .collect();
+    paths.extend(overflow_names);
+
+    Ok((paths, opf_meta))
+}
+
+/// Extract Dublin Core metadata from the OPF document.
+fn extract_opf_metadata(doc: &roxmltree::Document) -> Metadata {
+    let mut meta = Metadata::default();
+
+    for node in doc.descendants() {
+        let name = node.tag_name().name();
+        match name {
+            "title" if node.tag_name().namespace().is_some() => {
+                if let Some(text) = node.text() {
+                    let t = text.trim();
+                    if !t.is_empty() {
+                        meta.title = Some(t.to_string());
+                    }
+                }
+            }
+            "creator" if node.tag_name().namespace().is_some() => {
+                if let Some(text) = node.text() {
+                    let t = text.trim();
+                    if !t.is_empty() {
+                        meta.authors.push(t.to_string());
+                    }
+                }
+            }
+            "identifier" if node.tag_name().namespace().is_some() => {
+                if let Some(text) = node.text() {
+                    let t = text.trim();
+                    if t.starts_with("10.") && t.contains('/') {
+                        meta.doi = Some(t.to_string());
+                    }
+                }
+            }
+            _ => {}
+        }
+    }
+
+    meta
+}
+
+/// Find the OPF file path from META-INF/container.xml.
+fn find_opf_path(archive: &mut zip::ZipArchive<std::fs::File>) -> Result<String> {
+    let container = read_entry(archive, "META-INF/container.xml")
+        .context("reading META-INF/container.xml")?;
+    let doc = roxmltree::Document::parse(&container)
+        .context("parsing META-INF/container.xml")?;
+
+    for node in doc.descendants() {
+        if node.tag_name().name() == "rootfile"
+            && let Some(path) = node.attribute("full-path")
+        {
+            return Ok(path.to_string());
+        }
+    }
+
+    // Fallback: scan for .opf file
+    let opf = archive
+        .file_names()
+        .find(|n| n.ends_with(".opf"))
+        .map(String::from);
+
+    opf.ok_or_else(|| anyhow::anyhow!("no OPF file found in ePub"))
 }
 
 /// Largest uncompressed entry fte will read out of an ePub archive.
@@ -109,11 +246,23 @@ fn read_entry_limited(
     String::from_utf8(buf).with_context(|| format!("{name} is not valid UTF-8"))
 }
 
-fn parse_epub_xhtml(id: &str, xhtml: &str) -> Result<String> {
+fn parse_epub_xhtml(id: &str, xhtml: &str, opf_meta: &Metadata) -> Result<String> {
     let doc = Html::parse_document(xhtml);
 
-    // Extract metadata from schema.org properties
-    let meta = extract_epub_metadata(&doc);
+    // Extract metadata from schema.org properties, falling back to OPF
+    let mut meta = extract_epub_metadata(&doc);
+    if meta.title.is_none() {
+        meta.title.clone_from(&opf_meta.title);
+    }
+    if meta.authors.is_empty() {
+        meta.authors.clone_from(&opf_meta.authors);
+    }
+    if meta.doi.is_none() {
+        meta.doi.clone_from(&opf_meta.doi);
+    }
+    if meta.journal.is_none() {
+        meta.journal.clone_from(&opf_meta.journal);
+    }
 
     let mut body = String::new();
 
@@ -193,12 +342,28 @@ fn extract_epub_metadata(doc: &Html) -> Metadata {
         && let Some(href) = el.value().attr("href")
         && href.contains("doi.org")
     {
-        // Extract DOI from URL
         let doi = href
             .strip_prefix("https://doi.org/")
             .or_else(|| href.strip_prefix("http://doi.org/"))
             .unwrap_or(href);
         meta.doi = Some(doi.to_string());
+    }
+
+    // Fallback DOI: any <a> linking to doi.org
+    if meta.doi.is_none()
+        && let Ok(sel) = Selector::parse("a")
+    {
+        for el in doc.select(&sel) {
+            if let Some(href) = el.value().attr("href")
+                && let Some(doi) = href
+                    .strip_prefix("https://doi.org/")
+                    .or_else(|| href.strip_prefix("http://doi.org/"))
+                && doi.starts_with("10.")
+            {
+                meta.doi = Some(doi.to_string());
+                break;
+            }
+        }
     }
 
     // Journal from span[property="name"] inside span[property="isPartOf"][typeof="Periodical"]

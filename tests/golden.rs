@@ -2,6 +2,7 @@ use std::path::Path;
 
 use fte::config::Config;
 use fte::detect;
+use fte::epub;
 use fte::extract;
 
 fn golden(input_name: &str) {
@@ -16,11 +17,25 @@ fn golden(input_name: &str) {
     let actual = extract::extract(&format, id, &content)
         .unwrap_or_else(|e| panic!("extracting {input_name}: {e}"));
 
+    check_golden(input_name, id, &actual);
+}
+
+fn golden_epub(input_name: &str) {
+    let input_path = Path::new("tests/golden/input").join(input_name);
+    let id = input_path.file_stem().unwrap().to_str().unwrap();
+
+    let actual = epub::extract(id, &input_path)
+        .unwrap_or_else(|e| panic!("extracting {input_name}: {e}"));
+
+    check_golden(input_name, id, &actual);
+}
+
+fn check_golden(input_name: &str, id: &str, actual: &str) {
     let expected_name = format!("{}.md", id);
     let expected_path = Path::new("tests/golden/expected").join(&expected_name);
 
     if std::env::var("UPDATE_GOLDEN").is_ok() {
-        std::fs::write(&expected_path, &actual)
+        std::fs::write(&expected_path, actual)
             .unwrap_or_else(|e| panic!("writing {}: {e}", expected_path.display()));
         return;
     }
@@ -31,7 +46,7 @@ fn golden(input_name: &str) {
     if actual != expected {
         // Show a useful diff
         let mut diff = String::new();
-        for change in diff::lines(&expected, &actual) {
+        for change in diff::lines(&expected, actual) {
             match change {
                 diff::Result::Left(l) => diff.push_str(&format!("- {l}\n")),
                 diff::Result::Right(r) => diff.push_str(&format!("+ {r}\n")),
@@ -396,4 +411,60 @@ fn jats_real_schizophrenia() {
 #[test]
 fn jats_real_editorial() {
     golden("jats-real-editorial.xml");
+}
+
+// --- Real publisher HTML (manually saved) ---
+
+#[test]
+fn bmcgenomics_real() {
+    golden("bmcgenomics-passionfruit.html");
+}
+
+#[test]
+fn wiley_real_forest_defoliation() {
+    golden("wiley-forest-defoliation.html");
+}
+
+#[test]
+fn oup_real_dbapis() {
+    golden("oup-dbapis.html");
+}
+
+#[test]
+fn cambridge_real_academic_publishing() {
+    golden("cambridge-academic-publishing.html");
+}
+
+#[test]
+fn tandf_real_readership_awareness() {
+    golden("taylor-francis-readership-awareness.html");
+}
+
+#[test]
+fn mdpi_real_polymer_waveguide() {
+    golden("mdpi-polymer-waveguide-sensor.html");
+}
+
+#[test]
+fn frontiers_real_angelshark() {
+    golden("frontiers-angelshark-real.html");
+}
+
+// --- Real JATS XML (Frontiers via PubMed DTD) ---
+
+#[test]
+fn frontiers_real_angelshark_xml() {
+    golden("frontiers-angelshark.xml");
+}
+
+// --- Real ePub ---
+
+#[test]
+fn tandf_real_readership_awareness_epub() {
+    golden_epub("tandf-epub-readership-awareness.epub");
+}
+
+#[test]
+fn frontiers_real_angelshark_epub() {
+    golden_epub("frontiers-epub-angelshark.epub");
 }

@@ -317,20 +317,22 @@ fn default_publishers() -> BTreeMap<String, PublisherProfile> {
         PublisherProfile {
             detect_any: vec!["frontiersin.org".into(), "frontiersin-org".into()],
             body_selectors: vec![
+                "div.ArticleContent".into(),
                 "div.JournalFullText".into(),
                 "div.article-section".into(),
                 "article.article-text".into(),
             ],
             cruft_selectors: vec![
+                "div.References".into(),
                 "div.AbstractSummary".into(),
                 "div.article-header".into(),
                 "div.article-footer".into(),
                 "div.notes-section".into(),
+                "button.ArticleReference".into(),
                 "script".into(),
                 "style".into(),
                 "nav".into(),
             ],
-            ref_selector: Some("div.References".into()),
             ..Default::default()
         },
     );
