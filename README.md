@@ -7,8 +7,15 @@ Config-driven: add new publishers with YAML, no recompile needed.
 ## Install
 
 ```bash
-cargo install --path .
+cargo install fte
+# or
+brew install claylo/tap/fte
+# or
+npm install -g @claylo/fte
 ```
+
+Prebuilt binaries for macOS, Linux, and Windows are on the
+[releases page](https://github.com/claylo/fte/releases).
 
 ## Usage
 
@@ -138,6 +145,17 @@ journal: "Journal Name"
 
 ...
 ```
+
+## AI disclosure
+
+I build this with AI assistance — more of it than most disclosures admit.
+
+- **Tools**: Claude Code (Anthropic), running locally with persistent project memory and a fleet-wide set of workflow rules shared across my repos.
+- **Used for**: Design conversations, specs and plans, code, tests, CI workflows, refactors, docs. AI agents wrote substantial portions of this codebase, working from plans I approved.
+- **Not used for**: Committing, merging, pushing, tagging, publishing, version numbers. An agent drafts the commit message. I read the diff and run the commit myself. Releases pass a ship gate I run by hand.
+- **Verification**: Every change gets two independent AI review passes (spec compliance, then code quality) and the `just check` / `just test` gates. I read every diff before I commit it.
+- **Limitations**: AI code can pass tests and still be subtly wrong. The review stack catches most of it. Bug reports are welcome and taken seriously.
+- **Last reviewed**: 2026-08-11
 
 ## License
 

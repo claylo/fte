@@ -5,7 +5,11 @@ edition = "2024"
 rust-version = "1.89"
 license = "Apache-2.0 OR MIT"
 description = "Extract clean markdown from publisher HTML/XML/ePub academic papers"
-publish = false
+keywords = ["markdown", "epub", "extraction", "academic", "papers"]
+categories = ["command-line-utilities", "text-processing"]
+repository = "https://github.com/claylo/fte"
+homepage = "https://github.com/claylo/fte"
+readme = "README.md"
 
 [dependencies]
 anyhow = "1.0"
