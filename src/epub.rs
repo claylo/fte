@@ -48,15 +48,11 @@ fn discover_content_paths(
     archive: &mut zip::ZipArchive<std::fs::File>,
 ) -> Result<(Vec<String>, Metadata)> {
     let opf_path = find_opf_path(archive)?;
-    let opf_dir = opf_path
-        .rfind('/')
-        .map(|i| &opf_path[..=i])
-        .unwrap_or("");
+    let opf_dir = opf_path.rfind('/').map(|i| &opf_path[..=i]).unwrap_or("");
 
-    let opf_xml = read_entry(archive, &opf_path)
-        .with_context(|| format!("reading {opf_path}"))?;
-    let doc = roxmltree::Document::parse(&opf_xml)
-        .with_context(|| format!("parsing {opf_path}"))?;
+    let opf_xml = read_entry(archive, &opf_path).with_context(|| format!("reading {opf_path}"))?;
+    let doc =
+        roxmltree::Document::parse(&opf_xml).with_context(|| format!("parsing {opf_path}"))?;
 
     let opf_meta = extract_opf_metadata(&doc);
 
@@ -112,9 +108,7 @@ fn discover_content_paths(
     let overflow_names: Vec<String> = archive
         .file_names()
         .filter(|n| {
-            n.starts_with(xhtml_dir)
-                && n.ends_with(".xhtml")
-                && !paths.contains(&n.to_string())
+            n.starts_with(xhtml_dir) && n.ends_with(".xhtml") && !paths.contains(&n.to_string())
         })
         .filter(|n| {
             let lower = n.to_lowercase();
@@ -168,10 +162,9 @@ fn extract_opf_metadata(doc: &roxmltree::Document) -> Metadata {
 
 /// Find the OPF file path from META-INF/container.xml.
 fn find_opf_path(archive: &mut zip::ZipArchive<std::fs::File>) -> Result<String> {
-    let container = read_entry(archive, "META-INF/container.xml")
-        .context("reading META-INF/container.xml")?;
-    let doc = roxmltree::Document::parse(&container)
-        .context("parsing META-INF/container.xml")?;
+    let container =
+        read_entry(archive, "META-INF/container.xml").context("reading META-INF/container.xml")?;
+    let doc = roxmltree::Document::parse(&container).context("parsing META-INF/container.xml")?;
 
     for node in doc.descendants() {
         if node.tag_name().name() == "rootfile"

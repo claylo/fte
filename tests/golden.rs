@@ -24,8 +24,8 @@ fn golden_epub(input_name: &str) {
     let input_path = Path::new("tests/golden/input").join(input_name);
     let id = input_path.file_stem().unwrap().to_str().unwrap();
 
-    let actual = epub::extract(id, &input_path)
-        .unwrap_or_else(|e| panic!("extracting {input_name}: {e}"));
+    let actual =
+        epub::extract(id, &input_path).unwrap_or_else(|e| panic!("extracting {input_name}: {e}"));
 
     check_golden(input_name, id, &actual);
 }
@@ -40,8 +40,12 @@ fn check_golden(input_name: &str, id: &str, actual: &str) {
         return;
     }
 
-    let expected = std::fs::read_to_string(&expected_path)
-        .unwrap_or_else(|e| panic!("reading {}: {e}\n\nRun with UPDATE_GOLDEN=1 to create it", expected_path.display()));
+    let expected = std::fs::read_to_string(&expected_path).unwrap_or_else(|e| {
+        panic!(
+            "reading {}: {e}\n\nRun with UPDATE_GOLDEN=1 to create it",
+            expected_path.display()
+        )
+    });
 
     if actual != expected {
         // Show a useful diff
@@ -69,8 +73,8 @@ fn golden_bail(input_name: &str, expected_fragment: &str) {
     let config = Config::default();
     let format = detect::detect_format(&input_path, &content, &config);
 
-    let err = extract::extract(&format, id, &content)
-        .expect_err(&format!("{input_name} should bail"));
+    let err =
+        extract::extract(&format, id, &content).expect_err(&format!("{input_name} should bail"));
 
     assert!(
         err.to_string().contains(expected_fragment),

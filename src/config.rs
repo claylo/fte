@@ -340,10 +340,7 @@ fn default_publishers() -> BTreeMap<String, PublisherProfile> {
     m.insert(
         "ieee".into(),
         PublisherProfile {
-            detect_any: vec![
-                "ieeexplore.ieee.org".into(),
-                "ieeexplore-ieee-org".into(),
-            ],
+            detect_any: vec!["ieeexplore.ieee.org".into(), "ieeexplore-ieee-org".into()],
             body_selectors: vec![
                 "div#article-content".into(),
                 "div.article-content".into(),

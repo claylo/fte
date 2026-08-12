@@ -2,6 +2,7 @@ use anyhow::{Context, Result};
 use librebar::cli::clap::{self, Parser};
 use std::fs;
 use std::path::{Path, PathBuf};
+use std::process::ExitCode;
 
 use fte::{config, detect, epub, extract};
 
@@ -40,11 +41,11 @@ struct Cli {
     detect_only: bool,
 }
 
-fn main() -> Result<()> {
+fn main() -> Result<ExitCode> {
     let cli: Cli = librebar::cli::parse();
 
     if cli.common.apply(VERSION)?.is_exit() {
-        return Ok(());
+        return Ok(ExitCode::SUCCESS);
     }
 
     let cwd = std::env::current_dir()?;
@@ -66,64 +67,41 @@ fn main() -> Result<()> {
         fs::create_dir_all(&output_dir)?;
     }
 
-    let inputs = resolve_inputs(&cli.inputs, &input_dir)?;
+    let quiet = cli.common.quiet;
+    let verbose = cli.common.verbose > 0;
+
+    // Inputs that were requested but don't exist count as failures: the run
+    // was asked to do work it couldn't do, and the exit code must say so.
+    let (inputs, mut fail) = resolve_inputs(&cli.inputs, &input_dir)?;
 
     let mut ok = 0u32;
     let mut skip = 0u32;
-    let mut fail = 0u32;
 
     for path in &inputs {
         let id = path
             .file_stem()
             .and_then(|s| s.to_str())
             .unwrap_or("unknown");
-
         let ext = path.extension().and_then(|e| e.to_str()).unwrap_or("");
 
-        // ePub: handle before reading to string (it's a zip)
-        if ext == "epub" {
-            let format = detect::Format::Epub;
-
-            if cli.detect_only {
-                println!("{id}: {format}");
-                continue;
-            }
-
-            let out_path = output_dir.join(format!("{id}.md"));
-            if !cli.force && out_path.exists() {
-                skip += 1;
-                continue;
-            }
-
-            match epub::extract(id, path) {
-                Ok(md) => {
-                    if cli.stdout {
-                        println!("{md}");
-                    } else {
-                        fs::write(&out_path, &md)
-                            .with_context(|| format!("writing {}", out_path.display()))?;
-                        let kb = md.len() / 1024;
-                        eprintln!("  OK   {id}.md ({kb}KB)");
-                        ok += 1;
-                    }
-                }
-                Err(e) => {
-                    eprintln!("  FAIL {id}: {e}");
-                    fail += 1;
-                }
-            }
-            continue;
-        }
-
-        // HTML/XML: read to string, detect, extract
-        let content =
-            fs::read_to_string(path).with_context(|| format!("reading {}", path.display()))?;
-
-        let format = detect::detect_format(path, &content, &cfg);
+        // ePub is a zip, extracted from the path; everything else is read to
+        // a string and detected by content.
+        let (format, content) = if ext == "epub" {
+            (detect::Format::Epub, None)
+        } else {
+            let text =
+                fs::read_to_string(path).with_context(|| format!("reading {}", path.display()))?;
+            let format = detect::detect_format(path, &text, &cfg);
+            (format, Some(text))
+        };
 
         if cli.detect_only {
             println!("{id}: {format}");
             continue;
+        }
+
+        if verbose {
+            eprintln!("  detect {id}: {format}");
         }
 
         let out_path = output_dir.join(format!("{id}.md"));
@@ -132,17 +110,24 @@ fn main() -> Result<()> {
             continue;
         }
 
-        match extract::extract(&format, id, &content) {
+        let result = match &content {
+            None => epub::extract(id, path),
+            Some(text) => extract::extract(&format, id, text),
+        };
+
+        match result {
             Ok(md) => {
                 if cli.stdout {
                     println!("{md}");
                 } else {
                     fs::write(&out_path, &md)
                         .with_context(|| format!("writing {}", out_path.display()))?;
-                    let kb = md.len() / 1024;
-                    eprintln!("  OK   {id}.md ({kb}KB)");
-                    ok += 1;
+                    if !quiet {
+                        let kb = md.len() / 1024;
+                        eprintln!("  OK   {id}.md ({kb}KB)");
+                    }
                 }
+                ok += 1;
             }
             Err(e) => {
                 eprintln!("  FAIL {id}: {e}");
@@ -151,14 +136,21 @@ fn main() -> Result<()> {
         }
     }
 
-    if !cli.stdout && !cli.detect_only {
+    if !quiet && !cli.stdout && !cli.detect_only {
         eprintln!("\nDone: {ok} extracted, {skip} skipped, {fail} failed");
     }
 
-    Ok(())
+    Ok(if fail > 0 {
+        ExitCode::FAILURE
+    } else {
+        ExitCode::SUCCESS
+    })
 }
 
-fn resolve_inputs(inputs: &[String], input_dir: &Path) -> Result<Vec<PathBuf>> {
+/// Resolve CLI inputs to concrete paths, plus a count of requested inputs
+/// that don't exist anywhere — the caller folds that count into its failure
+/// total so the summary and exit code reflect them.
+fn resolve_inputs(inputs: &[String], input_dir: &Path) -> Result<(Vec<PathBuf>, u32)> {
     if inputs.is_empty() {
         // Process all files in input_dir
         let mut paths: Vec<PathBuf> = fs::read_dir(input_dir)
@@ -171,10 +163,11 @@ fn resolve_inputs(inputs: &[String], input_dir: &Path) -> Result<Vec<PathBuf>> {
             })
             .collect();
         paths.sort();
-        return Ok(paths);
+        return Ok((paths, 0));
     }
 
     let mut paths = Vec::new();
+    let mut missing = 0u32;
     for input in inputs {
         let p = Path::new(input);
         if p.exists() {
@@ -191,9 +184,10 @@ fn resolve_inputs(inputs: &[String], input_dir: &Path) -> Result<Vec<PathBuf>> {
             } else if html.exists() {
                 paths.push(html);
             } else {
-                eprintln!("  SKIP {input}: not found");
+                eprintln!("  FAIL {input}: not found");
+                missing += 1;
             }
         }
     }
-    Ok(paths)
+    Ok((paths, missing))
 }
