@@ -1,0 +1,29 @@
+{
+  "name": "@claylo/fte",
+  "version": "0.0.1",
+  "description": "Extract clean markdown from publisher HTML/XML/ePub academic papers",
+  "license": "Apache-2.0 OR MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/claylo/fte"
+  },
+  "bin": {
+    "fte": "cli.js"
+  },
+  "scripts": {
+    "postinstall": "node install.js"
+  },
+  "files": [
+    "index.js",
+    "cli.js",
+    "install.js"
+  ],
+  "optionalDependencies": {
+    "@claylo/fte-darwin-arm64": "0.0.1",
+    "@claylo/fte-darwin-x64": "0.0.1",
+    "@claylo/fte-linux-arm64": "0.0.1",
+    "@claylo/fte-linux-x64": "0.0.1",
+    "@claylo/fte-win32-arm64": "0.0.1",
+    "@claylo/fte-win32-x64": "0.0.1"
+  }
+}

@@ -1,0 +1,42 @@
+# gh-coda config
+# See: https://github.com/lovelesslabs/gh-coda
+
+description: Extract clean markdown from publisher HTML/XML/ePub academic papers
+topics: [rust, cli, markdown, epub, academic-publishing, text-extraction]
+
+# Merge settings
+auto_merge: true
+delete_branch_on_merge: true
+allow_squash_merge: true
+allow_merge_commit: false
+allow_rebase_merge: true
+
+# Features
+enable_discussions: false
+enable_projects: false
+enable_wiki: false
+
+# Security
+enable_secret_scanning: true
+enable_secret_scanning_push_protection: true
+dependabot_alerts: true
+dependabot_security_updates: true
+
+# 1Password secrets sync
+secrets_tags: claylo-github-actions
+secrets_app: actions
+
+variables:
+  PROJECT_NAME: fte
+  CARGO_PUBLISH_PACKAGES: fte
+  CRATES_IO_ENABLED: true
+  HOMEBREW_ENABLED: true
+  HOMEBREW_TAP: "claylo/homebrew-tap"
+  GPG_SIGNING_ENABLED: true
+  NPM_ENABLED: true
+  SBOM_ENABLED: true
+  AUTO_RELEASE_ENABLED: false
+
+# NOTE (fleet-new dry run 2026-08-11): gh-coda has no `environments:` key yet.
+# The `release` environment (required by cd.yml's OIDC publish jobs) is created
+# via: gh api -X PUT repos/claylo/fte/environments/release

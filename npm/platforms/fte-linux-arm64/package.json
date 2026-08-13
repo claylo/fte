@@ -1,0 +1,19 @@
+{
+  "name": "@claylo/fte-linux-arm64",
+  "version": "0.0.1",
+  "description": "Extract clean markdown from publisher HTML/XML/ePub academic papers (linux-arm64 binary)",
+  "license": "Apache-2.0 OR MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/claylo/fte"
+  },
+  "os": [
+    "linux"
+  ],
+  "cpu": [
+    "arm64"
+  ],
+  "files": [
+    "bin/"
+  ]
+}

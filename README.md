@@ -66,7 +66,7 @@ fte schema
 
 ## Configuration
 
-fte uses [librebar](https://crates.io/crates/librebar) for config discovery. Config files are found by walking up from the working directory, checking for `.fte.yaml`, `.config/fte.yaml`, or `fte.yaml` (also `.toml` and `.json`). User-level config lives at `~/.config/fte/config.yaml`.
+Config files are found by walking up from the working directory, checking for `.fte.yaml`, `.config/fte.yaml`, or `fte.yaml` (also `.toml` and `.json`). User-level config lives at `~/.config/fte/config.yaml`.
 
 Pass `-c/--config FILE` to load a specific file instead of relying on discovery. An explicit file is a deliberate selection, so it outranks both discovered files and environment variables.
 
