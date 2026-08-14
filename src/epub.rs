@@ -12,16 +12,46 @@ use crate::markdown::{self, Metadata};
 /// Discovers content files via the OPF spine (the EPUB standard way) rather
 /// than hardcoding paths. Falls back to scanning for .xhtml files if the
 /// OPF is missing or unparseable.
+///
+/// For book-length epubs (many spine files, no schema.org metadata), switches
+/// to a per-chapter extraction strategy using the nav TOC for structure.
 pub fn extract(id: &str, path: &Path) -> Result<String> {
     let file = std::fs::File::open(path).with_context(|| format!("opening {}", path.display()))?;
     let mut archive =
         zip::ZipArchive::new(file).with_context(|| format!("reading zip: {}", path.display()))?;
 
-    let (content_paths, opf_meta) = discover_content_paths(&mut archive)?;
+    let (content_paths, opf_meta, nav_path) = discover_content_paths(&mut archive)?;
+    let nav_entries = nav_path
+        .and_then(|p| parse_nav_toc(&mut archive, &p).ok())
+        .unwrap_or_default();
 
+    let is_book = content_paths.len() > 5 && !nav_entries.is_empty();
+
+    if is_book {
+        let subheading_classes = detect_subheading_classes(&mut archive);
+        extract_book(
+            id,
+            &mut archive,
+            &content_paths,
+            &opf_meta,
+            &nav_entries,
+            &subheading_classes,
+        )
+    } else {
+        extract_paper(id, &mut archive, &content_paths, &opf_meta)
+    }
+}
+
+/// Paper-length extraction: concatenate all spine files, parse as one document.
+fn extract_paper(
+    id: &str,
+    archive: &mut zip::ZipArchive<std::fs::File>,
+    content_paths: &[String],
+    opf_meta: &Metadata,
+) -> Result<String> {
     let mut combined_xhtml = String::new();
-    for entry_path in &content_paths {
-        match read_entry(&mut archive, entry_path) {
+    for entry_path in content_paths {
+        match read_entry(archive, entry_path) {
             Ok(content) => {
                 if !combined_xhtml.is_empty() {
                     combined_xhtml.push_str("\n<!-- epub-part: ");
@@ -40,13 +70,505 @@ pub fn extract(id: &str, path: &Path) -> Result<String> {
         anyhow::bail!("no readable content files in ePub");
     }
 
-    parse_epub_xhtml(id, &combined_xhtml, &opf_meta)
+    parse_epub_xhtml(id, &combined_xhtml, opf_meta)
 }
 
-/// Discover content XHTML paths from the OPF spine, plus Dublin Core metadata.
+/// Book-length extraction: use nav TOC to classify and structure chapters.
+fn extract_book(
+    id: &str,
+    archive: &mut zip::ZipArchive<std::fs::File>,
+    content_paths: &[String],
+    opf_meta: &Metadata,
+    nav_entries: &[NavEntry],
+    subheading_classes: &[String],
+) -> Result<String> {
+    let file_to_nav = build_file_nav_map(nav_entries);
+
+    let mut body = String::new();
+    let mut included_any = false;
+
+    // Title heading from OPF metadata
+    if let Some(t) = &opf_meta.title {
+        body.push_str(&format!("# {t}\n\n"));
+    }
+
+    // Table of contents with anchor links
+    body.push_str(&render_toc(nav_entries));
+    body.push('\n');
+
+    for entry_path in content_paths {
+        let nav_label = file_to_nav.get(entry_path.as_str()).map(|s| s.as_str());
+        let role = classify_spine_file(entry_path, nav_label);
+
+        if role == SpineRole::Skip {
+            continue;
+        }
+
+        let xhtml = match read_entry(archive, entry_path) {
+            Ok(content) => content,
+            Err(e) => {
+                eprintln!("  WARN skipping {entry_path}: {e}");
+                continue;
+            }
+        };
+
+        // Promote styled <p> subheadings to <h3> before parsing
+        let xhtml = promote_subheadings(&xhtml, subheading_classes);
+
+        let doc = Html::parse_document(&xhtml);
+        let body_el = match find_body_element(&doc) {
+            Some(el) => el,
+            None => continue,
+        };
+
+        let strip_sels = book_strip_selectors();
+
+        let has_real_heading = has_heading_in_body(&doc);
+
+        if !has_real_heading && let Some(label) = nav_label {
+            let heading = nav_label_to_heading(label);
+            if !heading.is_empty() {
+                body.push_str(&heading);
+                body.push_str("\n\n");
+            }
+        }
+
+        let mut chapter_body = String::new();
+        html::walk_element(&body_el, &strip_sels, &mut chapter_body, 0);
+        let chapter_body = markdown::collapse_blanks(&chapter_body);
+
+        let trimmed = chapter_body.trim();
+        if !trimmed.is_empty() {
+            body.push_str(trimmed);
+            body.push_str("\n\n");
+            included_any = true;
+        }
+    }
+
+    if !included_any {
+        anyhow::bail!("no body content found in ePub");
+    }
+
+    let body = markdown::collapse_blanks(&body);
+    Ok(markdown::document(id, "epub", opf_meta, &body))
+}
+
+// ---------------------------------------------------------------------------
+// Nav TOC parsing
+// ---------------------------------------------------------------------------
+
+#[derive(Debug)]
+struct NavEntry {
+    label: String,
+    href: String,
+    children: Vec<NavEntry>,
+}
+
+/// Parse the EPUB3 navigation document's TOC.
+fn parse_nav_toc(
+    archive: &mut zip::ZipArchive<std::fs::File>,
+    nav_path: &str,
+) -> Result<Vec<NavEntry>> {
+    let nav_dir = nav_path.rfind('/').map(|i| &nav_path[..=i]).unwrap_or("");
+    let content = read_entry(archive, nav_path)?;
+    let doc = Html::parse_document(&content);
+
+    let nav_sel = Selector::parse(r#"nav[epub\:type="toc"], nav[epub:type="toc"]"#)
+        .unwrap_or_else(|_| Selector::parse("nav").unwrap());
+    let nav_el = doc.select(&nav_sel).next();
+
+    // Fallback: try any nav element
+    let nav_el = nav_el.or_else(|| {
+        let any_nav = Selector::parse("nav").ok()?;
+        doc.select(&any_nav).next()
+    });
+
+    let nav_el = match nav_el {
+        Some(el) => el,
+        None => return Ok(Vec::new()),
+    };
+
+    let ol_sel = Selector::parse("ol").unwrap();
+    let top_ol = match nav_el.select(&ol_sel).next() {
+        Some(el) => el,
+        None => return Ok(Vec::new()),
+    };
+
+    Ok(parse_nav_ol(&top_ol, nav_dir))
+}
+
+fn parse_nav_ol(ol: &ElementRef, nav_dir: &str) -> Vec<NavEntry> {
+    let li_sel = Selector::parse("li").unwrap();
+    let a_sel = Selector::parse("a").unwrap();
+    let ol_sel = Selector::parse("ol").unwrap();
+
+    let mut entries = Vec::new();
+
+    for li in ol.select(&li_sel) {
+        // Only direct-child <li>s (skip nested ones from sub-<ol>)
+        if !is_direct_child_of(li, ol) {
+            continue;
+        }
+
+        if let Some(a) = li.select(&a_sel).next() {
+            let label = markdown::normalize_text(&html::element_text(&a));
+            let href = a.value().attr("href").unwrap_or("");
+            let file_href = href.split('#').next().unwrap_or(href);
+            let full_href = format!("{nav_dir}{file_href}");
+
+            let children = li
+                .select(&ol_sel)
+                .next()
+                .map(|child_ol| parse_nav_ol(&child_ol, nav_dir))
+                .unwrap_or_default();
+
+            entries.push(NavEntry {
+                label,
+                href: full_href,
+                children,
+            });
+        }
+    }
+
+    entries
+}
+
+fn is_direct_child_of(child: ElementRef, parent: &ElementRef) -> bool {
+    child
+        .parent()
+        .map(|p| p.id() == parent.id())
+        .unwrap_or(false)
+}
+
+/// Build a map from file path → nav label (flattening the TOC tree).
+fn build_file_nav_map(entries: &[NavEntry]) -> std::collections::HashMap<&str, String> {
+    let mut map = std::collections::HashMap::new();
+    collect_nav_labels(entries, &mut map);
+    map
+}
+
+fn collect_nav_labels<'a>(
+    entries: &'a [NavEntry],
+    map: &mut std::collections::HashMap<&'a str, String>,
+) {
+    for entry in entries {
+        if !entry.href.is_empty() && !map.contains_key(entry.href.as_str()) {
+            map.insert(&entry.href, entry.label.clone());
+        }
+        collect_nav_labels(&entry.children, map);
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Spine file classification
+// ---------------------------------------------------------------------------
+
+#[derive(Debug, PartialEq)]
+enum SpineRole {
+    Body,
+    Skip,
+}
+
+fn classify_spine_file(path: &str, nav_label: Option<&str>) -> SpineRole {
+    let lower_path = path.to_lowercase();
+    let fname = lower_path.rsplit('/').next().unwrap_or(&lower_path);
+
+    // Cover pages
+    if fname.starts_with("cover") || fname.starts_with("wrap") {
+        return SpineRole::Skip;
+    }
+
+    if let Some(label) = nav_label {
+        let lower = label.to_lowercase();
+
+        // Skip only the barest structural cruft — cover, title page, TOC
+        if is_structural_cruft(&lower) {
+            return SpineRole::Skip;
+        }
+    }
+
+    // Gutenberg license is not book content
+    if let Some(label) = nav_label
+        && label.to_lowercase().contains("project gutenberg")
+    {
+        return SpineRole::Skip;
+    }
+
+    SpineRole::Body
+}
+
+/// Structural cruft that adds no readable content — cover images, title pages,
+/// and the table of contents (which is just a list of links in an e-reader).
+fn is_structural_cruft(lower: &str) -> bool {
+    matches!(
+        lower,
+        "cover" | "cover page" | "title page" | "contents" | "table of contents"
+    )
+}
+
+/// Convert a nav label into a markdown heading.
+fn nav_label_to_heading(label: &str) -> String {
+    let trimmed = label.trim();
+    if trimmed.is_empty() {
+        return String::new();
+    }
+
+    // "Part One", "Part I", etc. → #
+    let lower = trimmed.to_lowercase();
+    if lower.starts_with("part ") {
+        return format!("# {trimmed}");
+    }
+
+    // Default: ## for chapter-level content
+    format!("## {trimmed}")
+}
+
+// ---------------------------------------------------------------------------
+// Table of contents
+// ---------------------------------------------------------------------------
+
+/// Render a markdown table of contents with anchor links from the nav TOC.
+fn render_toc(entries: &[NavEntry]) -> String {
+    let mut toc = String::from("## Contents\n\n");
+    render_toc_entries(entries, &mut toc, 0);
+    toc
+}
+
+fn render_toc_entries(entries: &[NavEntry], toc: &mut String, depth: usize) {
+    let indent = "  ".repeat(depth);
+    for entry in entries {
+        let lower = entry.label.to_lowercase();
+
+        // Skip structural cruft and Gutenberg license
+        if is_structural_cruft(&lower) || lower.contains("project gutenberg") {
+            continue;
+        }
+
+        let slug = heading_slug(&entry.label);
+        toc.push_str(&format!(
+            "{indent}- [{label}](#{slug})\n",
+            label = entry.label
+        ));
+
+        if !entry.children.is_empty() {
+            render_toc_entries(&entry.children, toc, depth + 1);
+        }
+    }
+}
+
+/// Generate a GFM-compatible anchor slug from a heading string.
+fn heading_slug(text: &str) -> String {
+    text.to_lowercase()
+        .chars()
+        .map(|c| {
+            if c.is_alphanumeric() {
+                c
+            } else if c == ' ' || c == '-' {
+                '-'
+            } else {
+                // Drop punctuation
+                '\0'
+            }
+        })
+        .filter(|&c| c != '\0')
+        .collect::<String>()
+        .split('-')
+        .filter(|s| !s.is_empty())
+        .collect::<Vec<_>>()
+        .join("-")
+}
+
+// ---------------------------------------------------------------------------
+// CSS-based subheading detection
+// ---------------------------------------------------------------------------
+
+/// Scan epub stylesheets for CSS classes that look like subheadings:
+/// centered text with a font-size bump (>= 1.1em).
+fn detect_subheading_classes(archive: &mut zip::ZipArchive<std::fs::File>) -> Vec<String> {
+    let css_names: Vec<String> = archive
+        .file_names()
+        .filter(|n| n.ends_with(".css"))
+        .map(String::from)
+        .collect();
+
+    let mut classes = Vec::new();
+    for name in css_names {
+        let css = match read_entry(archive, &name) {
+            Ok(c) => c,
+            Err(_) => continue,
+        };
+        classes.extend(find_subheading_classes_in_css(&css));
+    }
+    classes
+}
+
+fn find_subheading_classes_in_css(css: &str) -> Vec<String> {
+    // First pass: find the largest centered font-size (chapter/part heading level)
+    let mut max_size: f32 = 0.0;
+    for block in css.split('}') {
+        if block.contains("text-align")
+            && block.contains("center")
+            && let Some(size) = extract_font_size_em(block)
+            && size > max_size
+        {
+            max_size = size;
+        }
+    }
+
+    // Second pass: collect classes that are centered with a font-size bump
+    // but smaller than the chapter/part heading level. This distinguishes
+    // within-chapter subheadings (e.g. 1.1em) from chapter titles (1.5em).
+    let mut result = Vec::new();
+    for block in css.split('}') {
+        let has_center = block.contains("text-align") && block.contains("center");
+        if !has_center {
+            continue;
+        }
+        let size = match extract_font_size_em(block) {
+            Some(s) if s >= 1.1 && s < max_size => s,
+            _ => continue,
+        };
+        // Must also not be bold/heavy (those are chapter-level)
+        if block.contains("font-weight") && (block.contains("bold") || block.contains("800")) {
+            continue;
+        }
+        let _ = size;
+        if let Some(class_name) = extract_css_class_name(block)
+            && class_name.starts_with("class")
+        {
+            result.push(class_name);
+        }
+    }
+    result
+}
+
+fn extract_font_size_em(css_block: &str) -> Option<f32> {
+    let idx = css_block.find("font-size")?;
+    let rest = &css_block[idx..];
+    let colon = rest.find(':')?;
+    let after_colon = rest[colon + 1..].trim_start();
+    let em_idx = after_colon.find("em")?;
+    after_colon[..em_idx].trim().parse().ok()
+}
+
+fn extract_css_class_name(css_block: &str) -> Option<String> {
+    let dot = css_block.find('.')?;
+    let rest = &css_block[dot + 1..];
+    let end = rest
+        .find(|c: char| !c.is_alphanumeric() && c != '_' && c != '-')
+        .unwrap_or(rest.len());
+    let name = &rest[..end];
+    if name.is_empty() {
+        None
+    } else {
+        Some(name.to_string())
+    }
+}
+
+/// Rewrite `<p class="SUBHEADING_CLASS">...</p>` to `<h3>...</h3>` so that
+/// `walk_element` emits them as markdown headings.
+fn promote_subheadings(xhtml: &str, classes: &[String]) -> String {
+    if classes.is_empty() {
+        return xhtml.to_string();
+    }
+    let mut result = xhtml.to_string();
+    for class in classes {
+        let open_pattern = format!(r#"<p class="{class}">"#);
+        let close = "</p>";
+        // Replace each <p class="X">...</p> with <h3>...</h3>
+        while let Some(start) = result.find(&open_pattern) {
+            let after_open = start + open_pattern.len();
+            if let Some(close_offset) = result[after_open..].find(close) {
+                let close_start = after_open + close_offset;
+                let close_end = close_start + close.len();
+                let inner = result[after_open..close_start].to_string();
+                result = format!(
+                    "{}<h3>{}</h3>{}",
+                    &result[..start],
+                    inner,
+                    &result[close_end..]
+                );
+            } else {
+                break;
+            }
+        }
+    }
+    result
+}
+
+// ---------------------------------------------------------------------------
+// Body element detection
+// ---------------------------------------------------------------------------
+
+fn has_heading_in_body(doc: &Html) -> bool {
+    for tag in ["h1", "h2", "h3"] {
+        if let Ok(sel) = Selector::parse(tag) {
+            for el in doc.select(&sel) {
+                let text = html::element_text(&el).trim().to_string();
+                if !text.is_empty() && !looks_like_junk_title(&text) {
+                    return true;
+                }
+            }
+        }
+    }
+    false
+}
+
+fn book_strip_selectors() -> Vec<Selector> {
+    [
+        "section#frontmatter",
+        "section#backmatter",
+        "nav",
+        "div.authors",
+        "div.article-notes",
+        "div#keywords",
+        "script",
+        "style",
+    ]
+    .iter()
+    .filter_map(|s| Selector::parse(s).ok())
+    .collect()
+}
+
+// ---------------------------------------------------------------------------
+// Shared helpers (paper path + utilities)
+// ---------------------------------------------------------------------------
+
+/// Returns true if a title string looks like an obfuscated ID rather than a
+/// real title. Some epub converters produce filenames like "sgPhzGILRlKrLKg2DMvpew1"
+/// or "c0" as <title> content.
+fn looks_like_junk_title(t: &str) -> bool {
+    let t = t.trim();
+    if t.is_empty() {
+        return true;
+    }
+    let lower = t.to_lowercase();
+    // Generic non-titles
+    if lower == "cover" || lower == "nav" || lower == "title page" {
+        return true;
+    }
+    // No spaces: distinguish real single-word headings ("Dedication") from
+    // obfuscated file stems ("sgPhzGILRlKrLKg2DMvpew1", "c0", "cP").
+    // Real words are all-alpha; hashes/IDs contain digits or mixed case runs.
+    if !t.contains(' ') {
+        let has_digit = t.chars().any(|c| c.is_ascii_digit());
+        let all_alpha = t.chars().all(|c| c.is_alphabetic());
+        if has_digit || !all_alpha {
+            return true;
+        }
+        // Very short all-alpha without spaces still looks like an ID (e.g. "cP")
+        if t.len() <= 3 {
+            return true;
+        }
+    }
+    false
+}
+
+/// Discover content XHTML paths from the OPF spine, plus Dublin Core metadata,
+/// plus the nav document path (if any).
 fn discover_content_paths(
     archive: &mut zip::ZipArchive<std::fs::File>,
-) -> Result<(Vec<String>, Metadata)> {
+) -> Result<(Vec<String>, Metadata, Option<String>)> {
     let opf_path = find_opf_path(archive)?;
     let opf_dir = opf_path.rfind('/').map(|i| &opf_path[..=i]).unwrap_or("");
 
@@ -59,16 +581,18 @@ fn discover_content_paths(
     // Build manifest: id → href (resolved relative to OPF directory)
     let mut manifest = std::collections::HashMap::new();
     let mut nav_ids = std::collections::HashSet::new();
+    let mut nav_path: Option<String> = None;
 
     for node in doc.descendants() {
         if node.tag_name().name() == "item"
             && let (Some(item_id), Some(href)) = (node.attribute("id"), node.attribute("href"))
         {
             let props = node.attribute("properties").unwrap_or("");
+            let full_path = format!("{opf_dir}{href}");
             if props.contains("nav") {
                 nav_ids.insert(item_id.to_string());
+                nav_path = Some(full_path.clone());
             }
-            let full_path = format!("{opf_dir}{href}");
             manifest.insert(item_id.to_string(), full_path);
         }
     }
@@ -119,7 +643,7 @@ fn discover_content_paths(
         .collect();
     paths.extend(overflow_names);
 
-    Ok((paths, opf_meta))
+    Ok((paths, opf_meta, nav_path))
 }
 
 /// Extract Dublin Core metadata from the OPF document.
@@ -244,7 +768,12 @@ fn parse_epub_xhtml(id: &str, xhtml: &str, opf_meta: &Metadata) -> Result<String
 
     // Extract metadata from schema.org properties, falling back to OPF
     let mut meta = extract_epub_metadata(&doc);
-    if meta.title.is_none() {
+    if meta.title.is_none()
+        || meta
+            .title
+            .as_ref()
+            .is_some_and(|t| looks_like_junk_title(t))
+    {
         meta.title.clone_from(&opf_meta.title);
     }
     if meta.authors.is_empty() {
@@ -305,13 +834,13 @@ fn extract_epub_metadata(doc: &Html) -> Metadata {
         }
     }
 
-    // Fallback: <title> tag
+    // Fallback: <title> tag (skip if it looks like a junk ID)
     if meta.title.is_none()
         && let Ok(sel) = Selector::parse("title")
         && let Some(el) = doc.select(&sel).next()
     {
         let t = markdown::normalize_text(&html::element_text(&el));
-        if !t.is_empty() {
+        if !t.is_empty() && !looks_like_junk_title(&t) {
             meta.title = Some(t);
         }
     }
@@ -479,5 +1008,63 @@ mod tests {
         );
 
         let _ = std::fs::remove_file(&p);
+    }
+
+    #[test]
+    fn junk_titles_are_detected() {
+        assert!(looks_like_junk_title("sgPhzGILRlKrLKg2DMvpew1"));
+        assert!(looks_like_junk_title("c0"));
+        assert!(looks_like_junk_title("cP"));
+        assert!(looks_like_junk_title("Cover"));
+        assert!(looks_like_junk_title("nav"));
+        assert!(looks_like_junk_title(""));
+        assert!(looks_like_junk_title("item42"));
+
+        // Real titles (single-word and multi-word)
+        assert!(!looks_like_junk_title("Dedication"));
+        assert!(!looks_like_junk_title("Introduction"));
+        assert!(!looks_like_junk_title("Acknowledgments"));
+        assert!(!looks_like_junk_title(
+            "Shattered Assumptions: Towards a New Psychology of Trauma"
+        ));
+        assert!(!looks_like_junk_title(
+            "Frankenstein; or, the modern prometheus"
+        ));
+        assert!(!looks_like_junk_title("The Grieving Brain"));
+    }
+
+    #[test]
+    fn heading_slugs_are_gfm_compatible() {
+        assert_eq!(heading_slug("Dedication"), "dedication");
+        assert_eq!(heading_slug("Chapter 1"), "chapter-1");
+        assert_eq!(
+            heading_slug("1. Walking in the Dark"),
+            "1-walking-in-the-dark"
+        );
+        assert_eq!(
+            heading_slug("Part One: The Painful Loss of Here, Now, and Close"),
+            "part-one-the-painful-loss-of-here-now-and-close"
+        );
+        assert_eq!(
+            heading_slug("How Does the Brain Understand Loss?"),
+            "how-does-the-brain-understand-loss"
+        );
+        assert_eq!(
+            heading_slug("Then Suddenly, Out of Nowhere . . ."),
+            "then-suddenly-out-of-nowhere"
+        );
+    }
+
+    #[test]
+    fn structural_cruft_is_classified() {
+        assert!(is_structural_cruft("cover page"));
+        assert!(is_structural_cruft("title page"));
+        assert!(is_structural_cruft("contents"));
+        assert!(is_structural_cruft("table of contents"));
+        assert!(!is_structural_cruft("chapter 1"));
+        assert!(!is_structural_cruft("introduction"));
+        assert!(!is_structural_cruft("notes"));
+        assert!(!is_structural_cruft("index"));
+        assert!(!is_structural_cruft("acknowledgments"));
     }
 }

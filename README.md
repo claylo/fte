@@ -1,6 +1,6 @@
 # fte — Fulltext Extraction
 
-Extract clean markdown from publisher HTML, XML, and ePub academic papers.
+Extract clean markdown from publisher HTML, XML, and ePub files — academic papers and book-length epubs.
 
 Config-driven: add new publishers with YAML, no recompile needed.
 
@@ -52,7 +52,8 @@ fte schema
 
 | Format | Detection | Handler |
 |--------|-----------|---------|
-| ePub (Sage XHTML) | `.epub` extension | Zip unpack + XHTML walk |
+| ePub (academic) | `.epub`, ≤5 spine files | OPF spine + XHTML walk |
+| ePub (books) | `.epub`, >5 spine files + nav TOC | Per-chapter extraction with nav structure |
 | JATS/NLM XML | `<article` + JATS/NLM markers | Structural XML parser |
 | Wiley WML3G XML | `<component` + wiley marker | Structural XML parser |
 | Springer HTML | `c-article-body` / `c-article-title` | Config-driven CSS |
@@ -63,6 +64,18 @@ fte schema
 | Cambridge | cambridge URL | Config-driven CSS |
 | PLOS | plos URL / `artText` | Config-driven CSS |
 | SAGE HTML | sagepub URL | Detected as abstract-only |
+
+### Book-length ePubs
+
+fte handles book-length epubs — full-length books with many chapters, not just single academic articles. When it detects a book (>5 spine files with a navigation document), it switches to a per-chapter extraction strategy:
+
+- **Metadata** from OPF Dublin Core (`dc:title`, `dc:creator`), since per-file XHTML titles are often obfuscated converter artifacts.
+- **Chapter structure** from the EPUB3 navigation document's table of contents. When chapters lack heading elements (common in converter output), fte injects headings from the nav labels.
+- **Subheading recovery** via CSS heuristics. Some converters flatten subheadings into styled `<p>` tags — fte detects these by font-size and promotes them back to headings.
+- **Table of contents** with anchor links, rendered at the top of the output.
+- **All content included** — front matter, chapters, notes, references, index. The heading structure is clean enough to split by chapter or strip sections in post-processing.
+
+This is best-effort. ePub books vary wildly in structure, especially after format conversion. fte handles the common patterns well (tested against Gutenberg, HarperCollins, and Simon & Schuster converter output), but edge cases exist. If a book's XHTML uses no heading tags and no identifiable CSS patterns for subheadings, you'll get flat paragraphs with chapter breaks.
 
 ## Configuration
 
