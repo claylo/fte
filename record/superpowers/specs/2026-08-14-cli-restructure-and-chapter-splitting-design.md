@@ -234,12 +234,23 @@ to json, failures print a single JSON line to stderr as the last line:
 |------|------|-----------|-------------|
 | `usage` | 2 | false | Bad arguments, unknown subcommand, bare `fte` |
 | `not_found` | 3 | false | Input file or ID does not resolve; `input_dir` missing |
-| `unsupported_format` | 4 | false | No handler matches the detected format |
 | `extraction_failed` | 5 | false | Parsing produced no usable body content |
 | `output_exists` | 6 | false | Target exists and `--force` was not given |
 | `io_error` | 7 | true | Read or write failure |
 | `no_chapters` | 8 | false | `split` on a document with no chapter markers |
 | `config_error` | 9 | false | Malformed config or unknown template token |
+
+Seven kinds ship, not eight, and exit code 4 is a deliberate gap rather than
+a contiguous run 2 through 9. This section originally planned an eighth
+kind, `unsupported_format` (4), for "no handler matches the detected
+format." It was never reachable: a format-detection miss surfaces as a
+`"failed"` row with a `reason` (see Structured output, below), not as a
+fatal top-of-run error — wiring it up would have meant promoting one
+per-item outcome to a fatal error inconsistent with every other extraction
+failure. Final review M18 retired the kind rather than force a code path
+into existence for it. 4 is not reused for anything else, so a script or
+consumer still checking for it fails closed instead of silently matching a
+different kind later.
 
 ### Exit 1 is an outcome
 
