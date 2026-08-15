@@ -1,0 +1,245 @@
+sha256 935e0f9fdc7de105f2feb1af9582f8a8444e9796b0b787a8e71db3b19c27aa69
+bytes  782608
+---
+frontmatter id: tale-two-cities-pg source_format: epub title: "A Tale of Two Cities" authors: - "Charles Dickens"
+h1 A Tale of Two Cities
+h2 Contents
+toc-entry depth=0 slug=a-tale-of-two-cities
+toc-entry depth=0 slug=book-the-firstrecalled-to-life
+toc-entry depth=0 slug=chapter-i-the-period
+toc-entry depth=0 slug=chapter-ii-the-mail
+toc-entry depth=0 slug=chapter-iii-the-night-shadows
+toc-entry depth=0 slug=chapter-iv-the-preparation
+toc-entry depth=0 slug=chapter-v-the-wine-shop
+toc-entry depth=0 slug=chapter-vi-the-shoemaker
+toc-entry depth=0 slug=book-the-secondthe-golden-thread
+toc-entry depth=0 slug=chapter-i-five-years-later
+toc-entry depth=0 slug=chapter-ii-a-sight
+toc-entry depth=0 slug=chapter-iii-a-disappointment
+toc-entry depth=0 slug=chapter-iv-congratulatory
+toc-entry depth=0 slug=chapter-v-the-jackal
+toc-entry depth=0 slug=chapter-vi-hundreds-of-people
+toc-entry depth=0 slug=chapter-vii-monseigneur-in-town
+toc-entry depth=0 slug=chapter-viii-monseigneur-in-the-country
+toc-entry depth=0 slug=chapter-ix-the-gorgons-head
+toc-entry depth=0 slug=chapter-x-two-promises
+toc-entry depth=0 slug=chapter-xi-a-companion-picture
+toc-entry depth=0 slug=chapter-xii-the-fellow-of-delicacy
+toc-entry depth=0 slug=chapter-xiii-the-fellow-of-no-delicacy
+toc-entry depth=0 slug=chapter-xiv-the-honest-tradesman
+toc-entry depth=0 slug=chapter-xv-knitting
+toc-entry depth=0 slug=chapter-xvi-still-knitting
+toc-entry depth=0 slug=chapter-xvii-one-night
+toc-entry depth=0 slug=chapter-xviii-nine-days
+toc-entry depth=0 slug=chapter-xix-an-opinion
+toc-entry depth=0 slug=chapter-xx-a-plea
+toc-entry depth=0 slug=chapter-xxi-echoing-footsteps
+toc-entry depth=0 slug=chapter-xxii-the-sea-still-rises
+toc-entry depth=0 slug=chapter-xxiii-fire-rises
+toc-entry depth=0 slug=chapter-xxiv-drawn-to-the-loadstone-rock
+toc-entry depth=0 slug=book-the-thirdthe-track-of-a-storm
+toc-entry depth=0 slug=chapter-i-in-secret
+toc-entry depth=0 slug=chapter-ii-the-grindstone
+toc-entry depth=0 slug=chapter-iii-the-shadow
+toc-entry depth=0 slug=chapter-iv-calm-in-storm
+toc-entry depth=0 slug=chapter-v-the-wood-sawyer
+toc-entry depth=0 slug=chapter-vi-triumph
+toc-entry depth=0 slug=chapter-vii-a-knock-at-the-door
+toc-entry depth=0 slug=chapter-viii-a-hand-at-cards
+toc-entry depth=0 slug=chapter-ix-the-game-made
+toc-entry depth=0 slug=chapter-x-the-substance-of-the-shadow
+toc-entry depth=0 slug=chapter-xi-dusk
+toc-entry depth=0 slug=chapter-xii-darkness
+toc-entry depth=0 slug=chapter-xiii-fifty-two
+toc-entry depth=0 slug=chapter-xiv-the-knitting-done
+toc-entry depth=0 slug=chapter-xv-the-footsteps-die-out-for-ever
+chapter-start id="ch01" title="A TALE OF TWO CITIES" src="OEBPS/650582325774722811_98-h-0.htm.xhtml"
+h2 The Project Gutenberg eBook of A Tale of Two Cities
+text 35w
+h1 A TALE OF TWO CITIES
+h2 Contents
+text 321w
+chapter-end id="ch01"
+chapter-start id="ch02" title="Book the First—Recalled to Life" src="OEBPS/650582325774722811_98-h-1.htm.xhtml"
+h2 Book the First—Recalled to Life
+h2 CHAPTER I. The Period
+text 1001w
+chapter-end id="ch02"
+chapter-start id="ch03" title="CHAPTER II. The Mail" src="OEBPS/650582325774722811_98-h-2.htm.xhtml"
+h2 CHAPTER II. The Mail
+text 2013w
+chapter-end id="ch03"
+chapter-start id="ch04" title="CHAPTER III. The Night Shadows" src="OEBPS/650582325774722811_98-h-3.htm.xhtml"
+h2 CHAPTER III. The Night Shadows
+text 1609w
+chapter-end id="ch04"
+chapter-start id="ch05" title="CHAPTER IV. The Preparation" src="OEBPS/650582325774722811_98-h-4.htm.xhtml"
+h2 CHAPTER IV. The Preparation
+text 4379w
+chapter-end id="ch05"
+chapter-start id="ch06" title="CHAPTER V. The Wine-shop" src="OEBPS/650582325774722811_98-h-5.htm.xhtml"
+h2 CHAPTER V. The Wine-shop
+text 4147w
+chapter-end id="ch06"
+chapter-start id="ch07" title="CHAPTER VI. The Shoemaker" src="OEBPS/650582325774722811_98-h-6.htm.xhtml"
+h2 CHAPTER VI. The Shoemaker
+text 4123w
+chapter-end id="ch07"
+chapter-start id="ch08" title="Book the Second—the Golden Thread" src="OEBPS/650582325774722811_98-h-7.htm.xhtml"
+h2 Book the Second—the Golden Thread
+h2 CHAPTER I. Five Years Later
+text 2389w
+chapter-end id="ch08"
+chapter-start id="ch09" title="CHAPTER II. A Sight" src="OEBPS/650582325774722811_98-h-8.htm.xhtml"
+h2 CHAPTER II. A Sight
+text 2381w
+chapter-end id="ch09"
+chapter-start id="ch10" title="CHAPTER III. A Disappointment" src="OEBPS/650582325774722811_98-h-9.htm.xhtml"
+h2 CHAPTER III. A Disappointment
+text 4846w
+chapter-end id="ch10"
+chapter-start id="ch11" title="CHAPTER IV. Congratulatory" src="OEBPS/650582325774722811_98-h-10.htm.xhtml"
+h2 CHAPTER IV. Congratulatory
+text 2236w
+chapter-end id="ch11"
+chapter-start id="ch12" title="CHAPTER V. The Jackal" src="OEBPS/650582325774722811_98-h-11.htm.xhtml"
+h2 CHAPTER V. The Jackal
+text 2130w
+chapter-end id="ch12"
+chapter-start id="ch13" title="CHAPTER VI. Hundreds of People" src="OEBPS/650582325774722811_98-h-12.htm.xhtml"
+h2 CHAPTER VI. Hundreds of People
+text 4555w
+chapter-end id="ch13"
+chapter-start id="ch14" title="CHAPTER VII. Monseigneur in Town" src="OEBPS/650582325774722811_98-h-13.htm.xhtml"
+h2 CHAPTER VII. Monseigneur in Town
+text 3310w
+chapter-end id="ch14"
+chapter-start id="ch15" title="CHAPTER VIII. Monseigneur in the Country" src="OEBPS/650582325774722811_98-h-14.htm.xhtml"
+h2 CHAPTER VIII. Monseigneur in the Country
+text 1837w
+chapter-end id="ch15"
+chapter-start id="ch16" title="CHAPTER IX. The Gorgon’s Head" src="OEBPS/650582325774722811_98-h-15.htm.xhtml"
+h2 CHAPTER IX. The Gorgon’s Head
+text 4059w
+chapter-end id="ch16"
+chapter-start id="ch17" title="CHAPTER X. Two Promises" src="OEBPS/650582325774722811_98-h-16.htm.xhtml"
+h2 CHAPTER X. Two Promises
+text 2946w
+chapter-end id="ch17"
+chapter-start id="ch18" title="CHAPTER XI. A Companion Picture" src="OEBPS/650582325774722811_98-h-17.htm.xhtml"
+h2 CHAPTER XI. A Companion Picture
+text 1390w
+chapter-end id="ch18"
+chapter-start id="ch19" title="CHAPTER XII. The Fellow of Delicacy" src="OEBPS/650582325774722811_98-h-18.htm.xhtml"
+h2 CHAPTER XII. The Fellow of Delicacy
+text 2551w
+chapter-end id="ch19"
+chapter-start id="ch20" title="CHAPTER XIII. The Fellow of No Delicacy" src="OEBPS/650582325774722811_98-h-19.htm.xhtml"
+h2 CHAPTER XIII. The Fellow of No Delicacy
+text 1826w
+chapter-end id="ch20"
+chapter-start id="ch21" title="CHAPTER XIV. The Honest Tradesman" src="OEBPS/650582325774722811_98-h-20.htm.xhtml"
+h2 CHAPTER XIV. The Honest Tradesman
+text 3870w
+chapter-end id="ch21"
+chapter-start id="ch22" title="CHAPTER XV. Knitting" src="OEBPS/650582325774722811_98-h-21.htm.xhtml"
+h2 CHAPTER XV. Knitting
+text 4201w
+chapter-end id="ch22"
+chapter-start id="ch23" title="CHAPTER XVI. Still Knitting" src="OEBPS/650582325774722811_98-h-22.htm.xhtml"
+h2 CHAPTER XVI. Still Knitting
+text 3843w
+chapter-end id="ch23"
+chapter-start id="ch24" title="CHAPTER XVII. One Night" src="OEBPS/650582325774722811_98-h-23.htm.xhtml"
+h2 CHAPTER XVII. One Night
+text 1894w
+chapter-end id="ch24"
+chapter-start id="ch25" title="CHAPTER XVIII. Nine Days" src="OEBPS/650582325774722811_98-h-24.htm.xhtml"
+h2 CHAPTER XVIII. Nine Days
+text 2406w
+chapter-end id="ch25"
+chapter-start id="ch26" title="CHAPTER XIX. An Opinion" src="OEBPS/650582325774722811_98-h-25.htm.xhtml"
+h2 CHAPTER XIX. An Opinion
+text 2769w
+chapter-end id="ch26"
+chapter-start id="ch27" title="CHAPTER XX. A Plea" src="OEBPS/650582325774722811_98-h-26.htm.xhtml"
+h2 CHAPTER XX. A Plea
+text 1342w
+chapter-end id="ch27"
+chapter-start id="ch28" title="CHAPTER XXI. Echoing Footsteps" src="OEBPS/650582325774722811_98-h-27.htm.xhtml"
+h2 CHAPTER XXI. Echoing Footsteps
+text 4237w
+chapter-end id="ch28"
+chapter-start id="ch29" title="CHAPTER XXII. The Sea Still Rises" src="OEBPS/650582325774722811_98-h-28.htm.xhtml"
+h2 CHAPTER XXII. The Sea Still Rises
+text 2027w
+chapter-end id="ch29"
+chapter-start id="ch30" title="CHAPTER XXIII. Fire Rises" src="OEBPS/650582325774722811_98-h-29.htm.xhtml"
+h2 CHAPTER XXIII. Fire Rises
+text 2620w
+chapter-end id="ch30"
+chapter-start id="ch31" title="CHAPTER XXIV. Drawn to the Loadstone Rock" src="OEBPS/650582325774722811_98-h-30.htm.xhtml"
+h2 CHAPTER XXIV. Drawn to the Loadstone Rock
+text 4404w
+chapter-end id="ch31"
+chapter-start id="ch32" title="Book the Third—the Track of a Storm" src="OEBPS/650582325774722811_98-h-31.htm.xhtml"
+h2 Book the Third—the Track of a Storm
+h2 CHAPTER I. In Secret
+text 4233w
+chapter-end id="ch32"
+chapter-start id="ch33" title="CHAPTER II. The Grindstone" src="OEBPS/650582325774722811_98-h-32.htm.xhtml"
+h2 CHAPTER II. The Grindstone
+text 2475w
+chapter-end id="ch33"
+chapter-start id="ch34" title="CHAPTER III. The Shadow" src="OEBPS/650582325774722811_98-h-33.htm.xhtml"
+h2 CHAPTER III. The Shadow
+text 1719w
+chapter-end id="ch34"
+chapter-start id="ch35" title="CHAPTER IV. Calm in Storm" src="OEBPS/650582325774722811_98-h-34.htm.xhtml"
+h2 CHAPTER IV. Calm in Storm
+text 2132w
+chapter-end id="ch35"
+chapter-start id="ch36" title="CHAPTER V. The Wood-Sawyer" src="OEBPS/650582325774722811_98-h-35.htm.xhtml"
+h2 CHAPTER V. The Wood-Sawyer
+text 2270w
+chapter-end id="ch36"
+chapter-start id="ch37" title="CHAPTER VI. Triumph" src="OEBPS/650582325774722811_98-h-36.htm.xhtml"
+h2 CHAPTER VI. Triumph
+text 2491w
+chapter-end id="ch37"
+chapter-start id="ch38" title="CHAPTER VII. A Knock at the Door" src="OEBPS/650582325774722811_98-h-37.htm.xhtml"
+h2 CHAPTER VII. A Knock at the Door
+text 1841w
+chapter-end id="ch38"
+chapter-start id="ch39" title="CHAPTER VIII. A Hand at Cards" src="OEBPS/650582325774722811_98-h-38.htm.xhtml"
+h2 CHAPTER VIII. A Hand at Cards
+text 4650w
+chapter-end id="ch39"
+chapter-start id="ch40" title="CHAPTER IX. The Game Made" src="OEBPS/650582325774722811_98-h-39.htm.xhtml"
+h2 CHAPTER IX. The Game Made
+text 4625w
+chapter-end id="ch40"
+chapter-start id="ch41" title="CHAPTER X. The Substance of the Shadow" src="OEBPS/650582325774722811_98-h-40.htm.xhtml"
+h2 CHAPTER X. The Substance of the Shadow
+text 5761w
+chapter-end id="ch41"
+chapter-start id="ch42" title="CHAPTER XI. Dusk" src="OEBPS/650582325774722811_98-h-41.htm.xhtml"
+h2 CHAPTER XI. Dusk
+text 1451w
+chapter-end id="ch42"
+chapter-start id="ch43" title="CHAPTER XII. Darkness" src="OEBPS/650582325774722811_98-h-42.htm.xhtml"
+h2 CHAPTER XII. Darkness
+text 3189w
+chapter-end id="ch43"
+chapter-start id="ch44" title="CHAPTER XIII. Fifty-two" src="OEBPS/650582325774722811_98-h-43.htm.xhtml"
+h2 CHAPTER XIII. Fifty-two
+text 4388w
+chapter-end id="ch44"
+chapter-start id="ch45" title="CHAPTER XIV. The Knitting Done" src="OEBPS/650582325774722811_98-h-44.htm.xhtml"
+h2 CHAPTER XIV. The Knitting Done
+text 4628w
+chapter-end id="ch45"
+chapter-start id="ch46" title="CHAPTER XV. The Footsteps Die Out For Ever" src="OEBPS/650582325774722811_98-h-45.htm.xhtml"
+h2 CHAPTER XV. The Footsteps Die Out For Ever
+text 2217w
+chapter-end id="ch46"
