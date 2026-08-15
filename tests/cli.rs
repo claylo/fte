@@ -173,3 +173,30 @@ fn a_missing_default_indir_exits_zero_with_a_warning() {
             "warning: input directory ref/epub does not exist",
         ));
 }
+
+#[test]
+fn an_io_error_on_a_path_containing_exists_is_not_output_exists() {
+    let tmp = tempfile::tempdir().unwrap();
+    let locked = tmp.path().join("exists");
+    std::fs::create_dir(&locked).unwrap();
+
+    let mut perms = std::fs::metadata(&locked).unwrap().permissions();
+    perms.set_readonly(true);
+    std::fs::set_permissions(&locked, perms).unwrap();
+
+    let assert = fte()
+        .args(["split", "--outdir"])
+        .arg(locked.join("out"))
+        .arg("tests/golden/input/books/frankenstein-pg.epub")
+        .assert()
+        .failure();
+
+    // Restore permissions so tempdir cleanup succeeds regardless of outcome.
+    let mut perms = std::fs::metadata(&locked).unwrap().permissions();
+    #[allow(clippy::permissions_set_readonly_false)]
+    perms.set_readonly(false);
+    std::fs::set_permissions(&locked, perms).unwrap();
+
+    // io_error (7), not output_exists (6): the path merely contains the word.
+    assert.code(7);
+}

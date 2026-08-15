@@ -69,7 +69,7 @@ pub fn run(args: &SplitArgs, cfg: &Config, quiet: bool) -> Result<ExitCode, AppE
             Kind::NoChapters
         } else if msg.contains("unknown template token") || msg.contains("unterminated") {
             Kind::ConfigError
-        } else if msg.contains("exists") {
+        } else if msg.contains("pass --force to overwrite") {
             Kind::OutputExists
         } else {
             Kind::IoError
