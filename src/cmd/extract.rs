@@ -172,14 +172,17 @@ pub fn run(
     if !args.stdout {
         output::emit_items(&rows, render, |r| match r.status {
             "skipped" => format!("  SKIP {}.md (exists; use --force)", r.id),
-            // `source_format` stays "unknown" only for an input that never
-            // resolved to a path; a resolved input that failed extraction
-            // always has a real detected format.
-            "failed" if r.source_format == "unknown" => format!("  FAIL {}: not found", r.id),
-            "failed" => match &r.reason {
-                Some(reason) => format!("  FAIL {}.md: {reason}", r.id),
-                None => format!("  FAIL {}.md", r.id),
-            },
+            // Discriminate on `reason`, not `source_format`: `source_format`
+            // is "unknown" both for an input that never resolved to a path
+            // AND for a resolved file whose format `detect_format` could not
+            // classify (N1) — it does not distinguish "missing" from
+            // "unsupported". `reason` always carries the real cause for
+            // either case, so there is nothing left to special-case.
+            "failed" => format!(
+                "  FAIL {}: {}",
+                r.id,
+                r.reason.as_deref().unwrap_or("failed")
+            ),
             _ => format!("  OK   {}.md ({}KB)", r.id, r.bytes / 1024),
         });
     }

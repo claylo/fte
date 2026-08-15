@@ -355,7 +355,38 @@ fn a_failed_extraction_is_reported_exactly_once() {
         "the failure must not also appear on stderr:\n{stderr}"
     );
     // The reason (I4) survives even without the old stderr line.
-    assert!(stdout.contains("sage-html-article.md"));
+    assert!(stdout.contains("sage-html-article"));
+    assert!(stdout.contains("abstract-only format"));
+}
+
+#[test]
+fn a_resolved_unsupported_file_does_not_report_not_found() {
+    // N1 regression: the text-mode row used to discriminate "missing input"
+    // from "failed extraction" by testing `source_format == "unknown"", but
+    // a resolved file with an unclassifiable format also has
+    // `source_format: "unknown"` — so the row lied and said "not found" for
+    // a file that plainly exists and was given as an explicit path.
+    let indir = tempfile::tempdir().unwrap();
+    let input = indir.path().join("note.txt");
+    std::fs::write(&input, "hi").unwrap();
+
+    let outdir = tempfile::tempdir().unwrap();
+    let assert = fte()
+        .args(["extract", "--format", "text", "--outdir"])
+        .arg(outdir.path())
+        .arg(&input)
+        .assert()
+        .failure();
+
+    let stdout = String::from_utf8(assert.get_output().stdout.clone()).unwrap();
+    assert!(
+        !stdout.contains("not found"),
+        "a resolved file must not be reported as not found:\n{stdout}"
+    );
+    assert!(
+        stdout.contains("unknown format"),
+        "the real reason must appear:\n{stdout}"
+    );
 }
 
 #[test]
