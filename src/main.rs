@@ -141,6 +141,10 @@ fn schema_metadata() -> SchemaMetadata {
                 .output_field(
                     OutputField::new("status", "string")
                         .description("extracted | skipped | failed"),
+                )
+                .output_field(
+                    OutputField::new("reason", "string")
+                        .description("Why a failed row failed; absent otherwise"),
                 ),
         )
         .command(
@@ -157,8 +161,10 @@ fn schema_metadata() -> SchemaMetadata {
                 .output_field(
                     OutputField::new("format", "string").description("Detected format name"),
                 )
+                .output_field(OutputField::new("status", "string").description("detected | failed"))
                 .output_field(
-                    OutputField::new("status", "string").description("detected | failed"),
+                    OutputField::new("reason", "string")
+                        .description("Why a failed row failed; absent otherwise"),
                 ),
         )
         .command(
@@ -169,6 +175,8 @@ fn schema_metadata() -> SchemaMetadata {
                 .example(CommandExample::new([
                     "split",
                     "tests/golden/input/books/frankenstein-pg.epub",
+                    "--outdir",
+                    "target/clispec-scratch",
                 ]))
                 .output_field(
                     OutputField::new("index", "integer")
@@ -240,6 +248,16 @@ fn run() -> std::result::Result<ExitCode, fte::errors::AppError> {
                 ) {
                     print!("{error}");
                     return Ok(ExitCode::SUCCESS);
+                }
+                // Bare `fte` (arg_required_else_help) hits this arm: the
+                // "error" IS the full help screen, not a diagnostic. Print
+                // it exactly as clap would rather than JSON-escaping ~700
+                // characters of help text into AppError::message, but keep
+                // the usage exit code — this is still a usage failure.
+                if error.kind() == clap::error::ErrorKind::DisplayHelpOnMissingArgumentOrSubcommand
+                {
+                    let _ = error.print();
+                    return Ok(ExitCode::from(Kind::Usage.code()));
                 }
                 return Err(
                     AppError::new(Kind::Usage, error.to_string().trim().to_string())

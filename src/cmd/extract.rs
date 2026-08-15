@@ -18,6 +18,9 @@ struct ExtractRow {
     output_path: Option<String>,
     bytes: usize,
     status: &'static str,
+    /// Why a `"failed"` row failed. `None` for every other status.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    reason: Option<String>,
 }
 
 pub fn run(
@@ -60,8 +63,11 @@ pub fn run(
     for id in &resolved.missing {
         if args.stdout {
             // No JSON items channel exists in --stdout mode; this is the
-            // only diagnostic a missing input gets.
-            eprintln!("  FAIL {id}: not found");
+            // only diagnostic a missing input gets, and only in text mode —
+            // JSON mode's stderr carries the structured error envelope only.
+            if render == Render::Text {
+                eprintln!("  FAIL {id}: not found");
+            }
         } else {
             rows.push(ExtractRow {
                 id: id.clone(),
@@ -69,6 +75,7 @@ pub fn run(
                 output_path: None,
                 bytes: 0,
                 status: "failed",
+                reason: Some("not found".to_string()),
             });
         }
     }
@@ -90,7 +97,7 @@ pub fn run(
             (format, Some(text))
         };
 
-        if verbose {
+        if verbose && render == Render::Text {
             eprintln!("  detect {id}: {format}");
         }
 
@@ -103,6 +110,7 @@ pub fn run(
                 output_path: Some(out_path.display().to_string()),
                 bytes: 0,
                 status: "skipped",
+                reason: None,
             });
             continue;
         }
@@ -129,24 +137,31 @@ pub fn run(
                         output_path: Some(out_path.display().to_string()),
                         bytes: md.len(),
                         status: "extracted",
+                        reason: None,
                     });
                 }
                 ok += 1;
             }
             Err(e) => {
-                // In --stdout mode this is the only diagnostic (no JSON
-                // items channel); otherwise it's stderr chatter, so it
-                // stays text-mode only — JSON mode reports it as a row.
-                if args.stdout || render == Render::Text {
-                    eprintln!("  FAIL {id}: {e}");
-                }
-                if !args.stdout {
+                if args.stdout {
+                    // No JSON items channel exists in --stdout mode; this is
+                    // the only diagnostic a failed extraction gets, and only
+                    // in text mode — see the missing-input arm above.
+                    if render == Render::Text {
+                        eprintln!("  FAIL {id}: {e}");
+                    }
+                } else {
+                    // The row is the sole report of this failure — it goes
+                    // out once, from output::emit_items below, on whichever
+                    // stream `render` selects. Printing it here too would
+                    // double-report the same failure under two identifiers.
                     rows.push(ExtractRow {
                         id: id.to_string(),
                         source_format: format.to_string(),
                         output_path: None,
                         bytes: 0,
                         status: "failed",
+                        reason: Some(e.to_string()),
                     });
                 }
                 fail += 1;
@@ -161,7 +176,10 @@ pub fn run(
             // resolved to a path; a resolved input that failed extraction
             // always has a real detected format.
             "failed" if r.source_format == "unknown" => format!("  FAIL {}: not found", r.id),
-            "failed" => format!("  FAIL {}.md", r.id),
+            "failed" => match &r.reason {
+                Some(reason) => format!("  FAIL {}.md: {reason}", r.id),
+                None => format!("  FAIL {}.md", r.id),
+            },
             _ => format!("  OK   {}.md ({}KB)", r.id, r.bytes / 1024),
         });
     }

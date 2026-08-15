@@ -12,11 +12,42 @@ fn fte() -> Command {
 
 #[test]
 fn bare_invocation_shows_help_and_exits_two() {
-    fte()
+    // Pinned to `--format text`: assert_cmd pipes stdout, so unforced
+    // `auto` format resolves to JSON and `wants_json_errors()` would be
+    // true. Before I6 this test passed for the wrong reason — matching
+    // "extract"/"split" as substrings inside a JSON-escaped `message`
+    // field containing the whole help screen, not a real help render.
+    // Forcing text mode makes the assertion mean what it says: a plain
+    // help screen on stderr, not a JSON envelope.
+    let assert = fte()
+        .args(["--format", "text"])
         .assert()
         .code(2)
         .stderr(predicate::str::contains("extract"))
         .stderr(predicate::str::contains("split"));
+
+    let stderr = String::from_utf8(assert.get_output().stderr.clone()).unwrap();
+    assert!(
+        serde_json::from_str::<serde_json::Value>(stderr.trim()).is_err(),
+        "help screen must not be a JSON envelope: {stderr}"
+    );
+}
+
+#[test]
+fn bare_invocation_prints_real_help_even_in_json_mode() {
+    // I6: help text is exempted from the JSON error envelope entirely. No
+    // `--format` flag here: assert_cmd pipes stdout, so `wants_json_errors()`
+    // would resolve to JSON by the same `auto` rule as everywhere else —
+    // this proves the help path bypasses that envelope regardless, rather
+    // than stuffing ~700 characters of help into a `message` field.
+    let out = fte().assert().code(2).get_output().stderr.clone();
+    let stderr = String::from_utf8(out).unwrap();
+    assert!(stderr.contains("extract"));
+    assert!(stderr.contains("split"));
+    assert!(
+        serde_json::from_str::<serde_json::Value>(stderr.trim()).is_err(),
+        "help screen must not be a JSON envelope: {stderr}"
+    );
 }
 
 #[test]
@@ -30,9 +61,15 @@ fn extraction_success_exits_zero() {
 
 #[test]
 fn missing_input_id_exits_nonzero() {
+    // Forced text mode: `--stdout` has no JSON items channel, so a missing
+    // input's only diagnostic is this stderr line, printed in text mode
+    // only (I5) — assert_cmd pipes stdout, so unforced `auto` resolves to
+    // JSON and the line would not appear at all.
     fte()
         .args([
             "extract",
+            "--format",
+            "text",
             "--indir",
             "tests/golden/input",
             "--stdout",
@@ -93,12 +130,16 @@ fn quiet_suppresses_progress_but_not_failures() {
 
 #[test]
 fn verbose_reports_detected_format() {
+    // Forced text mode: unforced `auto` resolves to JSON here (assert_cmd
+    // pipes stdout), and `-v` chatter is text-mode-only (I5).
     let tmp = tempfile::tempdir().unwrap();
     fte()
         .args([
             "extract",
             "-v",
             "--force",
+            "--format",
+            "text",
             "--indir",
             "tests/golden/input",
             "--outdir",
@@ -284,6 +325,148 @@ fn json_mode_puts_no_plain_text_on_stderr() {
             "non-JSON line on stderr in JSON mode: {line}"
         );
     }
+}
+
+#[test]
+fn a_failed_extraction_is_reported_exactly_once() {
+    // I3: the same failure used to print once on stdout (via the row) and
+    // once on stderr (via a separate eprintln under a different
+    // identifier — "sage-html-article.md" vs "sage-html-article"). The row
+    // is now the sole report; stderr carries only progress/summary chatter.
+    let tmp = tempfile::tempdir().unwrap();
+    let assert = fte()
+        .args(["extract", "--format", "text", "--outdir"])
+        .arg(tmp.path())
+        .arg("tests/golden/input/sage-html-article.html")
+        .assert()
+        .failure();
+
+    let out = assert.get_output();
+    let stdout = String::from_utf8(out.stdout.clone()).unwrap();
+    let stderr = String::from_utf8(out.stderr.clone()).unwrap();
+
+    let stdout_fails = stdout.lines().filter(|l| l.contains("FAIL")).count();
+    assert_eq!(
+        stdout_fails, 1,
+        "expected exactly one FAIL row on stdout:\n{stdout}"
+    );
+    assert!(
+        !stderr.contains("FAIL"),
+        "the failure must not also appear on stderr:\n{stderr}"
+    );
+    // The reason (I4) survives even without the old stderr line.
+    assert!(stdout.contains("sage-html-article.md"));
+}
+
+#[test]
+fn extract_verbose_json_mode_puts_no_plain_text_on_stderr() {
+    // I5: `-v` had no `render` check and leaked "  detect id: format" onto
+    // stderr even in JSON mode. Regression per the review's suggestion to
+    // extend `json_mode_puts_no_plain_text_on_stderr` beyond `detect`.
+    let tmp = tempfile::tempdir().unwrap();
+    let out = fte()
+        .args([
+            "extract",
+            "-v",
+            "--force",
+            "--format",
+            "json",
+            "--indir",
+            "tests/golden/input",
+            "--outdir",
+        ])
+        .arg(tmp.path())
+        .arg("bmc-short")
+        .assert()
+        .success()
+        .get_output()
+        .stderr
+        .clone();
+
+    let text = String::from_utf8(out).unwrap();
+    for line in text.lines().filter(|l| !l.trim().is_empty()) {
+        assert!(
+            serde_json::from_str::<serde_json::Value>(line).is_ok(),
+            "non-JSON line on stderr in JSON mode: {line}"
+        );
+    }
+}
+
+#[test]
+fn extract_stdout_json_mode_puts_no_plain_text_on_stderr() {
+    // The `--stdout` per-item diagnostic (I5's smaller leak, extract.rs:64)
+    // is text-mode-only; JSON mode gets nothing on stderr for a per-item
+    // failure since --stdout has no items channel to report it through.
+    let out = fte()
+        .args([
+            "extract",
+            "--stdout",
+            "--format",
+            "json",
+            "--indir",
+            "tests/golden/input",
+            "definitely-not-a-real-id",
+        ])
+        .assert()
+        .failure()
+        .get_output()
+        .stderr
+        .clone();
+
+    let text = String::from_utf8(out).unwrap();
+    for line in text.lines().filter(|l| !l.trim().is_empty()) {
+        assert!(
+            serde_json::from_str::<serde_json::Value>(line).is_ok(),
+            "non-JSON line on stderr in JSON mode: {line}"
+        );
+    }
+}
+
+#[test]
+fn split_json_mode_puts_no_plain_text_on_stderr() {
+    let tmp = tempfile::tempdir().unwrap();
+    let out = fte()
+        .args(["split", "--format", "json", "--outdir"])
+        .arg(tmp.path())
+        .arg("tests/golden/input/books/frankenstein-pg.epub")
+        .assert()
+        .success()
+        .get_output()
+        .stderr
+        .clone();
+
+    let text = String::from_utf8(out).unwrap();
+    for line in text.lines().filter(|l| !l.trim().is_empty()) {
+        assert!(
+            serde_json::from_str::<serde_json::Value>(line).is_ok(),
+            "non-JSON line on stderr in JSON mode: {line}"
+        );
+    }
+}
+
+#[test]
+fn a_failed_row_carries_a_reason_in_json_mode() {
+    // I4: a JSON consumer could see status: "failed" with no way to tell
+    // why. `reason` makes the cause part of the structured envelope.
+    let tmp = tempfile::tempdir().unwrap();
+    let out = fte()
+        .args(["extract", "--format", "json", "--outdir"])
+        .arg(tmp.path())
+        .arg("tests/golden/input/sage-html-article.html")
+        .assert()
+        .failure()
+        .get_output()
+        .stdout
+        .clone();
+
+    let parsed: serde_json::Value = serde_json::from_slice(&out).unwrap();
+    let items = parsed["items"].as_array().expect("items array");
+    assert_eq!(items.len(), 1);
+    assert_eq!(items[0]["status"], "failed");
+    assert!(
+        items[0]["reason"].is_string() && items[0]["reason"] != "",
+        "failed row must carry a non-empty reason: {items:?}"
+    );
 }
 
 #[test]

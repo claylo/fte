@@ -17,6 +17,9 @@ struct DetectRow {
     path: String,
     format: String,
     status: &'static str,
+    /// Why a `"failed"` row failed. `None` for every other status.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    reason: Option<String>,
 }
 
 pub fn run(args: &DetectArgs, cfg: &Config, render: Render) -> Result<ExitCode, AppError> {
@@ -54,6 +57,7 @@ pub fn run(args: &DetectArgs, cfg: &Config, render: Render) -> Result<ExitCode, 
             path: path.display().to_string(),
             format: format.to_string(),
             status: "detected",
+            reason: None,
         });
     }
 
@@ -63,6 +67,7 @@ pub fn run(args: &DetectArgs, cfg: &Config, render: Render) -> Result<ExitCode, 
             path: String::new(),
             format: "unknown".to_string(),
             status: "failed",
+            reason: Some("not found".to_string()),
         });
     }
 
