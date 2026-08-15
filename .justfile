@@ -78,3 +78,20 @@ upgrade-breaking:
 check-updates:
     cargo update --dry-run
 
+# Score the built binary against The CLI Spec.
+#
+# Four checks are blocked by librebar 0.6, which emits CLIspec 0.2 and has no
+# `effects` or `cardinality` fields — see
+# record/superpowers/specs/2026-08-14-cli-restructure-and-chapter-splitting-design.md
+clispec-floor := "19"
+
+clispec:
+  @cargo build --quiet
+  @clispec score -o json ./target/debug/fte > target/clispec.json
+  @jq -e '.score >= {{clispec-floor}}' target/clispec.json > /dev/null || { \
+      echo "clispec score below floor of {{clispec-floor}}:" >&2; \
+      jq -r '.principles[].checks[] | select(.passed == false) | "  FAIL \(.name): \(.detail // "no detail")"' target/clispec.json >&2; \
+      exit 1; \
+  }
+  @jq -r '"clispec \(.score)/\(.max) (\(.percentage)%) \(.grade)"' target/clispec.json
+

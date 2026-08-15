@@ -222,6 +222,29 @@ fn detect_emits_an_items_envelope_in_json_mode() {
 }
 
 #[test]
+fn help_and_version_still_succeed() {
+    fte().arg("--help").assert().success();
+    fte().arg("--version").assert().success();
+}
+
+#[test]
+fn a_usage_error_emits_the_structured_envelope() {
+    let out = fte()
+        .args(["extract", "--nope", "--format", "json"])
+        .assert()
+        .code(2)
+        .get_output()
+        .stderr
+        .clone();
+
+    let text = String::from_utf8(out).unwrap();
+    let last = text.lines().last().expect("stderr is not empty");
+    let parsed: serde_json::Value =
+        serde_json::from_str(last).expect("last stderr line is a JSON envelope");
+    assert_eq!(parsed["kind"], "usage");
+}
+
+#[test]
 fn stdout_stays_raw_markdown_even_when_piped() {
     let out = fte()
         .args(["extract", "--stdout", "tests/golden/input/bmc-short.html"])

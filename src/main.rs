@@ -1,4 +1,8 @@
 use librebar::cli::clap::{self, Args, Parser, Subcommand};
+use librebar::cli::{
+    CommandExample, CommandMetadata, ErrorMetadata, OutcomeMetadata, OutputField, ParseOutcome,
+    SchemaMetadata, Stability,
+};
 use std::path::PathBuf;
 use std::process::ExitCode;
 
@@ -95,6 +99,74 @@ pub struct SplitArgs {
     pub force: bool,
 }
 
+/// Application facts published through `fte schema`.
+fn schema_metadata() -> SchemaMetadata {
+    let mut metadata = SchemaMetadata::new();
+
+    for kind in fte::errors::Kind::ALL {
+        metadata = metadata.error(
+            ErrorMetadata::new(kind.as_str())
+                .exit_code(kind.code())
+                .retryable(kind.retryable())
+                .description(kind.description()),
+        );
+    }
+
+    metadata = metadata.outcome(
+        OutcomeMetadata::new(fte::errors::PARTIAL_FAILURE, "partial_failure")
+            .description("Some inputs were processed and others failed."),
+    );
+
+    metadata
+        .command(
+            "extract",
+            CommandMetadata::new()
+                .mutating(true)
+                .stability(Stability::Stable)
+                .example(CommandExample::new(["extract", "--stdout", "paper.html"]))
+                .output_field(OutputField::new("id", "string").description("Input file stem"))
+                .output_field(
+                    OutputField::new("source_format", "string")
+                        .description("Detected publisher format"),
+                )
+                .output_field(
+                    OutputField::new("output_path", "string")
+                        .description("Path written, absent with --stdout"),
+                )
+                .output_field(OutputField::new("bytes", "integer").description("Markdown size"))
+                .output_field(
+                    OutputField::new("status", "string")
+                        .description("extracted | skipped | failed"),
+                ),
+        )
+        .command(
+            "detect",
+            CommandMetadata::new()
+                .mutating(false)
+                .stability(Stability::Stable)
+                .example(CommandExample::new(["detect", "paper.html"]))
+                .output_field(OutputField::new("id", "string").description("Input file stem"))
+                .output_field(OutputField::new("path", "string").description("Resolved path"))
+                .output_field(
+                    OutputField::new("format", "string").description("Detected format name"),
+                ),
+        )
+        .command(
+            "split",
+            CommandMetadata::new()
+                .mutating(true)
+                .stability(Stability::Stable)
+                .example(CommandExample::new(["split", "book.epub"]))
+                .output_field(
+                    OutputField::new("index", "integer")
+                        .description("Chapter number; 0 is the frontmatter file"),
+                )
+                .output_field(OutputField::new("title", "string").description("Chapter title"))
+                .output_field(OutputField::new("path", "string").description("Path written"))
+                .output_field(OutputField::new("bytes", "integer").description("File size")),
+        )
+}
+
 fn main() -> ExitCode {
     match run() {
         Ok(code) => code,
@@ -130,7 +202,39 @@ fn wants_json_errors() -> bool {
 }
 
 fn run() -> std::result::Result<ExitCode, fte::errors::AppError> {
-    let cli: Cli = librebar::cli::parse();
+    let cli: Cli =
+        match librebar::cli::try_parse_from::<Cli, _, _>(std::env::args_os(), schema_metadata()) {
+            Ok(ParseOutcome::Run(cli)) => cli,
+            Ok(ParseOutcome::Schema(document)) => {
+                let json = serde_json::to_string_pretty(&document)
+                    .map_err(|e| AppError::new(Kind::IoError, format!("rendering schema: {e}")))?;
+                println!("{json}");
+                return Ok(ExitCode::SUCCESS);
+            }
+            Ok(ParseOutcome::Completions(bytes)) => {
+                use std::io::Write;
+                std::io::stdout().write_all(&bytes).map_err(|e| {
+                    AppError::new(Kind::IoError, format!("writing completions: {e}"))
+                })?;
+                return Ok(ExitCode::SUCCESS);
+            }
+            Err(error) => {
+                // Help and version are successful requests, not failures: print
+                // them exactly as clap would and exit 0.
+                if matches!(
+                    error.kind(),
+                    clap::error::ErrorKind::DisplayHelp | clap::error::ErrorKind::DisplayVersion
+                ) {
+                    print!("{error}");
+                    return Ok(ExitCode::SUCCESS);
+                }
+                return Err(
+                    AppError::new(Kind::Usage, error.to_string().trim().to_string())
+                        .hint("run with --help for usage"),
+                );
+            }
+            Ok(_) => unreachable!("librebar::cli::ParseOutcome grew a variant fte does not handle"),
+        };
 
     if cli
         .common

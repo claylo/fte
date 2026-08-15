@@ -53,6 +53,54 @@ fte completions zsh > ~/.zfunc/_fte
 fte schema
 ```
 
+### Splitting books into chapters
+
+Book-length ePub output carries chapter boundary markers, so it can be split
+into per-chapter files:
+
+```bash
+# One shot: epub straight to chapter files
+fte split book.epub
+
+# Or split a document you already extracted
+fte extract book.epub && fte split ref/epub-md/book.md
+```
+
+Filenames come from templates, configurable in `.fte.yaml`:
+
+```yaml
+split:
+  subdir: "{book}"              # "" writes flat into the output directory
+  file: "{n}-{slug}.md"
+  front: "{n}-frontmatter.md"   # "" suppresses it
+  pad: 2
+```
+
+Available tokens are `{book}`, `{n}`, `{slug}`, `{title}`, and `{src}`. An
+unrecognized token is an error, not a literal. `--subdir`, `--name`, `--front`,
+and `--no-front` override the config per run.
+
+### Exit codes
+
+| Code | Meaning |
+|------|---------|
+| 0 | Success |
+| 1 | `partial_failure` — some inputs succeeded, others failed |
+| 2 | `usage` |
+| 3 | `not_found` |
+| 4 | `unsupported_format` |
+| 5 | `extraction_failed` |
+| 6 | `output_exists` |
+| 7 | `io_error` |
+| 8 | `no_chapters` |
+| 9 | `config_error` |
+
+With `--format json`, failures print a single-line envelope to stderr:
+
+```json
+{"kind":"not_found","message":"input 'foo.html' not found","hint":"check --indir"}
+```
+
 ## Supported Formats
 
 | Format | Detection | Handler |
@@ -79,6 +127,7 @@ fte handles book-length epubs — full-length books with many chapters, not just
 - **Subheading recovery** via CSS heuristics. Some converters flatten subheadings into styled `<p>` tags — fte detects these by font-size and promotes them back to headings.
 - **Table of contents** with anchor links, rendered at the top of the output.
 - **All content included** — front matter, chapters, notes, references, index. The heading structure is clean enough to split by chapter or strip sections in post-processing.
+- **Chapter boundary markers** embedded in the output, so `fte split` can cut the book into per-chapter files without re-parsing the source. See [Splitting books into chapters](#splitting-books-into-chapters).
 
 This is best-effort. ePub books vary wildly in structure, especially after format conversion. fte handles the common patterns well (tested against Gutenberg, HarperCollins, and Simon & Schuster converter output), but edge cases exist. If a book's XHTML uses no heading tags and no identifiable CSS patterns for subheadings, you'll get flat paragraphs with chapter breaks.
 
