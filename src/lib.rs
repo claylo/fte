@@ -8,4 +8,5 @@ pub mod html;
 pub mod inputs;
 pub mod jats;
 pub mod markdown;
+pub mod template;
 pub mod wiley_xml;
