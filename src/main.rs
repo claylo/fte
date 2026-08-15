@@ -119,6 +119,6 @@ fn main() -> Result<ExitCode> {
     match &cli.command {
         Commands::Extract(args) => cmd::extract::run(args, &cfg, quiet, verbose),
         Commands::Detect(args) => cmd::detect::run(args, &cfg),
-        Commands::Split(_) => anyhow::bail!("split is not implemented yet"),
+        Commands::Split(args) => cmd::split::run(args, &cfg, quiet),
     }
 }

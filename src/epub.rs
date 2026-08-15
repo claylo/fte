@@ -374,7 +374,8 @@ fn render_toc_entries(entries: &[NavEntry], toc: &mut String, depth: usize) {
 }
 
 /// Generate a GFM-compatible anchor slug from a heading string.
-fn heading_slug(text: &str) -> String {
+#[must_use]
+pub fn heading_slug(text: &str) -> String {
     text.to_lowercase()
         .chars()
         .map(|c| {
