@@ -21,22 +21,27 @@ Prebuilt binaries for macOS, Linux, and Windows are on the
 
 ```bash
 # Extract all files in a directory
-fte --indir path/to/html-files --outdir path/to/output
+fte extract --indir path/to/html-files --outdir path/to/output
 
 # Extract specific files
-fte paper.html chapter.xml article.epub
+fte extract paper.html chapter.xml article.epub
 
 # Print to stdout
-fte --stdout paper.html
+fte extract --stdout paper.html
 
 # Detect format without extracting
-fte --detect-only --indir path/to/html-files
+fte detect --indir path/to/html-files
 
 # Overwrite existing output
-fte --force --indir path/to/html-files --outdir path/to/output
+fte extract --force --indir path/to/html-files --outdir path/to/output
+
+# Split a book into per-chapter files
+fte split book.epub
 ```
 
-When run without `--indir`, fte looks for a config file (`.fte.yaml`, `.config/fte.yaml`, etc.) walking up from the current directory to find input/output paths.
+When run without `--indir`, `fte extract` looks for a config file (`.fte.yaml`,
+`.config/fte.yaml`, etc.) walking up from the current directory to find
+input/output paths. A bare `fte` prints help.
 
 ### Shell completions and machine-readable help
 

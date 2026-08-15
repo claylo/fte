@@ -5,6 +5,7 @@ pub mod detect;
 pub mod epub;
 pub mod extract;
 pub mod html;
+pub mod inputs;
 pub mod jats;
 pub mod markdown;
 pub mod wiley_xml;

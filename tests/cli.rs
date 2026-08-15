@@ -11,9 +11,18 @@ fn fte() -> Command {
 }
 
 #[test]
+fn bare_invocation_shows_help_and_exits_two() {
+    fte()
+        .assert()
+        .code(2)
+        .stderr(predicate::str::contains("extract"))
+        .stderr(predicate::str::contains("split"));
+}
+
+#[test]
 fn extraction_success_exits_zero() {
     fte()
-        .args(["--stdout", "tests/golden/input/bmc-short.html"])
+        .args(["extract", "--stdout", "tests/golden/input/bmc-short.html"])
         .assert()
         .success()
         .stdout(predicate::str::contains("---"));
@@ -23,6 +32,7 @@ fn extraction_success_exits_zero() {
 fn missing_input_id_exits_nonzero() {
     fte()
         .args([
+            "extract",
             "--indir",
             "tests/golden/input",
             "--stdout",
@@ -37,7 +47,7 @@ fn missing_input_id_exits_nonzero() {
 fn missing_input_is_counted_in_summary() {
     let tmp = tempfile::tempdir().unwrap();
     fte()
-        .args(["--indir", "tests/golden/input", "--outdir"])
+        .args(["extract", "--indir", "tests/golden/input", "--outdir"])
         .arg(tmp.path())
         .args(["bmc-short", "definitely-not-a-real-id"])
         .assert()
@@ -50,7 +60,14 @@ fn missing_input_is_counted_in_summary() {
 fn quiet_suppresses_progress_but_not_failures() {
     let tmp = tempfile::tempdir().unwrap();
     fte()
-        .args(["-q", "--force", "--indir", "tests/golden/input", "--outdir"])
+        .args([
+            "extract",
+            "-q",
+            "--force",
+            "--indir",
+            "tests/golden/input",
+            "--outdir",
+        ])
         .arg(tmp.path())
         .args(["bmc-short", "definitely-not-a-real-id"])
         .assert()
@@ -64,10 +81,35 @@ fn quiet_suppresses_progress_but_not_failures() {
 fn verbose_reports_detected_format() {
     let tmp = tempfile::tempdir().unwrap();
     fte()
-        .args(["-v", "--force", "--indir", "tests/golden/input", "--outdir"])
+        .args([
+            "extract",
+            "-v",
+            "--force",
+            "--indir",
+            "tests/golden/input",
+            "--outdir",
+        ])
         .arg(tmp.path())
         .arg("bmc-short")
         .assert()
         .success()
         .stderr(predicate::str::contains("detect bmc-short:"));
+}
+
+#[test]
+fn detect_is_its_own_command() {
+    fte()
+        .args(["detect", "tests/golden/input/bmc-short.html"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("bmc-short"));
+}
+
+#[test]
+fn schema_still_works_alongside_subcommands() {
+    fte()
+        .arg("schema")
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("\"clispec\""));
 }
