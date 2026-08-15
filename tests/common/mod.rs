@@ -97,6 +97,10 @@ fn is_toc_entry(trimmed: &str) -> bool {
 /// Compare a document's skeleton against its golden file.
 ///
 /// Honors `UPDATE_GOLDEN=1`, matching the convention in `tests/golden.rs`.
+///
+/// Unused in some test binaries that only pull in `skeleton` directly (e.g.
+/// `tests/split.rs`); `tests/book_golden.rs` uses it.
+#[allow(dead_code)]
 pub fn check_skeleton(name: &str, md: &str) {
     let path = Path::new("tests/golden/expected/books").join(format!("{name}.skeleton.txt"));
     let actual = skeleton(md);
