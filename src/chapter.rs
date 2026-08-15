@@ -63,6 +63,100 @@ pub fn first_heading_text(md: &str) -> Option<String> {
         .filter(|text| !text.is_empty())
 }
 
+/// One chapter recovered from a marked-up document.
+#[derive(Debug, Clone)]
+pub struct Chunk {
+    /// Sequential marker id, e.g. `ch03`.
+    pub id: String,
+    /// Chapter title from the marker.
+    pub title: String,
+    /// Source spine entry path from the marker.
+    pub src: String,
+    /// Markdown between the paired markers.
+    pub body: String,
+}
+
+/// A markdown document decomposed along its chapter markers.
+#[derive(Debug, Default, Clone)]
+pub struct Document {
+    /// YAML frontmatter body, without the `---` delimiters.
+    pub frontmatter: String,
+    /// Content before the first chapter marker: title heading and TOC.
+    pub preamble: String,
+    /// Chapters in document order.
+    pub chapters: Vec<Chunk>,
+}
+
+/// Decompose a document along its chapter markers.
+///
+/// Content between a `chapter-end` and the next `chapter-start` is discarded:
+/// paired markers exist so stray converter output cannot silently attach itself
+/// to the preceding chapter.
+#[must_use]
+pub fn parse(md: &str) -> Document {
+    let mut doc = Document::default();
+    let mut lines = md.lines().peekable();
+
+    if lines.peek().is_some_and(|l| l.trim() == "---") {
+        lines.next();
+        let mut front = String::new();
+        for line in lines.by_ref() {
+            if line.trim() == "---" {
+                break;
+            }
+            front.push_str(line);
+            front.push('\n');
+        }
+        doc.frontmatter = front;
+    }
+
+    let mut preamble = String::new();
+    let mut current: Option<Chunk> = None;
+    let mut seen_first_marker = false;
+
+    for line in lines {
+        let trimmed = line.trim();
+
+        if trimmed.starts_with(START_PREFIX) {
+            seen_first_marker = true;
+            current = Some(Chunk {
+                id: attr(trimmed, "id").unwrap_or_default(),
+                title: attr(trimmed, "title").unwrap_or_default(),
+                src: attr(trimmed, "src").unwrap_or_default(),
+                body: String::new(),
+            });
+            continue;
+        }
+
+        if trimmed.starts_with(END_PREFIX) {
+            if let Some(chunk) = current.take() {
+                doc.chapters.push(chunk);
+            }
+            continue;
+        }
+
+        if let Some(chunk) = current.as_mut() {
+            chunk.body.push_str(line);
+            chunk.body.push('\n');
+        } else if !seen_first_marker {
+            preamble.push_str(line);
+            preamble.push('\n');
+        }
+    }
+
+    doc.preamble = preamble.trim().to_string();
+    doc
+}
+
+/// Read a double-quoted attribute value out of a marker line.
+fn attr(line: &str, name: &str) -> Option<String> {
+    let needle = format!("{name}=\"");
+    let start = line.find(&needle)? + needle.len();
+    let rest = &line[start..];
+    let end = rest.find('"')?;
+    Some(rest[..end].to_string())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -113,5 +207,71 @@ mod tests {
             first_heading_text("plain\n\n### Deep\n"),
             Some("Deep".to_string())
         );
+    }
+
+    const SAMPLE: &str = r#"---
+id: demo
+title: "A Book"
+---
+
+# A Book
+
+## Contents
+
+- [One](#one)
+
+<!-- fte:chapter-start id="ch01" title="One" src="OEBPS/c1.xhtml" -->
+
+## One
+
+First body.
+
+<!-- fte:chapter-end id="ch01" -->
+
+stray converter cruft
+
+<!-- fte:chapter-start id="ch02" title="Two" src="OEBPS/c2.xhtml" -->
+
+## Two
+
+Second body.
+
+<!-- fte:chapter-end id="ch02" -->
+"#;
+
+    #[test]
+    fn parse_splits_frontmatter_preamble_and_chapters() {
+        let doc = parse(SAMPLE);
+        assert!(doc.frontmatter.contains("id: demo"));
+        assert!(doc.frontmatter.contains(r#"title: "A Book""#));
+        assert!(!doc.frontmatter.contains("---"));
+        assert!(doc.preamble.contains("# A Book"));
+        assert!(doc.preamble.contains("- [One](#one)"));
+        assert_eq!(doc.chapters.len(), 2);
+    }
+
+    #[test]
+    fn parse_reads_marker_attributes() {
+        let doc = parse(SAMPLE);
+        assert_eq!(doc.chapters[0].id, "ch01");
+        assert_eq!(doc.chapters[0].title, "One");
+        assert_eq!(doc.chapters[0].src, "OEBPS/c1.xhtml");
+        assert_eq!(doc.chapters[1].id, "ch02");
+    }
+
+    #[test]
+    fn parse_keeps_chapter_bodies_and_drops_cruft() {
+        let doc = parse(SAMPLE);
+        assert_eq!(doc.chapters[0].body.trim(), "## One\n\nFirst body.");
+        assert_eq!(doc.chapters[1].body.trim(), "## Two\n\nSecond body.");
+        assert!(!doc.chapters[0].body.contains("stray converter cruft"));
+        assert!(!doc.chapters[1].body.contains("stray converter cruft"));
+    }
+
+    #[test]
+    fn parse_of_an_unmarked_document_yields_no_chapters() {
+        let doc = parse("---\nid: paper\n---\n\n# Paper\n\nBody.\n");
+        assert!(doc.chapters.is_empty());
+        assert!(doc.preamble.contains("# Paper"));
     }
 }
