@@ -92,10 +92,6 @@ pub fn run(
     })?;
 
     if !quiet {
-        for w in &written {
-            let kb = w.bytes / 1024;
-            eprintln!("  OK   {} ({kb}KB)", w.path.display());
-        }
         eprintln!("\nDone: {} files written", written.len());
     }
 
@@ -110,7 +106,8 @@ pub fn run(
         .collect();
 
     output::emit_items(&rows, render, |r| {
-        format!("{}\t{}\t{} bytes", r.index, r.path, r.bytes)
+        let kb = r.bytes / 1024;
+        format!("  OK   {} ({kb}KB)", r.path)
     });
 
     Ok(ExitCode::SUCCESS)
