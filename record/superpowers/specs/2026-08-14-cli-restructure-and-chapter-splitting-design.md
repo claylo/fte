@@ -1,0 +1,413 @@
+# Design: CLI restructure, chapter markers, and CLIspec 0.3
+
+**Date:** 2026-08-14
+**Status:** Approved for planning
+**Branch:** main
+
+## Context
+
+`fte` currently exposes one implicit command: a bare invocation with a variadic
+positional that extracts every file in the configured `input_dir`. librebar
+injects `schema` and `completions` as real clap subcommands alongside that
+positional, so `fte schema` works by luck — a file named `schema` in the input
+directory would be shadowed.
+
+Four refinements land together because they depend on each other:
+
+1. Chapter boundary markers in book-length markdown output.
+2. Extraction moved under `fte extract`; bare `fte` shows help.
+3. A new `fte split` that turns marked-up book markdown into per-chapter files.
+4. Movement toward CLIspec 0.3 (release candidate).
+
+Items 2 and 4 are the same work seen from two angles. `clispec score` reports
+**11/24 (45%, "Needs Work")** against the current binary, and five failing
+checks give the identical reason: `no subcommand to test`. The scorer probes
+real subcommands to verify JSON output, format precedence, and stream
+separation. A bare-positional CLI is unscoreable.
+
+## Goals
+
+- Bare `fte` shows help and exits 2.
+- Book markdown carries machine-readable chapter boundaries.
+- `fte split` produces per-chapter files with user-configurable naming.
+- `clispec score` reaches 20/24, with the remaining 4 blocked on librebar and
+  documented as such.
+- The book extraction path gains golden coverage it has never had.
+
+## Non-goals
+
+- Changing librebar. The emitter gaps are real and are written up below as a
+  librebar 0.7 follow-up for a separate session.
+- Changing paper (non-book) extraction output. Every existing golden file stays
+  byte-identical.
+- Backwards compatibility for the bare-positional form. The repo has no git
+  tags; nothing has shipped.
+
+## 1. Command surface
+
+```
+fte                        help on stderr, exit 2 (usage)
+fte extract [INPUTS...]    today's extraction, semantics unchanged
+fte detect  [INPUTS...]    promoted from --detect-only
+fte split   <FILE>         new; accepts .md or .epub
+fte schema                 librebar-injected, unchanged
+fte completions <SHELL>    librebar-injected, unchanged
+```
+
+`fte extract` with no positionals still walks the configured `input_dir`. That
+behavior moves under a subcommand; it does not go away.
+
+`--detect-only` becomes `fte detect`. Under CLIspec 0.3 every command declares
+`effects` and `output_kind`. Detection is `read_only` and returns format names;
+extraction writes files. A flag that silently reclassifies a command's effects
+is precisely what 0.3 exists to prevent, so the two separate.
+
+### Flag placement
+
+Per-subcommand, not global — global args inflate `global_args` in the schema
+and imply a generality that does not exist.
+
+| Command | Flags |
+|---------|-------|
+| `extract` | `--indir`, `-o/--outdir`, `--stdout`, `--force` |
+| `detect` | `--indir` |
+| `split` | `-o/--outdir`, `--subdir`, `--name`, `--front`, `--no-front`, `--force` |
+
+librebar's `CommonArgs` (`-C`, `-c`, `-q`, `-v`, `--color`, `--format`,
+`--version-only`) stay global, as today.
+
+`-o` remains bound to `--outdir`. CLIspec permits `--format` as the output
+selector when `-o` is taken, which is what librebar already provides.
+
+## 2. Chapter markers
+
+Emitted by the book path only (`extract_book` in `src/epub.rs`).
+
+```markdown
+<!-- fte:chapter-start id="ch03" title="Walking in the Dark" src="OEBPS/ch03.xhtml" -->
+
+## Walking in the Dark
+
+Body text…
+
+<!-- fte:chapter-end id="ch03" -->
+```
+
+### Attributes
+
+| Attribute | Source |
+|-----------|--------|
+| `id` | Sequential: `ch01`, `ch02`, … |
+| `title` | Nav label, or the first heading found in the chapter body |
+| `src` | Spine entry path, verbatim |
+
+`id` is sequential rather than derived from the source stem. Book epubs
+routinely use obfuscated filenames (`sgPhzGILRlKrLKg2DMvpew1`, `c0`, `cP`) —
+`src` preserves the real path for provenance while `id` stays legible and
+stable.
+
+### Sanitization
+
+`--` cannot appear inside an HTML comment. Attribute values are sanitized
+before emission:
+
+- `--` collapses to an en dash (`–`)
+- `>` is stripped
+- Newlines collapse to a single space
+
+Em dashes rendered as `--` are common in converter output, so this is a live
+hazard rather than a theoretical one. An unsanitized title would produce a
+comment some parsers treat as unterminated, silently swallowing the chapter.
+
+### Placement
+
+The `# Title` heading and `## Contents` block are emitted before the first
+marker and belong to no chapter. `fte split` routes them to the frontmatter
+file. Content between a `chapter-end` and the next `chapter-start` is discarded
+by `split` — paired markers exist so converter cruft cannot silently attach
+itself to the preceding chapter.
+
+Markers are always on for books. They are invisible in rendered markdown, and
+`fte split` depends on them.
+
+## 3. `fte split`
+
+### Input
+
+- `.md` — a document produced by `fte extract` containing chapter markers.
+- `.epub` — run the extraction pipeline in memory, then split. No combined
+  `.md` is written; use `fte extract` for that.
+
+A document with no chapter markers is an error (`no_chapters`, exit 8), not a
+silent single-file copy. An academic-paper epub passed to `split` therefore
+fails with a clear reason.
+
+### Naming templates
+
+Configuration, not hardcoded styles:
+
+```yaml
+split:
+  subdir: "{book}"              # "" writes flat into outdir
+  file:   "{n}-{slug}.md"
+  front:  "{n}-frontmatter.md"  # "" suppresses the frontmatter file
+  pad:    2
+```
+
+| Token | Expands to |
+|-------|-----------|
+| `{book}` | Source file stem (`.md` or `.epub`) |
+| `{n}` | Index, zero-padded to `pad`. Frontmatter is 0; chapters start at 1 |
+| `{slug}` | GFM slug of the chapter title (reuses `heading_slug`) |
+| `{title}` | Raw chapter title |
+| `{src}` | Source spine-entry stem, from the marker's `src` attribute |
+
+An unrecognized `{token}` is a `config_error`, not a literal passthrough.
+
+The default produces:
+
+```
+oconner-2022/
+  00-frontmatter.md
+  01-dedication.md
+  02-walking-in-the-dark.md
+```
+
+An alternate convention is configuration alone, with no dedicated code path:
+
+```yaml
+split:
+  subdir: ""
+  file:   "{book}-ch{n}.md"
+  front:  "{book}-ch{n}-frontmatter.md"
+```
+
+```
+oconner-2022-ch00-frontmatter.md
+oconner-2022-ch01.md
+oconner-2022-ch02.md
+```
+
+CLI flags map 1:1 onto the config keys: `--subdir`, `--name`, `--front` /
+`--no-front`.
+
+### Frontmatter propagation
+
+Each chapter file inherits the book's YAML frontmatter and adds:
+
+```yaml
+chapter: 3
+chapter_title: "Walking in the Dark"
+source: "OEBPS/ch03.xhtml"
+```
+
+The frontmatter file receives the book frontmatter unchanged, plus the `# Title`
+heading and `## Contents` block.
+
+### Collisions
+
+Two chapters sharing a title produce the same `{slug}`. `split` detects the
+collision and appends the chapter index (`walking-in-the-dark-2`) rather than
+overwriting. Existing files are refused without `--force`, consistent with
+`extract`.
+
+## 4. CLIspec 0.3
+
+### Error kinds
+
+Declared through librebar's existing `ErrorMetadata`. When `--format` resolves
+to json, failures print a single JSON line to stderr as the last line:
+
+```json
+{"kind":"not_found","message":"input 'foo.html' not found","hint":"check --indir"}
+```
+
+| Kind | Exit | Retryable | Raised when |
+|------|------|-----------|-------------|
+| `usage` | 2 | false | Bad arguments, unknown subcommand, bare `fte` |
+| `not_found` | 3 | false | Input file or ID does not resolve; `input_dir` missing |
+| `unsupported_format` | 4 | false | No handler matches the detected format |
+| `extraction_failed` | 5 | false | Parsing produced no usable body content |
+| `output_exists` | 6 | false | Target exists and `--force` was not given |
+| `io_error` | 7 | true | Read or write failure |
+| `no_chapters` | 8 | false | `split` on a document with no chapter markers |
+| `config_error` | 9 | false | Malformed config or unknown template token |
+
+### Exit 1 is an outcome
+
+A run where 3 of 10 inputs fail currently exits 1, indistinguishable from a
+hard failure. CLIspec 0.3 separates errors from outcomes, and librebar already
+supports `OutcomeMetadata`:
+
+```
+outcomes: [{ code: 1, name: "partial_failure" }]
+```
+
+Exit 1 keeps its current meaning and gains a name. Whole-run failures use the
+error kinds above.
+
+### Structured output
+
+Each command emits a `{"items": [...]}` envelope. 0.3 requires the wrapper over
+a bare array so a consumer can add fields without a breaking change.
+
+| Command | `output_kind` | `cardinality` | `effects` | Fields |
+|---------|---------------|---------------|-----------|--------|
+| `extract` | data | bounded | idempotent | `id`, `source_format`, `output_path`, `bytes`, `status` |
+| `detect` | data | bounded | read_only | `id`, `path`, `format` |
+| `split` | data | bounded | idempotent | `index`, `title`, `path`, `bytes` |
+
+Cardinality is `bounded` because the item count is driven by caller input —
+explicit positionals or the contents of `input_dir`. No pagination is required.
+
+`extract` is `idempotent`: rerunning skips existing outputs and converges. Its
+items carry a `status` field (`extracted` / `skipped` / `failed`), which
+satisfies 0.3's expectation that idempotent commands report whether anything
+changed.
+
+### `--stdout` is opaque
+
+`fte extract --stdout paper.html` emits raw markdown regardless of `--format`.
+
+This is deliberate. `--format auto` resolves to json when stdout is not a TTY,
+so `fte extract --stdout paper.html > out.md` would otherwise JSON-wrap the
+markdown — a trap that only becomes reachable once JSON output exists at all.
+Declaring `--stdout` as `output_kind: opaque` with `media_type: text/markdown`
+makes the behavior contractual instead of surprising. Errors still print
+structured to stderr.
+
+`split` has no `--stdout`; it writes N files.
+
+### Text mode
+
+In text mode every command prints its result rows to stdout and nothing else.
+Progress lines (`OK  foo.md (12KB)`), warnings, and the `Done:` summary go to
+stderr, as they do today. This is already correct in `main.rs`; the CLIspec
+check *Messages on stderr only* currently fails only because the scorer has no
+subcommand to probe.
+
+### Expected score
+
+20/24 (83%), up from 11/24 (45%).
+
+## librebar 0.7 follow-up
+
+Four checks cannot pass from this repo. Verified against the published
+`v0.3.json`:
+
+- `properties.clispec` is `{"const": "0.3"}`. librebar hardcodes `"0.2"`
+  (`src/cli/schema.rs:11`), so schema validation fails on the first field.
+- `$defs.command.required` is `["name", "description", "effects"]`. librebar's
+  `CommandSchema` has no `effects` field; it emits the 0.2 `mutating` boolean
+  that 0.3 deprecates.
+- `cardinality`, `output_kind`, `media_type`, `stream_format`, and
+  `stdout_schema` have no representation in `SchemaMetadata`.
+
+Blocked checks: *Validates against clispec v0.3*, *Effects on all commands*,
+*Effects declarations*, *Cardinality declarations*.
+
+This belongs in a librebar session. librebar has zero reverse dependencies, so
+the 0.2 → 0.3 change needs no deprecation path. Record it in the fleet hub, not
+here.
+
+## Book golden tests
+
+The book path currently has fixtures (`tests/golden/input/books/`) but no
+expected output, so the exact path gaining chapter markers is unprotected. This
+work wires it up — but not with the paper harness's full-text comparison.
+
+### Why structural, not full text
+
+`check_golden` renders a complete line diff into the panic message
+(`tests/golden.rs:53-66`). At paper scale that is the right call. Frankenstein
+extracts to roughly 400KB of markdown and A Tale of Two Cities to roughly
+800KB; a one-line regression would print an entire novel as test output.
+
+Repo weight compounds it. `tale-two-cities-pg.epub` is 7.9MB on its own, which
+the previous handoff already flags. Another ~1.2MB of expected markdown buys
+little, because the paper goldens already cover body-text rendering byte for
+byte.
+
+### Skeleton format
+
+`tests/golden/expected/books/<id>.skeleton.txt`, one line per structural event:
+
+```
+sha256 f3a91c…
+bytes  412883
+---
+frontmatter id=frankenstein-pg format=epub title="Frankenstein; Or, The Modern Prometheus" authors=1
+h1 Frankenstein; Or, The Modern Prometheus
+h2 Contents
+toc 27
+chapter-start ch01 title="Letter 1" src="OEBPS/ch01.xhtml"
+h2 Letter 1
+text 1204w
+chapter-end ch01
+chapter-start ch02 title="Letter 2" src="OEBPS/ch02.xhtml"
+…
+```
+
+Prose collapses to a word count. Headings, markers, and frontmatter render in
+full — those are the structure the book path is responsible for, and the part
+chapter markers change.
+
+The `sha256` line covers the complete output, so a body-text-only regression
+still fails. It reports as "hash changed, structure identical", which localizes
+the problem immediately rather than burying it in a diff.
+
+`UPDATE_GOLDEN=1` regenerates skeletons, matching the existing harness
+convention.
+
+### Coverage
+
+| Fixture | Exercises |
+|---------|-----------|
+| `frankenstein-pg.epub` | Gutenberg boilerplate, `div.chapter` splitting, 31 spine files |
+| `tale-two-cities-pg.epub` | Illustrations, 47 spine files, long novel |
+
+Both were used to build the book capability, per the previous handoff.
+
+`fte split` reuses the same renderer: its golden is the output file tree plus
+one skeleton per chapter file.
+
+## Testing
+
+Unit:
+
+- Marker rendering, including `--` and `>` sanitization in titles.
+- Template expansion across every token, with padding widths 1–4.
+- Unknown template token produces `config_error`.
+- Slug collision disambiguation.
+
+Integration:
+
+- Book skeleton goldens for both Gutenberg fixtures (see above).
+- Round-trip `extract` → `split` on `frankenstein-pg.epub` under both the
+  default and the flat naming conventions.
+- One-shot `split book.epub` matches the two-step result.
+- `split` on a paper epub fails with `no_chapters` and exit 8.
+- Bare `fte` exits 2 with help on stderr.
+- One assertion per error kind confirming its exit code.
+- Existing golden files pass unchanged, confirming the paper path is untouched.
+
+Tooling:
+
+- `just clispec` wraps `clispec score` and fails below a floor, so the score is
+  a checked artifact rather than a number re-derived by hand.
+
+## Landmines
+
+- **Skeleton goldens trade diff precision for legibility.** A body-text change
+  reports as a hash mismatch with no indication of what moved. That is the
+  intended trade — the alternative prints a novel — but expect to re-extract by
+  hand when a hash-only failure appears.
+- **`split` on an epub duplicates extraction cost.** Running `extract` then
+  `split` parses the epub twice. Acceptable — the one-shot exists for
+  convenience, not throughput.
+- **`{src}` is absent for injected chapters.** If a future code path emits a
+  chapter with no backing spine file, `{src}` has nothing to expand to. Emit an
+  empty string and let the template author notice.
+- **The 20/24 estimate is a projection.** It assumes the scorer's subcommand
+  probes accept `fte detect` as a clean read-only target. Run `just clispec`
+  early in implementation rather than at the end.
