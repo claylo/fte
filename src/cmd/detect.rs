@@ -6,11 +6,19 @@ use std::process::ExitCode;
 
 use fte::errors::{AppError, Kind};
 use fte::inputs::InputDirOrigin;
+use fte::output::{self, Render};
 use fte::{config::Config, detect, inputs};
 
 use crate::DetectArgs;
 
-pub fn run(args: &DetectArgs, cfg: &Config) -> Result<ExitCode, AppError> {
+#[derive(serde::Serialize)]
+struct DetectRow {
+    id: String,
+    path: String,
+    format: String,
+}
+
+pub fn run(args: &DetectArgs, cfg: &Config, render: Render) -> Result<ExitCode, AppError> {
     let origin = if args.indir.is_some() {
         InputDirOrigin::Explicit
     } else {
@@ -23,6 +31,7 @@ pub fn run(args: &DetectArgs, cfg: &Config) -> Result<ExitCode, AppError> {
 
     let (paths, fail) = inputs::resolve(&args.inputs, &input_dir, origin)?;
 
+    let mut rows = Vec::with_capacity(paths.len());
     for path in &paths {
         let id = path
             .file_stem()
@@ -39,8 +48,14 @@ pub fn run(args: &DetectArgs, cfg: &Config) -> Result<ExitCode, AppError> {
             detect::detect_format(path, &text, cfg)
         };
 
-        println!("{id}: {format}");
+        rows.push(DetectRow {
+            id: id.to_string(),
+            path: path.display().to_string(),
+            format: format.to_string(),
+        });
     }
+
+    output::emit_items(&rows, render, |r| format!("{}: {}", r.id, r.format));
 
     Ok(if fail > 0 {
         ExitCode::from(fte::errors::PARTIAL_FAILURE)

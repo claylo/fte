@@ -164,9 +164,15 @@ fn run() -> std::result::Result<ExitCode, fte::errors::AppError> {
     let quiet = cli.common.quiet;
     let verbose = cli.common.verbose > 0;
 
+    use librebar::cli::ResolvedOutputFormat;
+    let render = match cli.common.output_format() {
+        ResolvedOutputFormat::Json => fte::output::Render::Json,
+        _ => fte::output::Render::Text,
+    };
+
     match &cli.command {
-        Commands::Extract(args) => cmd::extract::run(args, &cfg, quiet, verbose),
-        Commands::Detect(args) => cmd::detect::run(args, &cfg),
-        Commands::Split(args) => cmd::split::run(args, &cfg, quiet),
+        Commands::Extract(args) => cmd::extract::run(args, &cfg, quiet, verbose, render),
+        Commands::Detect(args) => cmd::detect::run(args, &cfg, render),
+        Commands::Split(args) => cmd::split::run(args, &cfg, quiet, render),
     }
 }

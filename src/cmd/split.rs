@@ -4,11 +4,25 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use fte::errors::{AppError, Kind};
+use fte::output::{self, Render};
 use fte::{chapter, config::Config, epub, splitter};
 
 use crate::SplitArgs;
 
-pub fn run(args: &SplitArgs, cfg: &Config, quiet: bool) -> Result<ExitCode, AppError> {
+#[derive(serde::Serialize)]
+struct SplitRow {
+    index: usize,
+    title: String,
+    path: String,
+    bytes: usize,
+}
+
+pub fn run(
+    args: &SplitArgs,
+    cfg: &Config,
+    quiet: bool,
+    render: Render,
+) -> Result<ExitCode, AppError> {
     let book = args
         .input
         .file_stem()
@@ -84,6 +98,20 @@ pub fn run(args: &SplitArgs, cfg: &Config, quiet: bool) -> Result<ExitCode, AppE
         }
         eprintln!("\nDone: {} files written", written.len());
     }
+
+    let rows: Vec<SplitRow> = written
+        .iter()
+        .map(|w| SplitRow {
+            index: w.index,
+            title: w.title.clone(),
+            path: w.path.display().to_string(),
+            bytes: w.bytes,
+        })
+        .collect();
+
+    output::emit_items(&rows, render, |r| {
+        format!("{}\t{}\t{} bytes", r.index, r.path, r.bytes)
+    });
 
     Ok(ExitCode::SUCCESS)
 }

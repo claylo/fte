@@ -200,3 +200,41 @@ fn an_io_error_on_a_path_containing_exists_is_not_output_exists() {
     // io_error (7), not output_exists (6): the path merely contains the word.
     assert.code(7);
 }
+
+#[test]
+fn detect_emits_an_items_envelope_in_json_mode() {
+    let out = fte()
+        .args([
+            "detect",
+            "--format",
+            "json",
+            "tests/golden/input/bmc-short.html",
+        ])
+        .assert()
+        .success()
+        .get_output()
+        .stdout
+        .clone();
+
+    let parsed: serde_json::Value = serde_json::from_slice(&out).unwrap();
+    assert!(parsed["items"].is_array());
+    assert_eq!(parsed["items"][0]["id"], "bmc-short");
+}
+
+#[test]
+fn stdout_stays_raw_markdown_even_when_piped() {
+    let out = fte()
+        .args(["extract", "--stdout", "tests/golden/input/bmc-short.html"])
+        .assert()
+        .success()
+        .get_output()
+        .stdout
+        .clone();
+
+    let text = String::from_utf8(out).unwrap();
+    assert!(
+        text.starts_with("---\n"),
+        "expected raw markdown frontmatter"
+    );
+    assert!(serde_json::from_str::<serde_json::Value>(&text).is_err());
+}
