@@ -50,13 +50,30 @@ pub fn run(
         })?;
     }
 
-    let (paths, mut fail) = inputs::resolve(&args.inputs, &input_dir, origin)?;
+    let resolved = inputs::resolve(&args.inputs, &input_dir, origin, render)?;
+    let mut fail = u32::try_from(resolved.missing.len()).unwrap_or(u32::MAX);
 
     let mut ok = 0u32;
     let mut skip = 0u32;
-    let mut rows = Vec::with_capacity(paths.len());
+    let mut rows = Vec::with_capacity(resolved.paths.len() + resolved.missing.len());
 
-    for path in &paths {
+    for id in &resolved.missing {
+        if args.stdout {
+            // No JSON items channel exists in --stdout mode; this is the
+            // only diagnostic a missing input gets.
+            eprintln!("  FAIL {id}: not found");
+        } else {
+            rows.push(ExtractRow {
+                id: id.clone(),
+                source_format: "unknown".to_string(),
+                output_path: None,
+                bytes: 0,
+                status: "failed",
+            });
+        }
+    }
+
+    for path in &resolved.paths {
         let id = path
             .file_stem()
             .and_then(|s| s.to_str())
@@ -117,7 +134,12 @@ pub fn run(
                 ok += 1;
             }
             Err(e) => {
-                eprintln!("  FAIL {id}: {e}");
+                // In --stdout mode this is the only diagnostic (no JSON
+                // items channel); otherwise it's stderr chatter, so it
+                // stays text-mode only — JSON mode reports it as a row.
+                if args.stdout || render == Render::Text {
+                    eprintln!("  FAIL {id}: {e}");
+                }
                 if !args.stdout {
                     rows.push(ExtractRow {
                         id: id.to_string(),
@@ -135,12 +157,16 @@ pub fn run(
     if !args.stdout {
         output::emit_items(&rows, render, |r| match r.status {
             "skipped" => format!("  SKIP {}.md (exists; use --force)", r.id),
+            // `source_format` stays "unknown" only for an input that never
+            // resolved to a path; a resolved input that failed extraction
+            // always has a real detected format.
+            "failed" if r.source_format == "unknown" => format!("  FAIL {}: not found", r.id),
             "failed" => format!("  FAIL {}.md", r.id),
             _ => format!("  OK   {}.md ({}KB)", r.id, r.bytes / 1024),
         });
     }
 
-    if !quiet && !args.stdout {
+    if !quiet && !args.stdout && render == Render::Text {
         eprintln!("\nDone: {ok} extracted, {skip} skipped, {fail} failed");
     }
 

@@ -123,7 +123,11 @@ fn schema_metadata() -> SchemaMetadata {
             CommandMetadata::new()
                 .mutating(true)
                 .stability(Stability::Stable)
-                .example(CommandExample::new(["extract", "--stdout", "paper.html"]))
+                .example(CommandExample::new([
+                    "extract",
+                    "--stdout",
+                    "tests/golden/input/bmc-short.html",
+                ]))
                 .output_field(OutputField::new("id", "string").description("Input file stem"))
                 .output_field(
                     OutputField::new("source_format", "string")
@@ -144,11 +148,17 @@ fn schema_metadata() -> SchemaMetadata {
             CommandMetadata::new()
                 .mutating(false)
                 .stability(Stability::Stable)
-                .example(CommandExample::new(["detect", "paper.html"]))
+                .example(CommandExample::new([
+                    "detect",
+                    "tests/golden/input/bmc-short.html",
+                ]))
                 .output_field(OutputField::new("id", "string").description("Input file stem"))
                 .output_field(OutputField::new("path", "string").description("Resolved path"))
                 .output_field(
                     OutputField::new("format", "string").description("Detected format name"),
+                )
+                .output_field(
+                    OutputField::new("status", "string").description("detected | failed"),
                 ),
         )
         .command(
@@ -156,7 +166,10 @@ fn schema_metadata() -> SchemaMetadata {
             CommandMetadata::new()
                 .mutating(true)
                 .stability(Stability::Stable)
-                .example(CommandExample::new(["split", "book.epub"]))
+                .example(CommandExample::new([
+                    "split",
+                    "tests/golden/input/books/frankenstein-pg.epub",
+                ]))
                 .output_field(
                     OutputField::new("index", "integer")
                         .description("Chapter number; 0 is the frontmatter file"),

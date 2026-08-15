@@ -16,6 +16,7 @@ struct DetectRow {
     id: String,
     path: String,
     format: String,
+    status: &'static str,
 }
 
 pub fn run(args: &DetectArgs, cfg: &Config, render: Render) -> Result<ExitCode, AppError> {
@@ -29,10 +30,10 @@ pub fn run(args: &DetectArgs, cfg: &Config, render: Render) -> Result<ExitCode, 
         .clone()
         .unwrap_or_else(|| PathBuf::from(&cfg.input_dir));
 
-    let (paths, fail) = inputs::resolve(&args.inputs, &input_dir, origin)?;
+    let resolved = inputs::resolve(&args.inputs, &input_dir, origin, render)?;
 
-    let mut rows = Vec::with_capacity(paths.len());
-    for path in &paths {
+    let mut rows = Vec::with_capacity(resolved.paths.len() + resolved.missing.len());
+    for path in &resolved.paths {
         let id = path
             .file_stem()
             .and_then(|s| s.to_str())
@@ -52,14 +53,27 @@ pub fn run(args: &DetectArgs, cfg: &Config, render: Render) -> Result<ExitCode, 
             id: id.to_string(),
             path: path.display().to_string(),
             format: format.to_string(),
+            status: "detected",
         });
     }
 
-    output::emit_items(&rows, render, |r| format!("{}: {}", r.id, r.format));
+    for id in &resolved.missing {
+        rows.push(DetectRow {
+            id: id.clone(),
+            path: String::new(),
+            format: "unknown".to_string(),
+            status: "failed",
+        });
+    }
 
-    Ok(if fail > 0 {
-        ExitCode::from(fte::errors::PARTIAL_FAILURE)
-    } else {
+    output::emit_items(&rows, render, |r| match r.status {
+        "failed" => format!("  FAIL {}: not found", r.id),
+        _ => format!("{}: {}", r.id, r.format),
+    });
+
+    Ok(if resolved.missing.is_empty() {
         ExitCode::SUCCESS
+    } else {
+        ExitCode::from(fte::errors::PARTIAL_FAILURE)
     })
 }

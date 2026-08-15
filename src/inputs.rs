@@ -4,6 +4,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 use crate::errors::{AppError, Kind};
+use crate::output::Render;
 
 /// Where `input_dir` came from — determines how a missing directory is
 /// treated by [`resolve`].
@@ -15,16 +16,31 @@ pub enum InputDirOrigin {
     Default,
 }
 
-/// Resolve CLI inputs to concrete paths, plus a count of requested inputs
-/// that don't exist anywhere — the caller folds that count into its failure
-/// total so the summary and exit code reflect them.
+/// Concrete paths found, plus the requested inputs that resolved nowhere.
+///
+/// `resolve` no longer prints anything about `missing` itself — the caller
+/// folds each entry into a row (status `"failed"`) so JSON mode reports it
+/// through the structured envelope instead of stderr chatter.
+#[derive(Debug, Default)]
+pub struct Resolved {
+    /// Concrete paths that exist on disk.
+    pub paths: Vec<PathBuf>,
+    /// Requested inputs (by their original string) that resolved nowhere.
+    pub missing: Vec<String>,
+}
+
+/// Resolve CLI inputs to concrete paths, plus the requested inputs that
+/// don't exist anywhere — the caller folds those into its row output and
+/// failure total so the summary and exit code reflect them.
 ///
 /// When `inputs` is empty, the whole `input_dir` is scanned. A missing
 /// directory named explicitly via `--indir` is a [`Kind::NotFound`] error; a
 /// missing directory that came from config (its default included) is not a
-/// fault — it prints a warning and resolves to zero inputs, since a run
-/// asked to process "everything in a directory that isn't there" has
-/// honestly processed nothing.
+/// fault — in text mode it prints a warning and resolves to zero inputs,
+/// since a run asked to process "everything in a directory that isn't
+/// there" has honestly processed nothing. `render` decides whether that
+/// warning is human chatter (printed) or noise on an otherwise-clean JSON
+/// stderr (suppressed).
 ///
 /// # Errors
 ///
@@ -35,7 +51,8 @@ pub fn resolve(
     inputs: &[String],
     input_dir: &Path,
     origin: InputDirOrigin,
-) -> Result<(Vec<PathBuf>, u32), AppError> {
+    render: Render,
+) -> Result<Resolved, AppError> {
     if inputs.is_empty() {
         if !input_dir.exists() {
             return match origin {
@@ -45,11 +62,13 @@ pub fn resolve(
                 )
                 .hint("check --indir")),
                 InputDirOrigin::Default => {
-                    eprintln!(
-                        "warning: input directory {} does not exist",
-                        input_dir.display()
-                    );
-                    Ok((Vec::new(), 0))
+                    if render == Render::Text {
+                        eprintln!(
+                            "warning: input directory {} does not exist",
+                            input_dir.display()
+                        );
+                    }
+                    Ok(Resolved::default())
                 }
             };
         }
@@ -69,11 +88,14 @@ pub fn resolve(
             })
             .collect();
         paths.sort();
-        return Ok((paths, 0));
+        return Ok(Resolved {
+            paths,
+            missing: Vec::new(),
+        });
     }
 
     let mut paths = Vec::new();
-    let mut missing = 0u32;
+    let mut missing = Vec::new();
     for input in inputs {
         let p = Path::new(input);
         if p.exists() {
@@ -89,10 +111,9 @@ pub fn resolve(
             } else if html.exists() {
                 paths.push(html);
             } else {
-                eprintln!("  FAIL {input}: not found");
-                missing += 1;
+                missing.push(input.clone());
             }
         }
     }
-    Ok((paths, missing))
+    Ok(Resolved { paths, missing })
 }

@@ -80,10 +80,23 @@ check-updates:
 
 # Score the built binary against The CLI Spec.
 #
-# Four checks are blocked by librebar 0.6, which emits CLIspec 0.2 and has no
-# `effects` or `cardinality` fields — see
+# Five checks are blocked by librebar 0.6, which emits CLIspec 0.2, has no
+# `effects` or `cardinality` fields, and unconditionally overwrites any
+# CommandMetadata this crate declares for the reserved `schema`/`completions`
+# commands (cli/parse.rs:116-128) — see
 # record/superpowers/specs/2026-08-14-cli-restructure-and-chapter-splitting-design.md
-clispec-floor := "19"
+#
+# librebar-blocked: Validates against clispec v0.3, Effects on all commands,
+# Effects declarations, Cardinality declarations, Output fields declared.
+#
+# A sixth, *Structured errors*, is blocked by our own design, not librebar:
+# `partial_failure` (exit 1) is documented as an outcome, not a fault
+# (errors::PARTIAL_FAILURE), so it reports through the `items` envelope on
+# stdout and puts nothing on stderr. clispec's error-envelope check wants a
+# JSON line on stderr for any nonzero exit, which this deliberately doesn't
+# do. Forcing one would mean duplicating the failure or reclassifying the
+# outcome as an error — parked rather than distorted.
+clispec-floor := "18"
 
 clispec:
   @cargo build --quiet

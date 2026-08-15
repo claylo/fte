@@ -91,7 +91,7 @@ pub fn run(
         AppError::new(kind, msg)
     })?;
 
-    if !quiet {
+    if !quiet && render == Render::Text {
         eprintln!("\nDone: {} files written", written.len());
     }
 

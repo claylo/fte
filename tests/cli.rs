@@ -45,9 +45,18 @@ fn missing_input_id_exits_nonzero() {
 
 #[test]
 fn missing_input_is_counted_in_summary() {
+    // assert_cmd pipes stdout, so `auto` format resolves to JSON unless
+    // forced — this test is specifically about the text-mode "Done:" line.
     let tmp = tempfile::tempdir().unwrap();
     fte()
-        .args(["extract", "--indir", "tests/golden/input", "--outdir"])
+        .args([
+            "extract",
+            "--format",
+            "text",
+            "--indir",
+            "tests/golden/input",
+            "--outdir",
+        ])
         .arg(tmp.path())
         .args(["bmc-short", "definitely-not-a-real-id"])
         .assert()
@@ -58,12 +67,17 @@ fn missing_input_is_counted_in_summary() {
 
 #[test]
 fn quiet_suppresses_progress_but_not_failures() {
+    // Forced text mode: the failure itself now lives in the row on stdout
+    // (JSON mode reports it the same way, via `status: "failed"`), so -q's
+    // job is only to keep OK/Done chatter off stderr.
     let tmp = tempfile::tempdir().unwrap();
     fte()
         .args([
             "extract",
             "-q",
             "--force",
+            "--format",
+            "text",
             "--indir",
             "tests/golden/input",
             "--outdir",
@@ -72,7 +86,7 @@ fn quiet_suppresses_progress_but_not_failures() {
         .args(["bmc-short", "definitely-not-a-real-id"])
         .assert()
         .failure()
-        .stderr(predicate::str::contains("not found"))
+        .stdout(predicate::str::contains("not found"))
         .stderr(predicate::str::contains("OK").not())
         .stderr(predicate::str::contains("Done:").not());
 }
@@ -163,10 +177,12 @@ fn an_explicit_missing_indir_exits_with_the_not_found_code() {
 
 #[test]
 fn a_missing_default_indir_exits_zero_with_a_warning() {
+    // assert_cmd pipes stdout, so `auto` format resolves to JSON unless
+    // forced — the warning is deliberately text-mode-only chatter.
     let tmp = tempfile::tempdir().unwrap();
     fte()
         .current_dir(tmp.path())
-        .arg("extract")
+        .args(["extract", "--format", "text"])
         .assert()
         .success()
         .stderr(predicate::str::contains(
@@ -242,6 +258,61 @@ fn a_usage_error_emits_the_structured_envelope() {
     let parsed: serde_json::Value =
         serde_json::from_str(last).expect("last stderr line is a JSON envelope");
     assert_eq!(parsed["kind"], "usage");
+}
+
+#[test]
+fn json_mode_puts_no_plain_text_on_stderr() {
+    let out = fte()
+        .args([
+            "detect",
+            "--indir",
+            "tests/golden/input",
+            "--format",
+            "json",
+            "definitely-not-a-real-id",
+        ])
+        .assert()
+        .code(1)
+        .get_output()
+        .stderr
+        .clone();
+
+    let text = String::from_utf8(out).unwrap();
+    for line in text.lines().filter(|l| !l.trim().is_empty()) {
+        assert!(
+            serde_json::from_str::<serde_json::Value>(line).is_ok(),
+            "non-JSON line on stderr in JSON mode: {line}"
+        );
+    }
+}
+
+#[test]
+fn a_missing_input_appears_as_a_failed_row() {
+    let out = fte()
+        .args([
+            "detect",
+            "--indir",
+            "tests/golden/input",
+            "--format",
+            "json",
+            "bmc-short",
+            "definitely-not-a-real-id",
+        ])
+        .assert()
+        .code(1)
+        .get_output()
+        .stdout
+        .clone();
+
+    let parsed: serde_json::Value = serde_json::from_slice(&out).unwrap();
+    let items = parsed["items"].as_array().expect("items array");
+    assert_eq!(items.len(), 2, "both inputs should be reported");
+    assert!(
+        items
+            .iter()
+            .any(|i| i["status"] == "failed" && i["id"] == "definitely-not-a-real-id"),
+        "the missing input needs a failed row"
+    );
 }
 
 #[test]
