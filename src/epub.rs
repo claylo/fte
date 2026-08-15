@@ -4,6 +4,7 @@ use std::path::Path;
 use anyhow::{Context, Result};
 use scraper::{ElementRef, Html, Selector};
 
+use crate::chapter;
 use crate::html;
 use crate::markdown::{self, Metadata};
 
@@ -86,6 +87,7 @@ fn extract_book(
 
     let mut body = String::new();
     let mut included_any = false;
+    let mut chapter_index = 0usize;
 
     // Title heading from OPF metadata
     if let Some(t) = &opf_meta.title {
@@ -125,24 +127,39 @@ fn extract_book(
 
         let has_real_heading = has_heading_in_body(&doc);
 
+        let mut chapter_md = String::new();
         if !has_real_heading && let Some(label) = nav_label {
             let heading = nav_label_to_heading(label);
             if !heading.is_empty() {
-                body.push_str(&heading);
-                body.push_str("\n\n");
+                chapter_md.push_str(&heading);
+                chapter_md.push_str("\n\n");
             }
         }
 
-        let mut chapter_body = String::new();
-        html::walk_element(&body_el, &strip_sels, &mut chapter_body, 0);
-        let chapter_body = markdown::collapse_blanks(&chapter_body);
+        let mut walked = String::new();
+        html::walk_element(&body_el, &strip_sels, &mut walked, 0);
+        let walked = markdown::collapse_blanks(&walked);
+        let walked = walked.trim();
 
-        let trimmed = chapter_body.trim();
-        if !trimmed.is_empty() {
-            body.push_str(trimmed);
-            body.push_str("\n\n");
-            included_any = true;
+        if walked.is_empty() {
+            continue;
         }
+        chapter_md.push_str(walked);
+
+        chapter_index += 1;
+        let id = chapter::chapter_id(chapter_index);
+        let title = nav_label
+            .map(str::to_owned)
+            .or_else(|| chapter::first_heading_text(&chapter_md))
+            .unwrap_or_default();
+
+        body.push_str(&chapter::start_marker(&id, &title, entry_path));
+        body.push_str("\n\n");
+        body.push_str(&chapter_md);
+        body.push_str("\n\n");
+        body.push_str(&chapter::end_marker(&id));
+        body.push_str("\n\n");
+        included_any = true;
     }
 
     if !included_any {

@@ -1,3 +1,4 @@
+pub mod chapter;
 pub mod config;
 pub mod depth;
 pub mod detect;
