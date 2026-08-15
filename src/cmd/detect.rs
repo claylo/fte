@@ -1,21 +1,27 @@
 //! `fte detect` — report the detected format without extracting.
 
-use anyhow::{Context, Result};
 use std::fs;
 use std::path::PathBuf;
 use std::process::ExitCode;
 
+use fte::errors::{AppError, Kind};
+use fte::inputs::InputDirOrigin;
 use fte::{config::Config, detect, inputs};
 
 use crate::DetectArgs;
 
-pub fn run(args: &DetectArgs, cfg: &Config) -> Result<ExitCode> {
+pub fn run(args: &DetectArgs, cfg: &Config) -> Result<ExitCode, AppError> {
+    let origin = if args.indir.is_some() {
+        InputDirOrigin::Explicit
+    } else {
+        InputDirOrigin::Default
+    };
     let input_dir = args
         .indir
         .clone()
         .unwrap_or_else(|| PathBuf::from(&cfg.input_dir));
 
-    let (paths, fail) = inputs::resolve(&args.inputs, &input_dir)?;
+    let (paths, fail) = inputs::resolve(&args.inputs, &input_dir, origin)?;
 
     for path in &paths {
         let id = path
@@ -27,8 +33,9 @@ pub fn run(args: &DetectArgs, cfg: &Config) -> Result<ExitCode> {
         let format = if ext == "epub" {
             detect::Format::Epub
         } else {
-            let text =
-                fs::read_to_string(path).with_context(|| format!("reading {}", path.display()))?;
+            let text = fs::read_to_string(path).map_err(|e| {
+                AppError::new(Kind::IoError, format!("reading {}: {e}", path.display()))
+            })?;
             detect::detect_format(path, &text, cfg)
         };
 
@@ -36,7 +43,7 @@ pub fn run(args: &DetectArgs, cfg: &Config) -> Result<ExitCode> {
     }
 
     Ok(if fail > 0 {
-        ExitCode::FAILURE
+        ExitCode::from(fte::errors::PARTIAL_FAILURE)
     } else {
         ExitCode::SUCCESS
     })

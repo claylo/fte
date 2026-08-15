@@ -113,3 +113,63 @@ fn schema_still_works_alongside_subcommands() {
         .success()
         .stdout(predicate::str::contains("\"clispec\""));
 }
+
+#[test]
+fn a_missing_input_exits_with_partial_failure() {
+    let tmp = tempfile::tempdir().unwrap();
+    fte()
+        .args(["extract", "--indir", "tests/golden/input", "--outdir"])
+        .arg(tmp.path())
+        .arg("definitely-not-a-real-id")
+        .assert()
+        .code(1);
+}
+
+#[test]
+fn a_bad_flag_exits_with_the_usage_code() {
+    fte().args(["extract", "--nope"]).assert().code(2);
+}
+
+#[test]
+fn an_unknown_template_token_exits_with_the_config_code() {
+    let tmp = tempfile::tempdir().unwrap();
+    fte()
+        .args(["split", "--name", "{chapter}.md", "--outdir"])
+        .arg(tmp.path())
+        .arg("tests/golden/input/books/frankenstein-pg.epub")
+        .assert()
+        .code(9);
+}
+
+#[test]
+fn splitting_a_paper_exits_with_the_no_chapters_code() {
+    let tmp = tempfile::tempdir().unwrap();
+    fte()
+        .args(["split", "--outdir"])
+        .arg(tmp.path())
+        .arg("tests/golden/input/frontiers-epub-angelshark.epub")
+        .assert()
+        .code(8);
+}
+
+#[test]
+fn an_explicit_missing_indir_exits_with_the_not_found_code() {
+    fte()
+        .args(["extract", "--indir", "tests/golden/does-not-exist"])
+        .assert()
+        .code(3)
+        .stderr(predicate::str::contains("check --indir"));
+}
+
+#[test]
+fn a_missing_default_indir_exits_zero_with_a_warning() {
+    let tmp = tempfile::tempdir().unwrap();
+    fte()
+        .current_dir(tmp.path())
+        .arg("extract")
+        .assert()
+        .success()
+        .stderr(predicate::str::contains(
+            "warning: input directory ref/epub does not exist",
+        ));
+}

@@ -1,19 +1,19 @@
 //! `fte split` — book markdown into per-chapter files.
 
-use anyhow::{Context, Result};
 use std::path::PathBuf;
 use std::process::ExitCode;
 
+use fte::errors::{AppError, Kind};
 use fte::{chapter, config::Config, epub, splitter};
 
 use crate::SplitArgs;
 
-pub fn run(args: &SplitArgs, cfg: &Config, quiet: bool) -> Result<ExitCode> {
+pub fn run(args: &SplitArgs, cfg: &Config, quiet: bool) -> Result<ExitCode, AppError> {
     let book = args
         .input
         .file_stem()
         .and_then(|s| s.to_str())
-        .context("input has no usable filename")?
+        .ok_or_else(|| AppError::new(Kind::Usage, "input has no usable filename"))?
         .to_string();
 
     let ext = args
@@ -25,10 +25,15 @@ pub fn run(args: &SplitArgs, cfg: &Config, quiet: bool) -> Result<ExitCode> {
     // An ePub is extracted in memory rather than round-tripped through disk;
     // `fte extract` is what writes the combined document.
     let md = if ext == "epub" {
-        epub::extract(&book, &args.input)?
+        epub::extract(&book, &args.input)
+            .map_err(|e| AppError::new(Kind::ExtractionFailed, e.to_string()))?
     } else {
-        std::fs::read_to_string(&args.input)
-            .with_context(|| format!("reading {}", args.input.display()))?
+        std::fs::read_to_string(&args.input).map_err(|e| {
+            AppError::new(
+                Kind::IoError,
+                format!("reading {}: {e}", args.input.display()),
+            )
+        })?
     };
 
     let doc = chapter::parse(&md);
@@ -58,7 +63,19 @@ pub fn run(args: &SplitArgs, cfg: &Config, quiet: bool) -> Result<ExitCode> {
         force: args.force,
     };
 
-    let written = splitter::split(&book, &doc, &opts)?;
+    let written = splitter::split(&book, &doc, &opts).map_err(|e| {
+        let msg = e.to_string();
+        let kind = if msg.contains("no chapter markers") {
+            Kind::NoChapters
+        } else if msg.contains("unknown template token") || msg.contains("unterminated") {
+            Kind::ConfigError
+        } else if msg.contains("exists") {
+            Kind::OutputExists
+        } else {
+            Kind::IoError
+        };
+        AppError::new(kind, msg)
+    })?;
 
     if !quiet {
         for w in &written {

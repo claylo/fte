@@ -1,15 +1,26 @@
 //! `fte extract` — publisher markup to markdown.
 
-use anyhow::{Context, Result};
 use std::fs;
 use std::path::PathBuf;
 use std::process::ExitCode;
 
+use fte::errors::{AppError, Kind};
+use fte::inputs::InputDirOrigin;
 use fte::{config::Config, detect, epub, extract, inputs};
 
 use crate::ExtractArgs;
 
-pub fn run(args: &ExtractArgs, cfg: &Config, quiet: bool, verbose: bool) -> Result<ExitCode> {
+pub fn run(
+    args: &ExtractArgs,
+    cfg: &Config,
+    quiet: bool,
+    verbose: bool,
+) -> Result<ExitCode, AppError> {
+    let origin = if args.indir.is_some() {
+        InputDirOrigin::Explicit
+    } else {
+        InputDirOrigin::Default
+    };
     let input_dir = args
         .indir
         .clone()
@@ -20,10 +31,15 @@ pub fn run(args: &ExtractArgs, cfg: &Config, quiet: bool, verbose: bool) -> Resu
         .unwrap_or_else(|| PathBuf::from(&cfg.output_dir));
 
     if !args.stdout {
-        fs::create_dir_all(&output_dir)?;
+        fs::create_dir_all(&output_dir).map_err(|e| {
+            AppError::new(
+                Kind::IoError,
+                format!("creating {}: {e}", output_dir.display()),
+            )
+        })?;
     }
 
-    let (paths, mut fail) = inputs::resolve(&args.inputs, &input_dir)?;
+    let (paths, mut fail) = inputs::resolve(&args.inputs, &input_dir, origin)?;
 
     let mut ok = 0u32;
     let mut skip = 0u32;
@@ -38,8 +54,9 @@ pub fn run(args: &ExtractArgs, cfg: &Config, quiet: bool, verbose: bool) -> Resu
         let (format, content) = if ext == "epub" {
             (detect::Format::Epub, None)
         } else {
-            let text =
-                fs::read_to_string(path).with_context(|| format!("reading {}", path.display()))?;
+            let text = fs::read_to_string(path).map_err(|e| {
+                AppError::new(Kind::IoError, format!("reading {}: {e}", path.display()))
+            })?;
             let format = detect::detect_format(path, &text, cfg);
             (format, Some(text))
         };
@@ -64,8 +81,12 @@ pub fn run(args: &ExtractArgs, cfg: &Config, quiet: bool, verbose: bool) -> Resu
                 if args.stdout {
                     println!("{md}");
                 } else {
-                    fs::write(&out_path, &md)
-                        .with_context(|| format!("writing {}", out_path.display()))?;
+                    fs::write(&out_path, &md).map_err(|e| {
+                        AppError::new(
+                            Kind::IoError,
+                            format!("writing {}: {e}", out_path.display()),
+                        )
+                    })?;
                     if !quiet {
                         let kb = md.len() / 1024;
                         eprintln!("  OK   {id}.md ({kb}KB)");
@@ -85,7 +106,7 @@ pub fn run(args: &ExtractArgs, cfg: &Config, quiet: bool, verbose: bool) -> Resu
     }
 
     Ok(if fail > 0 {
-        ExitCode::FAILURE
+        ExitCode::from(fte::errors::PARTIAL_FAILURE)
     } else {
         ExitCode::SUCCESS
     })

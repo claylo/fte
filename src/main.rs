@@ -1,4 +1,3 @@
-use anyhow::{Context, Result};
 use librebar::cli::clap::{self, Args, Parser, Subcommand};
 use std::path::PathBuf;
 use std::process::ExitCode;
@@ -6,6 +5,7 @@ use std::process::ExitCode;
 mod cmd;
 
 use fte::config;
+use fte::errors::{AppError, Kind};
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
@@ -95,23 +95,71 @@ pub struct SplitArgs {
     pub force: bool,
 }
 
-fn main() -> Result<ExitCode> {
+fn main() -> ExitCode {
+    match run() {
+        Ok(code) => code,
+        Err(err) => {
+            fte::errors::emit(&err, wants_json_errors());
+            ExitCode::from(err.kind.code())
+        }
+    }
+}
+
+/// Whether a failure should print the structured JSON envelope.
+///
+/// This runs in `main`, before and independently of clap: `run` can fail while
+/// loading config, long before a parsed `CommonArgs` exists. It mirrors
+/// librebar's `--format auto` rule — JSON when stdout is not a terminal —
+/// while honoring an explicit flag either way.
+fn wants_json_errors() -> bool {
+    let mut explicit = None;
+    let mut args = std::env::args();
+    while let Some(arg) = args.next() {
+        match arg.as_str() {
+            "--json" | "--format=json" => explicit = Some(true),
+            "--format=text" => explicit = Some(false),
+            "--format" => match args.next().as_deref() {
+                Some("json") => explicit = Some(true),
+                Some("text") => explicit = Some(false),
+                _ => {}
+            },
+            _ => {}
+        }
+    }
+    explicit.unwrap_or_else(|| !std::io::IsTerminal::is_terminal(&std::io::stdout()))
+}
+
+fn run() -> std::result::Result<ExitCode, fte::errors::AppError> {
     let cli: Cli = librebar::cli::parse();
 
-    if cli.common.apply(VERSION)?.is_exit() {
+    if cli
+        .common
+        .apply(VERSION)
+        .map_err(|e| AppError::new(Kind::ConfigError, e.to_string()))?
+        .is_exit()
+    {
         return Ok(ExitCode::SUCCESS);
     }
 
-    let cwd = std::env::current_dir()?;
-    let cwd_utf8 = cwd.to_str().context("cwd is not valid UTF-8")?;
+    let cwd = std::env::current_dir()
+        .map_err(|e| AppError::new(Kind::IoError, format!("reading current directory: {e}")))?;
+    let cwd_utf8 = cwd
+        .to_str()
+        .ok_or_else(|| AppError::new(Kind::ConfigError, "cwd is not valid UTF-8"))?;
 
     // Load config: struct defaults → user config → project config.
     // An explicit `-c/--config` file is layered on top of whatever discovery finds.
     let mut loader = librebar::config::ConfigLoader::new("fte").with_project_search(cwd_utf8);
-    if let Some(path) = cli.common.config_path()? {
+    if let Some(path) = cli
+        .common
+        .config_path()
+        .map_err(|e| AppError::new(Kind::ConfigError, e.to_string()))?
+    {
         loader = loader.with_file(&path);
     }
-    let (cfg, _sources) = loader.load::<config::Config>()?;
+    let (cfg, _sources) = loader
+        .load::<config::Config>()
+        .map_err(|e| AppError::new(Kind::ConfigError, e.to_string()))?;
 
     let quiet = cli.common.quiet;
     let verbose = cli.common.verbose > 0;
