@@ -1,0 +1,155 @@
+sha256 953839f9ae18857ec90a23a37b3c12c91cfdff4ffa2a56fe085406c3d10f820d
+bytes  426718
+---
+frontmatter id: frankenstein-pg source_format: epub title: "Frankenstein; or, the modern prometheus" authors: - "Mary Wollstonecraft Shelley"
+h1 Frankenstein; or, the modern prometheus
+h2 Contents
+toc-entry depth=0 slug=frankenstein
+toc-entry depth=0 slug=or-the-modern-prometheus
+toc-entry depth=0 slug=letter-1
+toc-entry depth=0 slug=letter-2
+toc-entry depth=0 slug=letter-3
+toc-entry depth=0 slug=letter-4
+toc-entry depth=0 slug=chapter-1
+toc-entry depth=0 slug=chapter-2
+toc-entry depth=0 slug=chapter-3
+toc-entry depth=0 slug=chapter-4
+toc-entry depth=0 slug=chapter-5
+toc-entry depth=0 slug=chapter-6
+toc-entry depth=0 slug=chapter-7
+toc-entry depth=0 slug=chapter-8
+toc-entry depth=0 slug=chapter-9
+toc-entry depth=0 slug=chapter-10
+toc-entry depth=0 slug=chapter-11
+toc-entry depth=0 slug=chapter-12
+toc-entry depth=0 slug=chapter-13
+toc-entry depth=0 slug=chapter-14
+toc-entry depth=0 slug=chapter-15
+toc-entry depth=0 slug=chapter-16
+toc-entry depth=0 slug=chapter-17
+toc-entry depth=0 slug=chapter-18
+toc-entry depth=0 slug=chapter-19
+toc-entry depth=0 slug=chapter-20
+toc-entry depth=0 slug=chapter-21
+toc-entry depth=0 slug=chapter-22
+toc-entry depth=0 slug=chapter-23
+toc-entry depth=0 slug=chapter-24
+chapter-start id="ch01" title="Frankenstein;" src="OEBPS/6955210388878302455_84-h-0.htm.xhtml"
+h2 The Project Gutenberg eBook of Frankenstein; or, the modern prometheus
+text 51w
+h1 Frankenstein;
+h3 or, the Modern Prometheus
+h2 by Mary Wollstonecraft (Godwin) Shelley
+chapter-end id="ch01"
+chapter-start id="ch02" title="Letter 1" src="OEBPS/6955210388878302455_84-h-2.htm.xhtml"
+h2 Letter 1
+text 1198w
+chapter-end id="ch02"
+chapter-start id="ch03" title="Letter 2" src="OEBPS/6955210388878302455_84-h-3.htm.xhtml"
+h2 Letter 2
+text 1309w
+chapter-end id="ch03"
+chapter-start id="ch04" title="Letter 3" src="OEBPS/6955210388878302455_84-h-4.htm.xhtml"
+h2 Letter 3
+text 298w
+chapter-end id="ch04"
+chapter-start id="ch05" title="Letter 4" src="OEBPS/6955210388878302455_84-h-5.htm.xhtml"
+h2 Letter 4
+text 2728w
+chapter-end id="ch05"
+chapter-start id="ch06" title="Chapter 1" src="OEBPS/6955210388878302455_84-h-6.htm.xhtml"
+h2 Chapter 1
+text 1764w
+chapter-end id="ch06"
+chapter-start id="ch07" title="Chapter 2" src="OEBPS/6955210388878302455_84-h-7.htm.xhtml"
+h2 Chapter 2
+text 2204w
+chapter-end id="ch07"
+chapter-start id="ch08" title="Chapter 3" src="OEBPS/6955210388878302455_84-h-8.htm.xhtml"
+h2 Chapter 3
+text 2673w
+chapter-end id="ch08"
+chapter-start id="ch09" title="Chapter 4" src="OEBPS/6955210388878302455_84-h-9.htm.xhtml"
+h2 Chapter 4
+text 2533w
+chapter-end id="ch09"
+chapter-start id="ch10" title="Chapter 5" src="OEBPS/6955210388878302455_84-h-10.htm.xhtml"
+h2 Chapter 5
+text 2355w
+chapter-end id="ch10"
+chapter-start id="ch11" title="Chapter 6" src="OEBPS/6955210388878302455_84-h-11.htm.xhtml"
+h2 Chapter 6
+text 2716w
+chapter-end id="ch11"
+chapter-start id="ch12" title="Chapter 7" src="OEBPS/6955210388878302455_84-h-12.htm.xhtml"
+h2 Chapter 7
+text 3558w
+chapter-end id="ch12"
+chapter-start id="ch13" title="Chapter 8" src="OEBPS/6955210388878302455_84-h-13.htm.xhtml"
+h2 Chapter 8
+text 3091w
+chapter-end id="ch13"
+chapter-start id="ch14" title="Chapter 9" src="OEBPS/6955210388878302455_84-h-14.htm.xhtml"
+h2 Chapter 9
+text 2210w
+chapter-end id="ch14"
+chapter-start id="ch15" title="Chapter 10" src="OEBPS/6955210388878302455_84-h-15.htm.xhtml"
+h2 Chapter 10
+text 2357w
+chapter-end id="ch15"
+chapter-start id="ch16" title="Chapter 11" src="OEBPS/6955210388878302455_84-h-16.htm.xhtml"
+h2 Chapter 11
+text 2905w
+chapter-end id="ch16"
+chapter-start id="ch17" title="Chapter 12" src="OEBPS/6955210388878302455_84-h-17.htm.xhtml"
+h2 Chapter 12
+text 2068w
+chapter-end id="ch17"
+chapter-start id="ch18" title="Chapter 13" src="OEBPS/6955210388878302455_84-h-18.htm.xhtml"
+h2 Chapter 13
+text 2030w
+chapter-end id="ch18"
+chapter-start id="ch19" title="Chapter 14" src="OEBPS/6955210388878302455_84-h-19.htm.xhtml"
+h2 Chapter 14
+text 1852w
+chapter-end id="ch19"
+chapter-start id="ch20" title="Chapter 15" src="OEBPS/6955210388878302455_84-h-20.htm.xhtml"
+h2 Chapter 15
+text 3011w
+chapter-end id="ch20"
+chapter-start id="ch21" title="Chapter 16" src="OEBPS/6955210388878302455_84-h-21.htm.xhtml"
+h2 Chapter 16
+text 3197w
+chapter-end id="ch21"
+chapter-start id="ch22" title="Chapter 17" src="OEBPS/6955210388878302455_84-h-22.htm.xhtml"
+h2 Chapter 17
+text 1915w
+chapter-end id="ch22"
+chapter-start id="ch23" title="Chapter 18" src="OEBPS/6955210388878302455_84-h-23.htm.xhtml"
+h2 Chapter 18
+text 2842w
+chapter-end id="ch23"
+chapter-start id="ch24" title="Chapter 19" src="OEBPS/6955210388878302455_84-h-24.htm.xhtml"
+h2 Chapter 19
+text 2609w
+chapter-end id="ch24"
+chapter-start id="ch25" title="Chapter 20" src="OEBPS/6955210388878302455_84-h-25.htm.xhtml"
+h2 Chapter 20
+text 3519w
+chapter-end id="ch25"
+chapter-start id="ch26" title="Chapter 21" src="OEBPS/6955210388878302455_84-h-26.htm.xhtml"
+h2 Chapter 21
+text 3736w
+chapter-end id="ch26"
+chapter-start id="ch27" title="Chapter 22" src="OEBPS/6955210388878302455_84-h-27.htm.xhtml"
+h2 Chapter 22
+text 3412w
+chapter-end id="ch27"
+chapter-start id="ch28" title="Chapter 23" src="OEBPS/6955210388878302455_84-h-28.htm.xhtml"
+h2 Chapter 23
+text 2592w
+chapter-end id="ch28"
+chapter-start id="ch29" title="Chapter 24" src="OEBPS/6955210388878302455_84-h-29.htm.xhtml"
+h2 Chapter 24
+text 8237w
+chapter-end id="ch29"

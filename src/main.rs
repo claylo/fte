@@ -1,193 +1,313 @@
-use anyhow::{Context, Result};
-use librebar::cli::clap::{self, Parser};
-use std::fs;
-use std::path::{Path, PathBuf};
+use librebar::cli::clap::{self, Args, Parser, Subcommand};
+use librebar::cli::{
+    CommandExample, CommandMetadata, ErrorMetadata, OutcomeMetadata, OutputField, ParseOutcome,
+    SchemaMetadata, Stability,
+};
+use std::path::PathBuf;
 use std::process::ExitCode;
 
-use fte::{config, detect, epub, extract};
+mod cmd;
+
+use fte::config;
+use fte::errors::{AppError, Kind};
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 #[derive(Parser)]
 #[command(
     version,
-    about = "Extract clean markdown from publisher HTML/XML/ePub academic papers"
+    about = "Extract clean markdown from publisher HTML/XML/ePub academic papers",
+    arg_required_else_help = true
 )]
 struct Cli {
     #[command(flatten)]
     common: librebar::cli::CommonArgs,
 
+    #[command(subcommand)]
+    command: Commands,
+}
+
+#[derive(Subcommand)]
+enum Commands {
+    /// Extract markdown from publisher markup
+    Extract(ExtractArgs),
+    /// Report the detected format without extracting
+    Detect(DetectArgs),
+    /// Split book markdown into per-chapter files
+    Split(SplitArgs),
+}
+
+#[derive(Args)]
+pub struct ExtractArgs {
     /// Input files or IDs (looked up in input_dir)
-    inputs: Vec<String>,
+    pub inputs: Vec<String>,
 
     /// Input directory to scan (overrides config)
     #[arg(long)]
-    indir: Option<PathBuf>,
+    pub indir: Option<PathBuf>,
 
     /// Output directory (overrides config)
     #[arg(short, long)]
-    outdir: Option<PathBuf>,
+    pub outdir: Option<PathBuf>,
 
     /// Print to stdout instead of writing files
     #[arg(long)]
-    stdout: bool,
+    pub stdout: bool,
 
     /// Overwrite existing output files
     #[arg(long)]
-    force: bool,
-
-    /// Show detected format without extracting
-    #[arg(long)]
-    detect_only: bool,
+    pub force: bool,
 }
 
-fn main() -> Result<ExitCode> {
-    let cli: Cli = librebar::cli::parse();
+#[derive(Args)]
+pub struct DetectArgs {
+    /// Input files or IDs (looked up in input_dir)
+    pub inputs: Vec<String>,
 
-    if cli.common.apply(VERSION)?.is_exit() {
+    /// Input directory to scan (overrides config)
+    #[arg(long)]
+    pub indir: Option<PathBuf>,
+}
+
+#[derive(Args)]
+pub struct SplitArgs {
+    /// Book markdown (.md) or ePub (.epub) to split
+    pub input: PathBuf,
+
+    /// Output directory (overrides config)
+    #[arg(short, long)]
+    pub outdir: Option<PathBuf>,
+
+    /// Subdirectory template (overrides config)
+    #[arg(long)]
+    pub subdir: Option<String>,
+
+    /// Chapter filename template (overrides config)
+    #[arg(long)]
+    pub name: Option<String>,
+
+    /// Frontmatter filename template (overrides config)
+    #[arg(long, conflicts_with = "no_front")]
+    pub front: Option<String>,
+
+    /// Do not write a frontmatter file
+    #[arg(long)]
+    pub no_front: bool,
+
+    /// Overwrite existing output files
+    #[arg(long)]
+    pub force: bool,
+}
+
+/// Application facts published through `fte schema`.
+fn schema_metadata() -> SchemaMetadata {
+    let mut metadata = SchemaMetadata::new();
+
+    for kind in fte::errors::Kind::ALL {
+        metadata = metadata.error(
+            ErrorMetadata::new(kind.as_str())
+                .exit_code(kind.code())
+                .retryable(kind.retryable())
+                .description(kind.description()),
+        );
+    }
+
+    metadata = metadata.outcome(
+        OutcomeMetadata::new(fte::errors::PARTIAL_FAILURE, "partial_failure")
+            .description("Some inputs were processed and others failed."),
+    );
+
+    metadata
+        .command(
+            "extract",
+            CommandMetadata::new()
+                .mutating(true)
+                .stability(Stability::Stable)
+                .example(CommandExample::new([
+                    "extract",
+                    "--stdout",
+                    "tests/golden/input/bmc-short.html",
+                ]))
+                .output_field(OutputField::new("id", "string").description("Input file stem"))
+                .output_field(
+                    OutputField::new("source_format", "string")
+                        .description("Detected publisher format"),
+                )
+                .output_field(
+                    OutputField::new("output_path", "string")
+                        .description("Path written, absent with --stdout"),
+                )
+                .output_field(OutputField::new("bytes", "integer").description("Markdown size"))
+                .output_field(
+                    OutputField::new("status", "string")
+                        .description("extracted | skipped | failed"),
+                )
+                .output_field(
+                    OutputField::new("reason", "string")
+                        .description("Why a failed row failed; absent otherwise"),
+                ),
+        )
+        .command(
+            "detect",
+            CommandMetadata::new()
+                .mutating(false)
+                .stability(Stability::Stable)
+                .example(CommandExample::new([
+                    "detect",
+                    "tests/golden/input/bmc-short.html",
+                ]))
+                .output_field(OutputField::new("id", "string").description("Input file stem"))
+                .output_field(OutputField::new("path", "string").description("Resolved path"))
+                .output_field(
+                    OutputField::new("format", "string").description("Detected format name"),
+                )
+                .output_field(OutputField::new("status", "string").description("detected | failed"))
+                .output_field(
+                    OutputField::new("reason", "string")
+                        .description("Why a failed row failed; absent otherwise"),
+                ),
+        )
+        .command(
+            "split",
+            CommandMetadata::new()
+                .mutating(true)
+                .stability(Stability::Stable)
+                .example(CommandExample::new([
+                    "split",
+                    "tests/golden/input/books/frankenstein-pg.epub",
+                    "--outdir",
+                    "target/clispec-scratch",
+                ]))
+                .output_field(
+                    OutputField::new("index", "integer")
+                        .description("Chapter number; 0 is the frontmatter file"),
+                )
+                .output_field(OutputField::new("title", "string").description("Chapter title"))
+                .output_field(OutputField::new("path", "string").description("Path written"))
+                .output_field(OutputField::new("bytes", "integer").description("File size")),
+        )
+}
+
+fn main() -> ExitCode {
+    match run() {
+        Ok(code) => code,
+        Err(err) => {
+            fte::errors::emit(&err, wants_json_errors());
+            ExitCode::from(err.kind.code())
+        }
+    }
+}
+
+/// Whether a failure should print the structured JSON envelope.
+///
+/// This runs in `main`, before and independently of clap: `run` can fail while
+/// loading config, long before a parsed `CommonArgs` exists. It mirrors
+/// librebar's `--format auto` rule — JSON when stdout is not a terminal —
+/// while honoring an explicit flag either way.
+fn wants_json_errors() -> bool {
+    let mut explicit = None;
+    let mut args = std::env::args();
+    while let Some(arg) = args.next() {
+        match arg.as_str() {
+            "--json" | "--format=json" => explicit = Some(true),
+            "--format=text" => explicit = Some(false),
+            "--format" => match args.next().as_deref() {
+                Some("json") => explicit = Some(true),
+                Some("text") => explicit = Some(false),
+                _ => {}
+            },
+            _ => {}
+        }
+    }
+    explicit.unwrap_or_else(|| !std::io::IsTerminal::is_terminal(&std::io::stdout()))
+}
+
+fn run() -> std::result::Result<ExitCode, fte::errors::AppError> {
+    let cli: Cli =
+        match librebar::cli::try_parse_from::<Cli, _, _>(std::env::args_os(), schema_metadata()) {
+            Ok(ParseOutcome::Run(cli)) => cli,
+            Ok(ParseOutcome::Schema(document)) => {
+                let json = serde_json::to_string_pretty(&document)
+                    .map_err(|e| AppError::new(Kind::IoError, format!("rendering schema: {e}")))?;
+                println!("{json}");
+                return Ok(ExitCode::SUCCESS);
+            }
+            Ok(ParseOutcome::Completions(bytes)) => {
+                use std::io::Write;
+                std::io::stdout().write_all(&bytes).map_err(|e| {
+                    AppError::new(Kind::IoError, format!("writing completions: {e}"))
+                })?;
+                return Ok(ExitCode::SUCCESS);
+            }
+            Err(error) => {
+                // Help and version are successful requests, not failures: print
+                // them exactly as clap would and exit 0.
+                if matches!(
+                    error.kind(),
+                    clap::error::ErrorKind::DisplayHelp | clap::error::ErrorKind::DisplayVersion
+                ) {
+                    print!("{error}");
+                    return Ok(ExitCode::SUCCESS);
+                }
+                // Bare `fte` (arg_required_else_help) hits this arm: the
+                // "error" IS the full help screen, not a diagnostic. Print
+                // it exactly as clap would rather than JSON-escaping ~700
+                // characters of help text into AppError::message, but keep
+                // the usage exit code — this is still a usage failure.
+                if error.kind() == clap::error::ErrorKind::DisplayHelpOnMissingArgumentOrSubcommand
+                {
+                    let _ = error.print();
+                    return Ok(ExitCode::from(Kind::Usage.code()));
+                }
+                return Err(
+                    AppError::new(Kind::Usage, error.to_string().trim().to_string())
+                        .hint("run with --help for usage"),
+                );
+            }
+            Ok(_) => unreachable!("librebar::cli::ParseOutcome grew a variant fte does not handle"),
+        };
+
+    if cli
+        .common
+        .apply(VERSION)
+        .map_err(|e| AppError::new(Kind::ConfigError, e.to_string()))?
+        .is_exit()
+    {
         return Ok(ExitCode::SUCCESS);
     }
 
-    let cwd = std::env::current_dir()?;
-    let cwd_utf8 = cwd.to_str().context("cwd is not valid UTF-8")?;
+    let cwd = std::env::current_dir()
+        .map_err(|e| AppError::new(Kind::IoError, format!("reading current directory: {e}")))?;
+    let cwd_utf8 = cwd
+        .to_str()
+        .ok_or_else(|| AppError::new(Kind::ConfigError, "cwd is not valid UTF-8"))?;
 
     // Load config: struct defaults → user config → project config.
     // An explicit `-c/--config` file is layered on top of whatever discovery finds.
     let mut loader = librebar::config::ConfigLoader::new("fte").with_project_search(cwd_utf8);
-    if let Some(path) = cli.common.config_path()? {
+    if let Some(path) = cli
+        .common
+        .config_path()
+        .map_err(|e| AppError::new(Kind::ConfigError, e.to_string()))?
+    {
         loader = loader.with_file(&path);
     }
-    let (cfg, _sources) = loader.load::<config::Config>()?;
-
-    // Resolve directories: CLI > config > defaults
-    let input_dir = cli.indir.unwrap_or_else(|| PathBuf::from(&cfg.input_dir));
-    let output_dir = cli.outdir.unwrap_or_else(|| PathBuf::from(&cfg.output_dir));
-
-    if !cli.stdout && !cli.detect_only {
-        fs::create_dir_all(&output_dir)?;
-    }
+    let (cfg, _sources) = loader
+        .load::<config::Config>()
+        .map_err(|e| AppError::new(Kind::ConfigError, e.to_string()))?;
 
     let quiet = cli.common.quiet;
     let verbose = cli.common.verbose > 0;
 
-    // Inputs that were requested but don't exist count as failures: the run
-    // was asked to do work it couldn't do, and the exit code must say so.
-    let (inputs, mut fail) = resolve_inputs(&cli.inputs, &input_dir)?;
+    use librebar::cli::ResolvedOutputFormat;
+    let render = match cli.common.output_format() {
+        ResolvedOutputFormat::Json => fte::output::Render::Json,
+        _ => fte::output::Render::Text,
+    };
 
-    let mut ok = 0u32;
-    let mut skip = 0u32;
-
-    for path in &inputs {
-        let id = path
-            .file_stem()
-            .and_then(|s| s.to_str())
-            .unwrap_or("unknown");
-        let ext = path.extension().and_then(|e| e.to_str()).unwrap_or("");
-
-        // ePub is a zip, extracted from the path; everything else is read to
-        // a string and detected by content.
-        let (format, content) = if ext == "epub" {
-            (detect::Format::Epub, None)
-        } else {
-            let text =
-                fs::read_to_string(path).with_context(|| format!("reading {}", path.display()))?;
-            let format = detect::detect_format(path, &text, &cfg);
-            (format, Some(text))
-        };
-
-        if cli.detect_only {
-            println!("{id}: {format}");
-            continue;
-        }
-
-        if verbose {
-            eprintln!("  detect {id}: {format}");
-        }
-
-        let out_path = output_dir.join(format!("{id}.md"));
-        if !cli.force && out_path.exists() {
-            skip += 1;
-            continue;
-        }
-
-        let result = match &content {
-            None => epub::extract(id, path),
-            Some(text) => extract::extract(&format, id, text),
-        };
-
-        match result {
-            Ok(md) => {
-                if cli.stdout {
-                    println!("{md}");
-                } else {
-                    fs::write(&out_path, &md)
-                        .with_context(|| format!("writing {}", out_path.display()))?;
-                    if !quiet {
-                        let kb = md.len() / 1024;
-                        eprintln!("  OK   {id}.md ({kb}KB)");
-                    }
-                }
-                ok += 1;
-            }
-            Err(e) => {
-                eprintln!("  FAIL {id}: {e}");
-                fail += 1;
-            }
-        }
+    match &cli.command {
+        Commands::Extract(args) => cmd::extract::run(args, &cfg, quiet, verbose, render),
+        Commands::Detect(args) => cmd::detect::run(args, &cfg, render),
+        Commands::Split(args) => cmd::split::run(args, &cfg, quiet, render),
     }
-
-    if !quiet && !cli.stdout && !cli.detect_only {
-        eprintln!("\nDone: {ok} extracted, {skip} skipped, {fail} failed");
-    }
-
-    Ok(if fail > 0 {
-        ExitCode::FAILURE
-    } else {
-        ExitCode::SUCCESS
-    })
-}
-
-/// Resolve CLI inputs to concrete paths, plus a count of requested inputs
-/// that don't exist anywhere — the caller folds that count into its failure
-/// total so the summary and exit code reflect them.
-fn resolve_inputs(inputs: &[String], input_dir: &Path) -> Result<(Vec<PathBuf>, u32)> {
-    if inputs.is_empty() {
-        // Process all files in input_dir
-        let mut paths: Vec<PathBuf> = fs::read_dir(input_dir)
-            .with_context(|| format!("reading {}", input_dir.display()))?
-            .filter_map(|e| e.ok())
-            .map(|e| e.path())
-            .filter(|p| {
-                p.extension()
-                    .is_some_and(|ext| ext == "html" || ext == "xml" || ext == "epub")
-            })
-            .collect();
-        paths.sort();
-        return Ok((paths, 0));
-    }
-
-    let mut paths = Vec::new();
-    let mut missing = 0u32;
-    for input in inputs {
-        let p = Path::new(input);
-        if p.exists() {
-            paths.push(p.to_path_buf());
-        } else {
-            // Try as ID in input_dir
-            let epub = input_dir.join(format!("{input}.epub"));
-            let xml = input_dir.join(format!("{input}.xml"));
-            let html = input_dir.join(format!("{input}.html"));
-            if epub.exists() {
-                paths.push(epub);
-            } else if xml.exists() {
-                paths.push(xml);
-            } else if html.exists() {
-                paths.push(html);
-            } else {
-                eprintln!("  FAIL {input}: not found");
-                missing += 1;
-            }
-        }
-    }
-    Ok((paths, missing))
 }

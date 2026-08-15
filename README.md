@@ -21,22 +21,27 @@ Prebuilt binaries for macOS, Linux, and Windows are on the
 
 ```bash
 # Extract all files in a directory
-fte --indir path/to/html-files --outdir path/to/output
+fte extract --indir path/to/html-files --outdir path/to/output
 
 # Extract specific files
-fte paper.html chapter.xml article.epub
+fte extract paper.html chapter.xml article.epub
 
 # Print to stdout
-fte --stdout paper.html
+fte extract --stdout paper.html
 
 # Detect format without extracting
-fte --detect-only --indir path/to/html-files
+fte detect --indir path/to/html-files
 
 # Overwrite existing output
-fte --force --indir path/to/html-files --outdir path/to/output
+fte extract --force --indir path/to/html-files --outdir path/to/output
+
+# Split a book into per-chapter files
+fte split book.epub
 ```
 
-When run without `--indir`, fte looks for a config file (`.fte.yaml`, `.config/fte.yaml`, etc.) walking up from the current directory to find input/output paths.
+When run without `--indir`, `fte extract` looks for a config file (`.fte.yaml`,
+`.config/fte.yaml`, etc.) walking up from the current directory to find
+input/output paths. A bare `fte` prints help.
 
 ### Shell completions and machine-readable help
 
@@ -46,6 +51,57 @@ fte completions zsh > ~/.zfunc/_fte
 
 # Print the CLI Spec schema for tooling and agents
 fte schema
+```
+
+### Splitting books into chapters
+
+Book-length ePub output carries chapter boundary markers, so it can be split
+into per-chapter files:
+
+```bash
+# One shot: epub straight to chapter files
+fte split book.epub
+
+# Or split a document you already extracted
+fte extract book.epub && fte split ref/epub-md/book.md
+```
+
+Filenames come from templates, configurable in `.fte.yaml`:
+
+```yaml
+split:
+  subdir: "{book}"              # "" writes flat into the output directory
+  file: "{n}-{slug}.md"
+  front: "{n}-frontmatter.md"   # "" suppresses it
+  pad: 2
+```
+
+Available tokens are `{book}`, `{n}`, `{slug}`, `{title}`, and `{src}`. An
+unrecognized token is an error, not a literal. `--subdir`, `--name`, `--front`,
+and `--no-front` override the config per run.
+
+### Exit codes
+
+| Code | Meaning |
+|------|---------|
+| 0 | Success |
+| 1 | `partial_failure` — some inputs succeeded, others failed |
+| 2 | `usage` |
+| 3 | `not_found` |
+| 5 | `extraction_failed` |
+| 6 | `output_exists` |
+| 7 | `io_error` |
+| 8 | `no_chapters` |
+| 9 | `config_error` |
+
+Codes are not contiguous: 4 (`unsupported_format`) is retired — no code path
+could ever produce it — rather than reused, so a script still checking for it
+fails closed instead of silently matching something else.
+
+With `--format json`, failures print a single-line envelope to stderr:
+
+```json
+{"kind":"not_found","message":"input 'foo.html' not found","hint":"check --indir"}
 ```
 
 ## Supported Formats
@@ -74,6 +130,7 @@ fte handles book-length epubs — full-length books with many chapters, not just
 - **Subheading recovery** via CSS heuristics. Some converters flatten subheadings into styled `<p>` tags — fte detects these by font-size and promotes them back to headings.
 - **Table of contents** with anchor links, rendered at the top of the output.
 - **All content included** — front matter, chapters, notes, references, index. The heading structure is clean enough to split by chapter or strip sections in post-processing.
+- **Chapter boundary markers** embedded in the output, so `fte split` can cut the book into per-chapter files without re-parsing the source. See [Splitting books into chapters](#splitting-books-into-chapters).
 
 This is best-effort. ePub books vary wildly in structure, especially after format conversion. fte handles the common patterns well (tested against Gutenberg, HarperCollins, and Simon & Schuster converter output), but edge cases exist. If a book's XHTML uses no heading tags and no identifiable CSS patterns for subheadings, you'll get flat paragraphs with chapter breaks.
 

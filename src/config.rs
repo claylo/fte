@@ -8,8 +8,34 @@ use serde::{Deserialize, Serialize};
 pub struct Config {
     pub input_dir: String,
     pub output_dir: String,
+    pub split: SplitConfig,
     pub publishers: BTreeMap<String, PublisherProfile>,
     pub fallback: PublisherProfile,
+}
+
+/// Naming rules for `fte split` output.
+#[derive(Debug, Clone, Deserialize, Serialize)]
+#[serde(default)]
+pub struct SplitConfig {
+    /// Subdirectory template; empty writes flat into the output directory.
+    pub subdir: String,
+    /// Chapter filename template.
+    pub file: String,
+    /// Frontmatter filename template; empty suppresses the file.
+    pub front: String,
+    /// Zero-padding width for `{n}`.
+    pub pad: usize,
+}
+
+impl Default for SplitConfig {
+    fn default() -> Self {
+        Self {
+            subdir: "{book}".into(),
+            file: "{n}-{slug}.md".into(),
+            front: "{n}-frontmatter.md".into(),
+            pad: 2,
+        }
+    }
 }
 
 /// A publisher extraction profile — detection markers + CSS selectors.
@@ -41,6 +67,7 @@ impl Default for Config {
         Self {
             input_dir: "ref/epub".into(),
             output_dir: "ref/epub-md".into(),
+            split: SplitConfig::default(),
             publishers: default_publishers(),
             fallback: fallback_profile(),
         }

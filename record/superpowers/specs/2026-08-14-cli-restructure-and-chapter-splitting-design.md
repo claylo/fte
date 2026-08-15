@@ -30,8 +30,9 @@ separation. A bare-positional CLI is unscoreable.
 - Bare `fte` shows help and exits 2.
 - Book markdown carries machine-readable chapter boundaries.
 - `fte split` produces per-chapter files with user-configurable naming.
-- `clispec score` reaches 20/24, with the remaining 4 blocked on librebar and
-  documented as such.
+- `clispec score` reaches 18/24, with the remaining 6 parked: 5 blocked on
+  librebar 0.6 emitter gaps, 1 (*Structured errors*) blocked on this repo's
+  own outcome-vs-error design. Both are documented in `.justfile`.
 - The book extraction path gains golden coverage it has never had.
 
 ## Non-goals
@@ -99,12 +100,19 @@ Body text…
 |-----------|--------|
 | `id` | Sequential: `ch01`, `ch02`, … |
 | `title` | Nav label, or the first heading found in the chapter body |
-| `src` | Spine entry path, verbatim |
+| `src` | Spine entry path, sanitized (see Sanitization below) |
 
 `id` is sequential rather than derived from the source stem. Book epubs
 routinely use obfuscated filenames (`sgPhzGILRlKrLKg2DMvpew1`, `c0`, `cP`) —
 `src` preserves the real path for provenance while `id` stays legible and
 stable.
+
+`src` goes through the same sanitization as `title` (below) because it sits
+inside the same HTML comment attribute — an unsanitized `--` or `"` in a
+spine path is exactly as much of a corruption hazard as one in a title. This
+means `src` is provenance, not a guaranteed-exact round-trip key: a spine
+path containing `--` (e.g. `OEBPS/part--one.xhtml`) round-trips with an en
+dash substituted. Use `id` when exact identity matters.
 
 ### Sanitization
 
@@ -226,12 +234,23 @@ to json, failures print a single JSON line to stderr as the last line:
 |------|------|-----------|-------------|
 | `usage` | 2 | false | Bad arguments, unknown subcommand, bare `fte` |
 | `not_found` | 3 | false | Input file or ID does not resolve; `input_dir` missing |
-| `unsupported_format` | 4 | false | No handler matches the detected format |
 | `extraction_failed` | 5 | false | Parsing produced no usable body content |
 | `output_exists` | 6 | false | Target exists and `--force` was not given |
 | `io_error` | 7 | true | Read or write failure |
 | `no_chapters` | 8 | false | `split` on a document with no chapter markers |
 | `config_error` | 9 | false | Malformed config or unknown template token |
+
+Seven kinds ship, not eight, and exit code 4 is a deliberate gap rather than
+a contiguous run 2 through 9. This section originally planned an eighth
+kind, `unsupported_format` (4), for "no handler matches the detected
+format." It was never reachable: a format-detection miss surfaces as a
+`"failed"` row with a `reason` (see Structured output, below), not as a
+fatal top-of-run error — wiring it up would have meant promoting one
+per-item outcome to a fatal error inconsistent with every other extraction
+failure. Final review M18 retired the kind rather than force a code path
+into existence for it. 4 is not reused for anything else, so a script or
+consumer still checking for it fails closed instead of silently matching a
+different kind later.
 
 ### Exit 1 is an outcome
 
@@ -253,9 +272,17 @@ a bare array so a consumer can add fields without a breaking change.
 
 | Command | `output_kind` | `cardinality` | `effects` | Fields |
 |---------|---------------|---------------|-----------|--------|
-| `extract` | data | bounded | idempotent | `id`, `source_format`, `output_path`, `bytes`, `status` |
-| `detect` | data | bounded | read_only | `id`, `path`, `format` |
+| `extract` | data | bounded | idempotent | `id`, `source_format`, `output_path`, `bytes`, `status`, `reason` |
+| `detect` | data | bounded | read_only | `id`, `path`, `format`, `status`, `reason` |
 | `split` | data | bounded | idempotent | `index`, `title`, `path`, `bytes` |
+
+This table describes the target 0.3 shape; only the `Fields` column is
+actually shipped. `output_kind`, `cardinality`, and `effects` are not
+declared anywhere — `SchemaMetadata` in librebar 0.6 has no fields for them
+(see the librebar 0.7 follow-up below), and `fte schema` still reports
+`"clispec": "0.2"`. `status` and `reason` were not in the original design;
+both were added during the final review pass (I4) so a JSON consumer can
+tell not just *that* a row failed but *why*.
 
 Cardinality is `bounded` because the item count is driven by caller input —
 explicit positionals or the contents of `input_dir`. No pagination is required.
@@ -272,9 +299,15 @@ changed.
 This is deliberate. `--format auto` resolves to json when stdout is not a TTY,
 so `fte extract --stdout paper.html > out.md` would otherwise JSON-wrap the
 markdown — a trap that only becomes reachable once JSON output exists at all.
-Declaring `--stdout` as `output_kind: opaque` with `media_type: text/markdown`
-makes the behavior contractual instead of surprising. Errors still print
-structured to stderr.
+
+The *behavior* is shipped and golden-tested
+(`tests/cli.rs::stdout_stays_raw_markdown_even_when_piped`). The
+`output_kind: opaque` / `media_type: text/markdown` *declaration* was not:
+librebar 0.6's `SchemaMetadata` has no field for either, the same gap that
+blocks `cardinality` and `effects` below. Until librebar carries them, this
+is a documented behavioral contract, not a machine-readable one — a
+JSON-consuming caller has to know `--stdout` is special from this doc, not
+from `fte schema`.
 
 `split` has no `--stdout`; it writes N files.
 
@@ -286,13 +319,24 @@ stderr, as they do today. This is already correct in `main.rs`; the CLIspec
 check *Messages on stderr only* currently fails only because the scorer has no
 subcommand to probe.
 
-### Expected score
+### Score
 
-20/24 (83%), up from 11/24 (45%).
+18/24 (75%), up from 11/24 (45%). Six checks are parked, not failing for lack
+of effort: five are blocked by librebar 0.6 emitter gaps (below), and a
+sixth, *Structured errors*, is blocked by this repo's own outcome-vs-error
+design — `partial_failure` (exit 1) is documented as an outcome, not a
+fault, so it reports through the `items` envelope on stdout and puts nothing
+on stderr, which the scorer's error-envelope check doesn't have a category
+for. `.justfile`'s `clispec` recipe carries the current, authoritative list
+of both; this section summarizes it.
+
+This section originally projected 20/24 before implementation. The measured
+score came in lower because a sixth check (*Structured errors*) turned out to
+be blocked too, on a design decision rather than a librebar gap — see above.
 
 ## librebar 0.7 follow-up
 
-Four checks cannot pass from this repo. Verified against the published
+Five checks cannot pass from this repo. Verified against the published
 `v0.3.json`:
 
 - `properties.clispec` is `{"const": "0.3"}`. librebar hardcodes `"0.2"`
@@ -304,7 +348,13 @@ Four checks cannot pass from this repo. Verified against the published
   `stdout_schema` have no representation in `SchemaMetadata`.
 
 Blocked checks: *Validates against clispec v0.3*, *Effects on all commands*,
-*Effects declarations*, *Cardinality declarations*.
+*Effects declarations*, *Cardinality declarations*, *Output fields declared*.
+
+A sixth check, *Structured errors*, is blocked separately — not by librebar,
+but by this repo's own outcome-vs-error design (see Score, above). Forcing it
+to pass would mean either duplicating a partial-failure's rows as a stderr
+error line or reclassifying the outcome as an error, undoing the exit-1
+design this section argues for. It stays parked on purpose.
 
 ### The version must be selectable, not switched
 
@@ -413,8 +463,15 @@ convention.
 
 Both were used to build the book capability, per the previous handoff.
 
-`fte split` reuses the same renderer: its golden is the output file tree plus
-one skeleton per chapter file.
+`fte split` reuses the same renderer, but its golden coverage is narrower
+than originally planned here. `tests/split.rs::one_shot_epub_split_matches_the_two_step_result`
+compares exactly one file — `00-frontmatter.md` — between the one-shot and
+two-step runs. `common::skeleton` embeds a full sha256, so that one file is
+compared byte for byte, but the ~30 chapter files are not compared at all,
+and there is no file-tree golden. Widening it to walk the output directory
+and compare skeletons pairwise is a real gap (final review M19) but was
+judged deferrable rather than must-fix for this branch; it remains open
+follow-up work.
 
 ## Testing
 
@@ -453,6 +510,10 @@ Tooling:
 - **`{src}` is absent for injected chapters.** If a future code path emits a
   chapter with no backing spine file, `{src}` has nothing to expand to. Emit an
   empty string and let the template author notice.
-- **The 20/24 estimate is a projection.** It assumes the scorer's subcommand
-  probes accept `fte detect` as a clean read-only target. Run `just clispec`
-  early in implementation rather than at the end.
+- **The 20/24 estimate was a projection; it undercounted the parked checks.**
+  It assumed only librebar-blocked checks would be parked. The measured score
+  is 18/24 (75%) — five checks blocked by librebar 0.6, plus one
+  (*Structured errors*) blocked by this repo's own outcome-vs-error design,
+  which the original estimate didn't anticipate. See Score, above. `just
+  clispec` was run early, per this note, which is exactly how the gap was
+  caught before merge instead of after.

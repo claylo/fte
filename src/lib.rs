@@ -1,9 +1,15 @@
+pub mod chapter;
 pub mod config;
 pub mod depth;
 pub mod detect;
 pub mod epub;
+pub mod errors;
 pub mod extract;
 pub mod html;
+pub mod inputs;
 pub mod jats;
 pub mod markdown;
+pub mod output;
+pub mod splitter;
+pub mod template;
 pub mod wiley_xml;
