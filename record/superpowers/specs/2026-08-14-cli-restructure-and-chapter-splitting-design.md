@@ -167,7 +167,7 @@ An unrecognized `{token}` is a `config_error`, not a literal passthrough.
 The default produces:
 
 ```
-oconner-2022/
+oconnor-2022/
   00-frontmatter.md
   01-dedication.md
   02-walking-in-the-dark.md
@@ -183,9 +183,9 @@ split:
 ```
 
 ```
-oconner-2022-ch00-frontmatter.md
-oconner-2022-ch01.md
-oconner-2022-ch02.md
+oconnor-2022-ch00-frontmatter.md
+oconnor-2022-ch01.md
+oconnor-2022-ch02.md
 ```
 
 CLI flags map 1:1 onto the config keys: `--subdir`, `--name`, `--front` /
@@ -306,9 +306,54 @@ Four checks cannot pass from this repo. Verified against the published
 Blocked checks: *Validates against clispec v0.3*, *Effects on all commands*,
 *Effects declarations*, *Cardinality declarations*.
 
-This belongs in a librebar session. librebar has zero reverse dependencies, so
-the 0.2 → 0.3 change needs no deprecation path. Record it in the fleet hub, not
-here.
+### The version must be selectable, not switched
+
+The obvious fix — retarget `CLI_SPEC_VERSION` to `"0.3"` — is wrong, and this
+is the load-bearing constraint on that work.
+
+Moving 0.2 → 0.3 is not an emitter-only change. `$defs.command` requires
+`effects` on every command, and only the application knows whether a command is
+`read_only`, `idempotent`, or `non_idempotent`. `cardinality` is the same. So a
+librebar release that flips the constant would make every consumer emit a
+document *claiming* 0.3 conformance while failing 0.3 validation — strictly
+worse than the valid 0.2 document it emits today, and silent. `cargo update`
+would break `schema` output in repos nobody touched.
+
+librebar 0.7 should therefore emit both versions and let the application pick:
+
+- `SchemaMetadata::spec_version(SpecVersion::V0_3)`, defaulting to `V0_2`.
+- Requesting `V0_3` without `effects` on every command is a `SchemaError`, not a
+  silently invalid document. librebar already validates metadata against the
+  command tree in `validate_metadata`, so this is the existing mechanism.
+- `V0_3` emission drops the deprecated `mutating` boolean and gains `effects`,
+  `cardinality`, `output_kind`, `media_type`, `stream_format`, and
+  `stdout_schema`.
+
+The selector is permanent infrastructure, not RC-window scaffolding. CLIspec
+versions fast — v0.2 took five amendments in two months before freezing, and
+0.3 arrived three months later — and every bump has the same shape: new
+required fields that only the application can supply. There will be a 0.4.
+`SpecVersion` should be `#[non_exhaustive]` and the emitter structured for N
+versions, not as a two-way toggle.
+
+What *is* disposable is the `V0_2` arm. **Once CLIspec 0.3 freezes,
+re-assess:** if librebar still has no external consumers, flip the default to
+`V0_3`, sweep the fleet repos to declare `effects` in the same pass, ship one
+release, and drop `V0_2` when nothing selects it. The default tracks the newest
+frozen version the fleet has migrated to.
+
+The `SchemaError` above is what makes each such flip a one-pass job — a
+consumer that has not declared the new version's required fields fails loudly
+instead of quietly emitting a document that lies about its own version. That
+property is worth more at 0.4 than it is at 0.3, because by then the fleet is
+larger.
+
+The zero-reverse-dependencies fact does not license skipping the selector
+today. It means no *external* crate breaks — it says nothing about the fleet
+repos that would start emitting invalid schemas on upgrade. It is the reason
+the eventual flip is a one-session job rather than a deprecation cycle.
+
+This belongs in a librebar session; recorded in the fleet hub, not here.
 
 ## Book golden tests
 
