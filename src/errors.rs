@@ -20,8 +20,6 @@ pub enum Kind {
     Usage,
     /// An input file or ID did not resolve.
     NotFound,
-    /// No handler matches the detected format.
-    UnsupportedFormat,
     /// Parsing produced no usable body content.
     ExtractionFailed,
     /// A target file exists and `--force` was not given.
@@ -36,10 +34,9 @@ pub enum Kind {
 
 impl Kind {
     /// Every declared kind, for schema emission and exhaustiveness tests.
-    pub const ALL: [Self; 8] = [
+    pub const ALL: [Self; 7] = [
         Self::Usage,
         Self::NotFound,
-        Self::UnsupportedFormat,
         Self::ExtractionFailed,
         Self::OutputExists,
         Self::IoError,
@@ -48,12 +45,16 @@ impl Kind {
     ];
 
     /// The process exit code for this kind.
+    ///
+    /// Codes are not contiguous: 4 (`unsupported_format`) was retired — see
+    /// M18 in the final review — rather than reused, so a script that still
+    /// checks for it fails closed instead of silently matching something
+    /// else.
     #[must_use]
     pub const fn code(self) -> u8 {
         match self {
             Self::Usage => 2,
             Self::NotFound => 3,
-            Self::UnsupportedFormat => 4,
             Self::ExtractionFailed => 5,
             Self::OutputExists => 6,
             Self::IoError => 7,
@@ -68,7 +69,6 @@ impl Kind {
         match self {
             Self::Usage => "usage",
             Self::NotFound => "not_found",
-            Self::UnsupportedFormat => "unsupported_format",
             Self::ExtractionFailed => "extraction_failed",
             Self::OutputExists => "output_exists",
             Self::IoError => "io_error",
@@ -89,7 +89,6 @@ impl Kind {
         match self {
             Self::Usage => "Invalid arguments, unrecognized command, or bad flag value.",
             Self::NotFound => "An input file or ID could not be found.",
-            Self::UnsupportedFormat => "No extraction handler matches the detected format.",
             Self::ExtractionFailed => "Parsing produced no usable body content.",
             Self::OutputExists => "An output file already exists and --force was not given.",
             Self::IoError => "A read or write operation failed.",
@@ -185,7 +184,6 @@ mod tests {
     fn codes_match_the_spec() {
         assert_eq!(Kind::Usage.code(), 2);
         assert_eq!(Kind::NotFound.code(), 3);
-        assert_eq!(Kind::UnsupportedFormat.code(), 4);
         assert_eq!(Kind::ExtractionFailed.code(), 5);
         assert_eq!(Kind::OutputExists.code(), 6);
         assert_eq!(Kind::IoError.code(), 7);

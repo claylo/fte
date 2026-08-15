@@ -88,12 +88,15 @@ and `--no-front` override the config per run.
 | 1 | `partial_failure` — some inputs succeeded, others failed |
 | 2 | `usage` |
 | 3 | `not_found` |
-| 4 | `unsupported_format` |
 | 5 | `extraction_failed` |
 | 6 | `output_exists` |
 | 7 | `io_error` |
 | 8 | `no_chapters` |
 | 9 | `config_error` |
+
+Codes are not contiguous: 4 (`unsupported_format`) is retired — no code path
+could ever produce it — rather than reused, so a script still checking for it
+fails closed instead of silently matching something else.
 
 With `--format json`, failures print a single-line envelope to stderr:
 
