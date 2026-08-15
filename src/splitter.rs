@@ -132,7 +132,10 @@ pub fn split(book: &str, doc: &Document, opts: &Options) -> Result<Vec<Written>>
             chunk.title.replace('\\', "\\\\").replace('"', "\\\"")
         ));
         if !chunk.src.is_empty() {
-            content.push_str(&format!("source: \"{}\"\n", chunk.src));
+            content.push_str(&format!(
+                "source: \"{}\"\n",
+                chunk.src.replace('\\', "\\\\").replace('"', "\\\"")
+            ));
         }
         content.push_str("---\n\n");
         content.push_str(chunk.body.trim());
@@ -158,9 +161,24 @@ fn disambiguate(path: PathBuf, n: usize, used: &HashSet<PathBuf>) -> PathBuf {
     let stem = path
         .file_stem()
         .and_then(|s| s.to_str())
-        .unwrap_or("chapter");
-    let ext = path.extension().and_then(|s| s.to_str()).unwrap_or("md");
-    path.with_file_name(format!("{stem}-{n}.{ext}"))
+        .unwrap_or("chapter")
+        .to_string();
+    let ext = path
+        .extension()
+        .and_then(|s| s.to_str())
+        .unwrap_or("md")
+        .to_string();
+
+    // The index alone is not enough: a chapter genuinely titled "one-3" can
+    // collide with chapter 3's disambiguated "one-3". Keep widening until the
+    // name is free — overwriting a chapter we already wrote loses content.
+    let mut candidate = path.with_file_name(format!("{stem}-{n}.{ext}"));
+    let mut extra = 2usize;
+    while used.contains(&candidate) {
+        candidate = path.with_file_name(format!("{stem}-{n}-{extra}.{ext}"));
+        extra += 1;
+    }
+    candidate
 }
 
 fn write_file(
@@ -310,11 +328,74 @@ Second body.
         let err = split("demo", &doc, &opts(tmp.path())).unwrap_err();
         assert!(err.to_string().contains("exists"));
 
+        let chapter_path = tmp.path().join("demo/01-one.md");
+        std::fs::write(&chapter_path, "sentinel: not real chapter content").unwrap();
+
         let forced = Options {
             force: true,
             ..opts(tmp.path())
         };
         assert!(split("demo", &doc, &forced).is_ok());
+
+        let body = std::fs::read_to_string(&chapter_path).unwrap();
+        assert!(!body.contains("sentinel"), "--force did not overwrite");
+        assert!(
+            body.contains("First body."),
+            "--force did not rewrite real content"
+        );
+    }
+
+    #[test]
+    fn disambiguation_never_overwrites_an_earlier_chapter() {
+        const TRICKY: &str = r#"---
+id: demo
+---
+
+<!-- fte:chapter-start id="ch01" title="One" src="a.xhtml" -->
+
+body one
+
+<!-- fte:chapter-end id="ch01" -->
+
+<!-- fte:chapter-start id="ch02" title="One-3" src="b.xhtml" -->
+
+body two
+
+<!-- fte:chapter-end id="ch02" -->
+
+<!-- fte:chapter-start id="ch03" title="One" src="c.xhtml" -->
+
+body three
+
+<!-- fte:chapter-end id="ch03" -->
+"#;
+        let tmp = tempfile::tempdir().unwrap();
+        let doc = chapter::parse(TRICKY);
+        let o = Options {
+            file: "{slug}.md".into(),
+            front: None,
+            force: true,
+            ..opts(tmp.path())
+        };
+        let written = split("demo", &doc, &o).unwrap();
+
+        // Three chapters must produce three distinct paths.
+        let mut paths: Vec<_> = written.iter().map(|w| w.path.clone()).collect();
+        paths.sort();
+        paths.dedup();
+        assert_eq!(paths.len(), 3, "a chapter overwrote another chapter");
+
+        // And every body must survive.
+        let bodies: Vec<String> = written
+            .iter()
+            .map(|w| std::fs::read_to_string(&w.path).unwrap())
+            .collect();
+        for expected in ["body one", "body two", "body three"] {
+            assert!(
+                bodies.iter().any(|b| b.contains(expected)),
+                "{expected} was lost"
+            );
+        }
     }
 
     #[test]
