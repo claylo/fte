@@ -127,6 +127,94 @@ fn existing_output_is_refused_without_force() {
 }
 
 #[test]
+fn an_io_failure_message_carries_the_root_cause() {
+    // I7: `with_context(|| "creating {dir}")` used to render as just that
+    // outer layer via `e.to_string()`, dropping the io::Error source that
+    // actually explains the failure (e.g. "Permission denied").
+    let tmp = tempfile::tempdir().unwrap();
+    let locked = tmp.path().join("locked");
+    std::fs::create_dir(&locked).unwrap();
+    let mut perms = std::fs::metadata(&locked).unwrap().permissions();
+    perms.set_readonly(true);
+    std::fs::set_permissions(&locked, perms).unwrap();
+
+    let assert = fte()
+        .args(["split", "--outdir"])
+        .arg(locked.join("out"))
+        .arg(BOOK)
+        .assert()
+        .failure();
+
+    let mut perms = std::fs::metadata(&locked).unwrap().permissions();
+    #[allow(clippy::permissions_set_readonly_false)]
+    perms.set_readonly(false);
+    std::fs::set_permissions(&locked, perms).unwrap();
+
+    let out = assert.get_output();
+    let stderr = String::from_utf8(out.stderr.clone()).unwrap();
+    assert!(
+        stderr.to_lowercase().contains("permission denied")
+            || stderr.to_lowercase().contains("denied"),
+        "expected the io::Error cause in the message, got: {stderr}"
+    );
+    assert!(
+        stderr.contains("creating"),
+        "outer context should survive too: {stderr}"
+    );
+}
+
+#[test]
+fn an_unterminated_trailing_chapter_fails_instead_of_vanishing() {
+    // Regression for C1: two chapters, the second missing its chapter-end.
+    // The old behavior silently dropped chapter two and exited 0.
+    let src = tempfile::tempdir().unwrap();
+    let input = src.path().join("trunc.md");
+    std::fs::write(
+        &input,
+        "---\nid: trunc\n---\n\n# T\n\n\
+         <!-- fte:chapter-start id=\"ch01\" title=\"One\" src=\"a.xhtml\" -->\n\n\
+         ## One\n\nbody one\n\n\
+         <!-- fte:chapter-end id=\"ch01\" -->\n\n\
+         <!-- fte:chapter-start id=\"ch02\" title=\"Two\" src=\"b.xhtml\" -->\n\n\
+         ## Two\n\nbody two IMPORTANT\n",
+    )
+    .unwrap();
+
+    let tmp = tempfile::tempdir().unwrap();
+    fte()
+        .args(["split", "--format", "text", "--outdir"])
+        .arg(tmp.path())
+        .arg(&input)
+        .assert()
+        .failure()
+        .code(5)
+        .stderr(predicate::str::contains("ch02"));
+
+    // No file anywhere in the output tree may contain the lost chapter's body.
+    let leaked = walkdir_contains(tmp.path(), "body two IMPORTANT");
+    assert!(!leaked, "chapter two's content leaked despite the failure");
+}
+
+fn walkdir_contains(dir: &std::path::Path, needle: &str) -> bool {
+    if !dir.exists() {
+        return false;
+    }
+    for entry in std::fs::read_dir(dir).unwrap().filter_map(|e| e.ok()) {
+        let path = entry.path();
+        if path.is_dir() {
+            if walkdir_contains(&path, needle) {
+                return true;
+            }
+        } else if let Ok(content) = std::fs::read_to_string(&path)
+            && content.contains(needle)
+        {
+            return true;
+        }
+    }
+    false
+}
+
+#[test]
 fn one_shot_epub_split_matches_the_two_step_result() {
     let one_shot = tempfile::tempdir().unwrap();
     let two_step = tempfile::tempdir().unwrap();

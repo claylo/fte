@@ -46,6 +46,8 @@ pub struct Written {
 /// target exists without `force`, or a write fails.
 pub fn split(book: &str, doc: &Document, opts: &Options) -> Result<Vec<Written>> {
     if doc.chapters.is_empty() {
+        // keep in sync with cmd/split.rs: matched by substring against
+        // "no chapter markers" to classify this as Kind::NoChapters.
         bail!("no chapter markers in {book}; only book-length ePub output carries them");
     }
 
@@ -188,6 +190,8 @@ fn write_file(
     used: &mut HashSet<PathBuf>,
 ) -> Result<()> {
     if !force && path.exists() {
+        // keep in sync with cmd/split.rs: matched by substring against
+        // "pass --force to overwrite" to classify this as Kind::OutputExists.
         bail!("{} exists; pass --force to overwrite", path.display());
     }
     std::fs::write(path, content).with_context(|| format!("writing {}", path.display()))?;

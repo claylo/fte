@@ -52,6 +52,16 @@ pub fn run(
 
     let doc = chapter::parse(&md);
 
+    if let Some(reason) = &doc.unterminated {
+        // An unbalanced document is corrupt input, not a shape to paper
+        // over: emitting a short tree and exiting 0 would silently drop the
+        // unterminated chapter's content. See chapter::parse.
+        return Err(AppError::new(
+            Kind::ExtractionFailed,
+            format!("{}: {reason}", args.input.display()),
+        ));
+    }
+
     let front = if args.no_front {
         None
     } else {
@@ -78,16 +88,27 @@ pub fn run(
     };
 
     let written = splitter::split(&book, &doc, &opts).map_err(|e| {
-        let msg = e.to_string();
-        let kind = if msg.contains("no chapter markers") {
+        // `e.to_string()` alone renders only the outermost `with_context`
+        // layer ("creating {dir}"), dropping the io::Error source chain
+        // that actually explains the failure (permission denied, no space,
+        // …). Classification below still matches on the outermost message —
+        // keep in sync with the `bail!`/`Display` sites in splitter.rs — but
+        // the message shown to the user carries the full chain.
+        let outer = e.to_string();
+        let kind = if outer.contains("no chapter markers") {
             Kind::NoChapters
-        } else if msg.contains("unknown template token") || msg.contains("unterminated") {
+        } else if outer.contains("unknown template token") || outer.contains("unterminated") {
             Kind::ConfigError
-        } else if msg.contains("pass --force to overwrite") {
+        } else if outer.contains("pass --force to overwrite") {
             Kind::OutputExists
         } else {
             Kind::IoError
         };
+        let msg = e
+            .chain()
+            .map(ToString::to_string)
+            .collect::<Vec<_>>()
+            .join(": ");
         AppError::new(kind, msg)
     })?;
 

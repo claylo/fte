@@ -29,6 +29,9 @@ pub enum TemplateError {
 }
 
 impl fmt::Display for TemplateError {
+    // keep in sync with cmd/split.rs: both arms are matched by substring
+    // ("unknown template token", "unterminated") to classify a template
+    // failure as Kind::ConfigError.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::UnknownToken(token) => write!(
