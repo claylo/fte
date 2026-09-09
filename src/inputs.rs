@@ -101,19 +101,78 @@ pub fn resolve(
         if p.exists() {
             paths.push(p.to_path_buf());
         } else {
-            let epub = input_dir.join(format!("{input}.epub"));
+            // Structured markup first. A journal article fetched as both
+            // JATS/Wiley XML and ePub gets the XML: the ePub is a reflow that
+            // drops tables and references. This is also the order a full
+            // directory scan produces, since sorted paths make the `.xml`
+            // output overwrite the `.epub` one.
             let xml = input_dir.join(format!("{input}.xml"));
             let html = input_dir.join(format!("{input}.html"));
-            if epub.exists() {
-                paths.push(epub);
-            } else if xml.exists() {
+            let epub = input_dir.join(format!("{input}.epub"));
+            if xml.exists() {
                 paths.push(xml);
             } else if html.exists() {
                 paths.push(html);
+            } else if epub.exists() {
+                paths.push(epub);
             } else {
                 missing.push(input.clone());
             }
         }
     }
     Ok(Resolved { paths, missing })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// An id with several publisher files resolves to the structured XML,
+    /// matching what a directory scan already does (sorted paths, so the
+    /// `.xml` output overwrites the `.epub` one). The ePub of a journal
+    /// article is a lossy reflow that drops tables and references.
+    #[test]
+    fn by_id_lookup_prefers_xml_over_epub_and_html() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        for ext in ["epub", "xml", "html"] {
+            fs::write(dir.path().join(format!("paper-2026.{ext}")), b"x").expect("write");
+        }
+        let resolved = resolve(
+            &["paper-2026".to_string()],
+            dir.path(),
+            InputDirOrigin::Default,
+            Render::Text,
+        )
+        .expect("resolves");
+        assert_eq!(resolved.paths.len(), 1);
+        assert_eq!(
+            resolved.paths[0].extension().and_then(|e| e.to_str()),
+            Some("xml"),
+            "got {:?}",
+            resolved.paths
+        );
+        assert!(resolved.missing.is_empty());
+    }
+
+    #[test]
+    fn by_id_lookup_falls_back_to_html_then_epub() {
+        let dir = tempfile::tempdir().expect("tempdir");
+        fs::write(dir.path().join("a.html"), b"x").expect("write");
+        fs::write(dir.path().join("a.epub"), b"x").expect("write");
+        fs::write(dir.path().join("b.epub"), b"x").expect("write");
+        let resolved = resolve(
+            &["a".to_string(), "b".to_string(), "c".to_string()],
+            dir.path(),
+            InputDirOrigin::Default,
+            Render::Text,
+        )
+        .expect("resolves");
+        let exts: Vec<_> = resolved
+            .paths
+            .iter()
+            .map(|p| p.extension().and_then(|e| e.to_str()).unwrap_or(""))
+            .collect();
+        assert_eq!(exts, vec!["html", "epub"]);
+        assert_eq!(resolved.missing, vec!["c".to_string()]);
+    }
 }

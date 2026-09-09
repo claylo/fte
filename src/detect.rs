@@ -134,6 +134,33 @@ fn matches_profile(head: &str, profile: &PublisherProfile) -> bool {
 mod tests {
     use super::*;
 
+    /// Taylor & Francis full-text pages run on the same Atypon platform as
+    /// ACS and carry `NLM_sec_level_*` section classes. Profiles are matched
+    /// alphabetically, so a generic marker on `acs` captured every T&F page
+    /// and its `div.NLM_sec_level_1` body selector kept one section of it.
+    #[test]
+    fn tandf_fulltext_with_nlm_sections_is_not_detected_as_acs() {
+        let head = r#"<html><head><meta name="dc.Publisher" content="Taylor &amp; Francis Group">
+            <link rel="canonical" href="https://www.tandfonline.com/doi/full/10.1080/x"></head>
+            <body><div class="hlFld-Fulltext"><div class="NLM_sec NLM_sec_level_1"><p>body</p></div></div>"#;
+        let config = Config::default();
+        match detect_html(head, &config) {
+            Format::Html { name, .. } => assert_eq!(name, "tandf"),
+            other => panic!("expected an HTML profile, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn acs_pages_still_detect_by_their_own_domain() {
+        let head = r#"<html><head><link rel="canonical" href="https://pubs.acs.org/doi/10.1021/x"></head>
+            <body><div class="article_content"><div class="NLM_sec NLM_sec_level_1"><p>body</p></div></div>"#;
+        let config = Config::default();
+        match detect_html(head, &config) {
+            Format::Html { name, .. } => assert_eq!(name, "acs"),
+            other => panic!("expected an HTML profile, got {other:?}"),
+        }
+    }
+
     /// A string whose final character is multi-byte and straddles `boundary`,
     /// so slicing at exactly `boundary` splits a UTF-8 code point.
     fn straddling(boundary: usize) -> String {

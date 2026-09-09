@@ -284,11 +284,10 @@ fn default_publishers() -> BTreeMap<String, PublisherProfile> {
     m.insert(
         "acs".into(),
         PublisherProfile {
-            detect_any: vec![
-                "pubs.acs.org".into(),
-                "pubs-acs-org".into(),
-                "NLM_sec_level".into(),
-            ],
+            // No platform-generic markers here: `NLM_sec_level_*` is Atypon
+            // markup that Taylor & Francis full texts also carry, and "acs"
+            // sorts before "tandf" in the profile map.
+            detect_any: vec!["pubs.acs.org".into(), "pubs-acs-org".into()],
             body_selectors: vec![
                 "div.article_content-left".into(),
                 "div.article_content".into(),
