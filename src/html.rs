@@ -407,7 +407,11 @@ fn element_text_at(el: &ElementRef, depth: usize) -> String {
             Node::Element(_) => {
                 if let Some(child_el) = ElementRef::wrap(child) {
                     let tag = child_el.value().name();
-                    if !matches!(tag, "script" | "style" | "svg") {
+                    if tag == "br" {
+                        // A break separates words ("Stories<br/>as"); callers
+                        // normalize it to a space, as inline_markdown's is.
+                        out.push('\n');
+                    } else if !matches!(tag, "script" | "style" | "svg") {
                         out.push_str(&element_text_at(&child_el, depth + 1));
                     }
                 }
@@ -476,5 +480,18 @@ mod tests {
 
         assert_eq!(element_text(&p), "hello world");
         assert_eq!(inline_markdown(&p, &[]), "hello **world**");
+    }
+
+    #[test]
+    fn a_line_break_in_a_heading_separates_its_words() {
+        let doc = Html::parse_document(
+            "<html><body><h1>Defining Stories<br/>as Precipitates</h1></body></html>",
+        );
+        let sel = Selector::parse("body").unwrap();
+        let body = doc.select(&sel).next().unwrap();
+
+        let mut out = String::new();
+        walk_element(&body, &[], &mut out, 0);
+        assert_eq!(out, "# Defining Stories as Precipitates\n\n");
     }
 }

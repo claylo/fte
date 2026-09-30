@@ -5,6 +5,7 @@ use anyhow::{Context, Result};
 use scraper::{ElementRef, Html, Selector};
 
 use crate::chapter;
+use crate::depth::{MAX_XML_DEPTH, xml_depth_exceeds};
 use crate::html;
 use crate::markdown::{self, Metadata};
 
@@ -15,15 +16,19 @@ use crate::markdown::{self, Metadata};
 /// OPF is missing or unparseable.
 ///
 /// For book-length epubs (many spine files, no schema.org metadata), switches
-/// to a per-chapter extraction strategy using the nav TOC for structure.
+/// to a per-chapter extraction strategy using the nav TOC for structure. An
+/// EPUB2 book has no nav document, so its NCX supplies the same structure.
 pub fn extract(id: &str, path: &Path) -> Result<String> {
     let file = std::fs::File::open(path).with_context(|| format!("opening {}", path.display()))?;
     let mut archive =
         zip::ZipArchive::new(file).with_context(|| format!("reading zip: {}", path.display()))?;
 
-    let (content_paths, opf_meta, nav_path) = discover_content_paths(&mut archive)?;
-    let nav_entries = nav_path
+    let (content_paths, opf_meta, toc) = discover_content_paths(&mut archive)?;
+    let nav_entries = toc
+        .nav
         .and_then(|p| parse_nav_toc(&mut archive, &p).ok())
+        .filter(|entries| !entries.is_empty())
+        .or_else(|| toc.ncx.and_then(|p| parse_ncx_toc(&mut archive, &p).ok()))
         .unwrap_or_default();
 
     let is_book = content_paths.len() > 5 && !nav_entries.is_empty();
@@ -248,6 +253,74 @@ fn parse_nav_ol(ol: &ElementRef, nav_dir: &str) -> Vec<NavEntry> {
     }
 
     entries
+}
+
+/// Parse an EPUB2 NCX `navMap` into the entries the EPUB3 nav TOC yields.
+fn parse_ncx_toc(
+    archive: &mut zip::ZipArchive<std::fs::File>,
+    ncx_path: &str,
+) -> Result<Vec<NavEntry>> {
+    let ncx_dir = ncx_path.rfind('/').map(|i| &ncx_path[..=i]).unwrap_or("");
+    let content = read_entry(archive, ncx_path)?;
+
+    // roxmltree recurses while parsing, so over-deep input aborts inside the
+    // parser where no error handling can reach it (see crate::depth).
+    if xml_depth_exceeds(&content, MAX_XML_DEPTH) {
+        anyhow::bail!("{ncx_path} nests deeper than {MAX_XML_DEPTH} elements; refusing to parse");
+    }
+
+    // Publisher NCX files routinely declare the NISO ncx-2005-1 DTD, and
+    // roxmltree refuses any DTD unless told otherwise. It never fetches the
+    // external subset, so allowing the declaration only means parsing it.
+    let opts = roxmltree::ParsingOptions {
+        allow_dtd: true,
+        ..Default::default()
+    };
+    let doc = roxmltree::Document::parse_with_options(&content, opts)
+        .with_context(|| format!("parsing {ncx_path}"))?;
+
+    let Some(nav_map) = doc.descendants().find(|n| n.tag_name().name() == "navMap") else {
+        return Ok(Vec::new());
+    };
+
+    Ok(parse_nav_points(nav_map, ncx_dir))
+}
+
+fn parse_nav_points(parent: roxmltree::Node, ncx_dir: &str) -> Vec<NavEntry> {
+    parent
+        .children()
+        .filter(|n| n.tag_name().name() == "navPoint")
+        .map(|point| {
+            let label = point
+                .children()
+                .find(|n| n.tag_name().name() == "navLabel")
+                .map(|l| {
+                    let text: String = l
+                        .descendants()
+                        .filter(|n| n.is_text())
+                        .filter_map(|n| n.text())
+                        .collect();
+                    markdown::normalize_text(&text)
+                })
+                .unwrap_or_default();
+
+            let href = point
+                .children()
+                .find(|n| n.tag_name().name() == "content")
+                .and_then(|c| c.attribute("src"))
+                .map(|src| {
+                    let file_href = src.split('#').next().unwrap_or(src);
+                    format!("{ncx_dir}{file_href}")
+                })
+                .unwrap_or_default();
+
+            NavEntry {
+                label,
+                href,
+                children: parse_nav_points(point, ncx_dir),
+            }
+        })
+        .collect()
 }
 
 fn is_direct_child_of(child: ElementRef, parent: &ElementRef) -> bool {
@@ -582,11 +655,21 @@ fn looks_like_junk_title(t: &str) -> bool {
     false
 }
 
+/// Where an ePub keeps its table of contents: an EPUB3 nav document, an
+/// EPUB2 NCX, or both (EPUB3 files often ship an NCX for older readers).
+#[derive(Debug, Default)]
+struct TocPaths {
+    nav: Option<String>,
+    ncx: Option<String>,
+}
+
+const NCX_MEDIA_TYPE: &str = "application/x-dtbncx+xml";
+
 /// Discover content XHTML paths from the OPF spine, plus Dublin Core metadata,
-/// plus the nav document path (if any).
+/// plus the table-of-contents document paths (if any).
 fn discover_content_paths(
     archive: &mut zip::ZipArchive<std::fs::File>,
-) -> Result<(Vec<String>, Metadata, Option<String>)> {
+) -> Result<(Vec<String>, Metadata, TocPaths)> {
     let opf_path = find_opf_path(archive)?;
     let opf_dir = opf_path.rfind('/').map(|i| &opf_path[..=i]).unwrap_or("");
 
@@ -599,7 +682,7 @@ fn discover_content_paths(
     // Build manifest: id → href (resolved relative to OPF directory)
     let mut manifest = std::collections::HashMap::new();
     let mut nav_ids = std::collections::HashSet::new();
-    let mut nav_path: Option<String> = None;
+    let mut toc = TocPaths::default();
 
     for node in doc.descendants() {
         if node.tag_name().name() == "item"
@@ -609,7 +692,10 @@ fn discover_content_paths(
             let full_path = format!("{opf_dir}{href}");
             if props.contains("nav") {
                 nav_ids.insert(item_id.to_string());
-                nav_path = Some(full_path.clone());
+                toc.nav = Some(full_path.clone());
+            }
+            if node.attribute("media-type") == Some(NCX_MEDIA_TYPE) {
+                toc.ncx = Some(full_path.clone());
             }
             manifest.insert(item_id.to_string(), full_path);
         }
@@ -661,7 +747,7 @@ fn discover_content_paths(
         .collect();
     paths.extend(overflow_names);
 
-    Ok((paths, opf_meta, nav_path))
+    Ok((paths, opf_meta, toc))
 }
 
 /// Extract Dublin Core metadata from the OPF document.
@@ -1023,6 +1109,33 @@ mod tests {
         assert!(
             err.to_string().contains("not valid UTF-8"),
             "should name the encoding problem: {err}"
+        );
+
+        let _ = std::fs::remove_file(&p);
+    }
+
+    fn nested_ncx(depth: usize) -> String {
+        let mut x = String::from(r#"<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/"><navMap>"#);
+        for _ in 0..depth {
+            x.push_str(r#"<navPoint><navLabel><text>x</text></navLabel><content src="a.html"/>"#);
+        }
+        for _ in 0..depth {
+            x.push_str("</navPoint>");
+        }
+        x.push_str("</navMap></ncx>");
+        x
+    }
+
+    #[test]
+    fn a_deeply_nested_ncx_is_refused_rather_than_aborting() {
+        let p = temp_zip("deep-ncx", "OEBPS/toc.ncx", nested_ncx(5_000).as_bytes());
+        let mut a = open(&p);
+
+        let err = parse_ncx_toc(&mut a, "OEBPS/toc.ncx")
+            .expect_err("deep input must be refused, not parsed");
+        assert!(
+            err.to_string().contains("nests deeper"),
+            "error should name the depth limit: {err}"
         );
 
         let _ = std::fs::remove_file(&p);
