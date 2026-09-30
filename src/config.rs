@@ -9,8 +9,22 @@ pub struct Config {
     pub input_dir: String,
     pub output_dir: String,
     pub split: SplitConfig,
+    pub epub: EpubConfig,
     pub publishers: BTreeMap<String, PublisherProfile>,
     pub fallback: PublisherProfile,
+}
+
+/// Book-length ePub extraction settings.
+#[derive(Debug, Default, Clone, Deserialize, Serialize)]
+#[serde(default)]
+pub struct EpubConfig {
+    /// Publisher → element class → Markdown heading level (2 is `##`).
+    ///
+    /// For books that style section heads as `<p class="…">` rather than
+    /// `<hN>`. The publisher is the OPF's `dc:publisher`, matched exactly
+    /// after trimming. A class listed here outranks the level a TOC link
+    /// would give the same paragraph.
+    pub heading_classes: BTreeMap<String, BTreeMap<String, u8>>,
 }
 
 /// Naming rules for `fte split` output.
@@ -68,6 +82,7 @@ impl Default for Config {
             input_dir: "ref/epub".into(),
             output_dir: "ref/epub-md".into(),
             split: SplitConfig::default(),
+            epub: EpubConfig::default(),
             publishers: default_publishers(),
             fallback: fallback_profile(),
         }

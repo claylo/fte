@@ -4,7 +4,10 @@ use std::path::Path;
 use anyhow::{Context, Result};
 use scraper::{ElementRef, Html, Selector};
 
+use std::collections::BTreeMap;
+
 use crate::chapter;
+use crate::config::EpubConfig;
 use crate::depth::{MAX_XML_DEPTH, xml_depth_exceeds};
 use crate::html;
 use crate::markdown::{self, Metadata};
@@ -18,33 +21,44 @@ use crate::markdown::{self, Metadata};
 /// For book-length epubs (many spine files, no schema.org metadata), switches
 /// to a per-chapter extraction strategy using the nav TOC for structure. An
 /// EPUB2 book has no nav document, so its NCX supplies the same structure.
-pub fn extract(id: &str, path: &Path) -> Result<String> {
+pub fn extract(id: &str, path: &Path, cfg: &EpubConfig) -> Result<String> {
     let file = std::fs::File::open(path).with_context(|| format!("opening {}", path.display()))?;
     let mut archive =
         zip::ZipArchive::new(file).with_context(|| format!("reading zip: {}", path.display()))?;
 
-    let (content_paths, opf_meta, toc) = discover_content_paths(&mut archive)?;
-    let nav_entries = toc
+    let package = discover_content_paths(&mut archive)?;
+    let nav_entries = package
+        .toc
         .nav
         .and_then(|p| parse_nav_toc(&mut archive, &p).ok())
         .filter(|entries| !entries.is_empty())
-        .or_else(|| toc.ncx.and_then(|p| parse_ncx_toc(&mut archive, &p).ok()))
+        .or_else(|| {
+            package
+                .toc
+                .ncx
+                .and_then(|p| parse_ncx_toc(&mut archive, &p).ok())
+        })
         .unwrap_or_default();
 
-    let is_book = content_paths.len() > 5 && !nav_entries.is_empty();
+    let is_book = package.content_paths.len() > 5 && !nav_entries.is_empty();
 
     if is_book {
         let subheading_classes = detect_subheading_classes(&mut archive);
+        let heading_classes = package
+            .publisher
+            .as_deref()
+            .and_then(|p| cfg.heading_classes.get(p));
         extract_book(
             id,
             &mut archive,
-            &content_paths,
-            &opf_meta,
+            &package.content_paths,
+            &package.meta,
             &nav_entries,
             &subheading_classes,
+            heading_classes,
         )
     } else {
-        extract_paper(id, &mut archive, &content_paths, &opf_meta)
+        extract_paper(id, &mut archive, &package.content_paths, &package.meta)
     }
 }
 
@@ -87,8 +101,10 @@ fn extract_book(
     opf_meta: &Metadata,
     nav_entries: &[NavEntry],
     subheading_classes: &[String],
+    heading_classes: Option<&BTreeMap<String, u8>>,
 ) -> Result<String> {
     let file_to_nav = build_file_nav_map(nav_entries);
+    let toc_levels = toc_heading_levels(nav_entries);
 
     let mut body = String::new();
     let mut included_any = false;
@@ -117,6 +133,20 @@ fn extract_book(
                 eprintln!("  WARN skipping {entry_path}: {e}");
                 continue;
             }
+        };
+
+        // A paragraph the TOC links to is a section head, styled or not, and
+        // so is one whose class the config maps to a level for this publisher.
+        let by_id = toc_levels.get(entry_path.as_str());
+        let xhtml = if by_id.is_some() || heading_classes.is_some() {
+            promote_paragraphs(&xhtml, |id, class| {
+                let from_class = class.zip(heading_classes).and_then(|(class, map)| {
+                    class.split_whitespace().find_map(|c| map.get(c).copied())
+                });
+                from_class.or_else(|| id.zip(by_id).and_then(|(id, m)| m.get(id).copied()))
+            })
+        } else {
+            xhtml
         };
 
         // Promote styled <p> subheadings to <h3> before parsing
@@ -182,8 +212,20 @@ fn extract_book(
 #[derive(Debug)]
 struct NavEntry {
     label: String,
+    /// Spine file the entry points at, without its fragment.
     href: String,
+    /// The `#id` part of the entry's link, when it points inside a file.
+    fragment: Option<String>,
     children: Vec<NavEntry>,
+}
+
+/// Split a TOC link into the file it points at and its fragment, if any.
+fn split_href(href: &str) -> (&str, Option<&str>) {
+    match href.split_once('#') {
+        Some((file, frag)) if !frag.is_empty() => (file, Some(frag)),
+        Some((file, _)) => (file, None),
+        None => (href, None),
+    }
 }
 
 /// Parse the EPUB3 navigation document's TOC.
@@ -235,7 +277,7 @@ fn parse_nav_ol(ol: &ElementRef, nav_dir: &str) -> Vec<NavEntry> {
         if let Some(a) = li.select(&a_sel).next() {
             let label = markdown::normalize_text(&html::element_text(&a));
             let href = a.value().attr("href").unwrap_or("");
-            let file_href = href.split('#').next().unwrap_or(href);
+            let (file_href, fragment) = split_href(href);
             let full_href = format!("{nav_dir}{file_href}");
 
             let children = li
@@ -247,6 +289,7 @@ fn parse_nav_ol(ol: &ElementRef, nav_dir: &str) -> Vec<NavEntry> {
             entries.push(NavEntry {
                 label,
                 href: full_href,
+                fragment: fragment.map(str::to_owned),
                 children,
             });
         }
@@ -304,19 +347,21 @@ fn parse_nav_points(parent: roxmltree::Node, ncx_dir: &str) -> Vec<NavEntry> {
                 })
                 .unwrap_or_default();
 
-            let href = point
+            let src = point
                 .children()
                 .find(|n| n.tag_name().name() == "content")
-                .and_then(|c| c.attribute("src"))
-                .map(|src| {
-                    let file_href = src.split('#').next().unwrap_or(src);
-                    format!("{ncx_dir}{file_href}")
-                })
-                .unwrap_or_default();
+                .and_then(|c| c.attribute("src"));
+            let (href, fragment) = match src.map(split_href) {
+                Some((file_href, fragment)) => {
+                    (format!("{ncx_dir}{file_href}"), fragment.map(str::to_owned))
+                }
+                None => (String::new(), None),
+            };
 
             NavEntry {
                 label,
                 href,
+                fragment,
                 children: parse_nav_points(point, ncx_dir),
             }
         })
@@ -328,6 +373,49 @@ fn is_direct_child_of(child: ElementRef, parent: &ElementRef) -> bool {
         .parent()
         .map(|p| p.id() == parent.id())
         .unwrap_or(false)
+}
+
+/// Heading levels for the elements a TOC links to by fragment, keyed by
+/// spine file and then element id.
+///
+/// A level is relative to the file's shallowest TOC entry: a section listed
+/// one level under its chapter is `2` (`##`), below the chapter title's `#`.
+fn toc_heading_levels(
+    entries: &[NavEntry],
+) -> std::collections::HashMap<String, std::collections::HashMap<String, u8>> {
+    use std::collections::HashMap;
+
+    fn walk<'a>(entries: &'a [NavEntry], depth: usize, out: &mut Vec<(&'a NavEntry, usize)>) {
+        for entry in entries {
+            out.push((entry, depth));
+            walk(&entry.children, depth + 1, out);
+        }
+    }
+    let mut flat = Vec::new();
+    walk(entries, 0, &mut flat);
+
+    let mut shallowest: HashMap<&str, usize> = HashMap::new();
+    for (entry, depth) in &flat {
+        if !entry.href.is_empty() {
+            let d = shallowest.entry(entry.href.as_str()).or_insert(*depth);
+            *d = (*d).min(*depth);
+        }
+    }
+
+    let mut levels: HashMap<String, HashMap<String, u8>> = HashMap::new();
+    for (entry, depth) in &flat {
+        let (Some(fragment), Some(&top)) = (&entry.fragment, shallowest.get(entry.href.as_str()))
+        else {
+            continue;
+        };
+        let level = u8::try_from(depth - top + 1).unwrap_or(6).min(6);
+        levels
+            .entry(entry.href.clone())
+            .or_default()
+            .entry(fragment.clone())
+            .or_insert(level);
+    }
+    levels
 }
 
 /// Build a map from file path → nav label (flattening the TOC tree).
@@ -556,6 +644,120 @@ fn extract_css_class_name(css_block: &str) -> Option<String> {
     }
 }
 
+/// Rewrite `<p …>…</p>` as `<hN …>…</hN>` wherever `level_for` names a level
+/// for the paragraph's `id` and `class` attributes, keeping the attributes.
+///
+/// Some publishers style section heads as paragraphs. Like
+/// `promote_subheadings`, this works on the raw XHTML before parsing; a `<p>`
+/// cannot contain another `<p>`, so the next `</p>` closes it.
+fn promote_paragraphs(
+    xhtml: &str,
+    level_for: impl Fn(Option<&str>, Option<&str>) -> Option<u8>,
+) -> String {
+    const CLOSE: &str = "</p>";
+    let mut out = String::with_capacity(xhtml.len());
+    let mut rest = xhtml;
+
+    while let Some(start) = find_p_start(rest) {
+        let Some(tag_len) = start_tag_len(&rest[start..]) else {
+            break;
+        };
+        let after = start + tag_len;
+        let tag = &rest[start..after];
+        let self_closing = tag.ends_with("/>");
+
+        let level = if self_closing {
+            None
+        } else {
+            level_for(tag_attr(tag, "id"), tag_attr(tag, "class"))
+        };
+        match level.zip(rest[after..].find(CLOSE)) {
+            Some((level, close)) => {
+                // HTML has h1-h6; anything else would parse as an unknown
+                // element and the walker would drop its text.
+                let level = level.clamp(1, 6);
+                out.push_str(&rest[..start]);
+                out.push_str(&format!("<h{level}"));
+                out.push_str(&tag[2..]);
+                out.push_str(&rest[after..after + close]);
+                out.push_str(&format!("</h{level}>"));
+                rest = &rest[after + close + CLOSE.len()..];
+            }
+            None => {
+                out.push_str(&rest[..after]);
+                rest = &rest[after..];
+            }
+        }
+    }
+    out.push_str(rest);
+    out
+}
+
+/// Offset of the next `<p` start tag (not `<pre`, `<param`, …).
+fn find_p_start(s: &str) -> Option<usize> {
+    s.match_indices("<p").map(|(i, _)| i).find(|&i| {
+        matches!(
+            s.as_bytes().get(i + 2),
+            Some(b' ' | b'\t' | b'\n' | b'\r' | b'>' | b'/')
+        )
+    })
+}
+
+/// Length of the start tag at the beginning of `s`, through its `>`, skipping
+/// any `>` inside a quoted attribute value.
+fn start_tag_len(s: &str) -> Option<usize> {
+    let mut quote = None;
+    for (i, b) in s.bytes().enumerate() {
+        match (quote, b) {
+            (None, b'"' | b'\'') => quote = Some(b),
+            (Some(q), _) if b == q => quote = None,
+            (None, b'>') => return Some(i + 1),
+            _ => {}
+        }
+    }
+    None
+}
+
+/// Value of attribute `name` in a start tag such as `<p class="x" id='y'>`.
+fn tag_attr<'a>(tag: &'a str, name: &str) -> Option<&'a str> {
+    let mut rest = tag.trim_start_matches('<');
+    // Skip the element name.
+    rest = rest.trim_start_matches(|c: char| !c.is_whitespace() && c != '>' && c != '/');
+    loop {
+        rest = rest.trim_start();
+        let name_end =
+            rest.find(|c: char| c == '=' || c.is_whitespace() || c == '>' || c == '/')?;
+        if name_end == 0 {
+            return None;
+        }
+        let attr = &rest[..name_end];
+        rest = rest[name_end..].trim_start();
+        let value = if let Some(after_eq) = rest.strip_prefix('=') {
+            let after_eq = after_eq.trim_start();
+            let (value, tail) = match after_eq.chars().next()? {
+                q @ ('"' | '\'') => {
+                    let body = &after_eq[1..];
+                    let end = body.find(q)?;
+                    (&body[..end], &body[end + 1..])
+                }
+                _ => {
+                    let end = after_eq
+                        .find(|c: char| c.is_whitespace() || c == '>')
+                        .unwrap_or(after_eq.len());
+                    (&after_eq[..end], &after_eq[end..])
+                }
+            };
+            rest = tail;
+            Some(value)
+        } else {
+            None
+        };
+        if attr.eq_ignore_ascii_case(name) {
+            return value;
+        }
+    }
+}
+
 /// Rewrite `<p class="SUBHEADING_CLASS">...</p>` to `<h3>...</h3>` so that
 /// `walk_element` emits them as markdown headings.
 fn promote_subheadings(xhtml: &str, classes: &[String]) -> String {
@@ -595,7 +797,7 @@ fn has_heading_in_body(doc: &Html) -> bool {
     for tag in ["h1", "h2", "h3"] {
         if let Ok(sel) = Selector::parse(tag) {
             for el in doc.select(&sel) {
-                let text = html::element_text(&el).trim().to_string();
+                let text = markdown::normalize_text(&html::element_text(&el));
                 if !text.is_empty() && !looks_like_junk_title(&text) {
                     return true;
                 }
@@ -665,11 +867,19 @@ struct TocPaths {
 
 const NCX_MEDIA_TYPE: &str = "application/x-dtbncx+xml";
 
+/// What the OPF package document says about an ePub.
+struct Package {
+    /// Spine content files in reading order, plus overflow table/figure files.
+    content_paths: Vec<String>,
+    meta: Metadata,
+    toc: TocPaths,
+    /// `dc:publisher`, trimmed.
+    publisher: Option<String>,
+}
+
 /// Discover content XHTML paths from the OPF spine, plus Dublin Core metadata,
 /// plus the table-of-contents document paths (if any).
-fn discover_content_paths(
-    archive: &mut zip::ZipArchive<std::fs::File>,
-) -> Result<(Vec<String>, Metadata, TocPaths)> {
+fn discover_content_paths(archive: &mut zip::ZipArchive<std::fs::File>) -> Result<Package> {
     let opf_path = find_opf_path(archive)?;
     let opf_dir = opf_path.rfind('/').map(|i| &opf_path[..=i]).unwrap_or("");
 
@@ -747,7 +957,20 @@ fn discover_content_paths(
         .collect();
     paths.extend(overflow_names);
 
-    Ok((paths, opf_meta, toc))
+    let publisher = doc
+        .descendants()
+        .find(|n| n.tag_name().name() == "publisher" && n.tag_name().namespace().is_some())
+        .and_then(|n| n.text())
+        .map(str::trim)
+        .filter(|p| !p.is_empty())
+        .map(str::to_owned);
+
+    Ok(Package {
+        content_paths: paths,
+        meta: opf_meta,
+        toc,
+        publisher,
+    })
 }
 
 /// Extract Dublin Core metadata from the OPF document.
@@ -1139,6 +1362,31 @@ mod tests {
         );
 
         let _ = std::fs::remove_file(&p);
+    }
+
+    fn by_id(id: Option<&str>, _class: Option<&str>) -> Option<u8> {
+        (id == Some("s1")).then_some(2)
+    }
+
+    #[test]
+    fn a_quoted_gt_does_not_end_the_start_tag() {
+        let got = promote_paragraphs(r#"<p title="a>b" id="s1"><b>X</b></p>"#, by_id);
+        assert_eq!(got, r#"<h2 title="a>b" id="s1"><b>X</b></h2>"#);
+    }
+
+    #[test]
+    fn only_the_named_attribute_matches() {
+        let html = r#"<p data-id="s1">X</p><p id='s1'>Y</p>"#;
+        assert_eq!(
+            promote_paragraphs(html, by_id),
+            r#"<p data-id="s1">X</p><h2 id='s1'>Y</h2>"#
+        );
+    }
+
+    #[test]
+    fn pre_and_self_closing_paragraphs_are_left_alone() {
+        let html = r#"<pre id="s1">x</pre><p id="s1"/><p>z</p>"#;
+        assert_eq!(promote_paragraphs(html, by_id), html);
     }
 
     #[test]

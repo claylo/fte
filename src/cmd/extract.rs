@@ -116,7 +116,7 @@ pub fn run(
         }
 
         let result = match &content {
-            None => epub::extract(id, path),
+            None => epub::extract(id, path, &cfg.epub),
             Some(text) => extract::extract(&format, id, text),
         };
 

@@ -24,8 +24,8 @@ fn golden_epub(input_name: &str) {
     let input_path = Path::new("tests/golden/input").join(input_name);
     let id = input_path.file_stem().unwrap().to_str().unwrap();
 
-    let actual =
-        epub::extract(id, &input_path).unwrap_or_else(|e| panic!("extracting {input_name}: {e}"));
+    let actual = epub::extract(id, &input_path, &Config::default().epub)
+        .unwrap_or_else(|e| panic!("extracting {input_name}: {e}"));
 
     check_golden(input_name, id, &actual);
 }

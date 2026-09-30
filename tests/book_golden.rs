@@ -9,7 +9,8 @@ use std::path::Path;
 
 fn book(name: &str) {
     let path = Path::new("tests/golden/input/books").join(format!("{name}.epub"));
-    let md = fte::epub::extract(name, &path).unwrap_or_else(|e| panic!("extracting {name}: {e}"));
+    let md = fte::epub::extract(name, &path, &fte::config::EpubConfig::default())
+        .unwrap_or_else(|e| panic!("extracting {name}: {e}"));
     common::check_skeleton(name, &md);
 }
 
