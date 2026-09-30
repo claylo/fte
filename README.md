@@ -109,7 +109,7 @@ With `--format json`, failures print a single-line envelope to stderr:
 | Format | Detection | Handler |
 |--------|-----------|---------|
 | ePub (academic) | `.epub`, ≤5 spine files | OPF spine + XHTML walk |
-| ePub (books) | `.epub`, >5 spine files + nav TOC | Per-chapter extraction with nav structure |
+| ePub (books) | `.epub`, >5 spine files + nav TOC or NCX | Per-chapter extraction with TOC structure |
 | JATS/NLM XML | `<article` + JATS/NLM markers | Structural XML parser |
 | Wiley WML3G XML | `<component` + wiley marker | Structural XML parser |
 | Springer HTML | `c-article-body` / `c-article-title` | Config-driven CSS |
@@ -123,10 +123,12 @@ With `--format json`, failures print a single-line envelope to stderr:
 
 ### Book-length ePubs
 
-fte handles book-length epubs — full-length books with many chapters, not just single academic articles. When it detects a book (>5 spine files with a navigation document), it switches to a per-chapter extraction strategy:
+fte handles book-length epubs — full-length books with many chapters, not just single academic articles. When it detects a book (>5 spine files with a table of contents), it switches to a per-chapter extraction strategy:
 
 - **Metadata** from OPF Dublin Core (`dc:title`, `dc:creator`), since per-file XHTML titles are often obfuscated converter artifacts.
-- **Chapter structure** from the EPUB3 navigation document's table of contents. When chapters lack heading elements (common in converter output), fte injects headings from the nav labels.
+- **Chapter structure** from the EPUB3 navigation document's table of contents, or from the NCX (`toc.ncx`) in an EPUB2 book that has no navigation document. When chapters lack heading elements (common in converter output), fte injects headings from the TOC labels.
+- **Section headings from the TOC.** A `<p>` the TOC links to by fragment (`chapter1.html#s1`) becomes a heading one level below its chapter's own TOC entry. Publishers such as Guilford style every section head as a paragraph; this recovers the ones the TOC lists.
+- **Configured heading classes** for the levels a TOC doesn't list. See [Section heads styled as paragraphs](#section-heads-styled-as-paragraphs).
 - **Subheading recovery** via CSS heuristics. Some converters flatten subheadings into styled `<p>` tags — fte detects these by font-size and promotes them back to headings.
 - **Table of contents** with anchor links, rendered at the top of the output.
 - **All content included** — front matter, chapters, notes, references, index. The heading structure is clean enough to split by chapter or strip sections in post-processing.
@@ -188,6 +190,24 @@ publishers:
 | `abstract_only` | `bool` | Always bail (e.g. SAGE HTML) |
 
 Detection runs against the first 150KB of the HTML. Profiles are tested in alphabetical order; first match wins. Unmatched HTML falls through to the `fallback` profile.
+
+### Section heads styled as paragraphs
+
+Some book publishers mark every section head as `<p class="…"><b>…</b></p>`
+instead of `<h2>`–`<h6>`. fte recovers the ones the TOC links to on its own;
+for deeper levels, map the classes to Markdown heading levels per publisher:
+
+```yaml
+epub:
+  heading_classes:
+    The Guilford Press:     # the OPF's dc:publisher, matched exactly
+      sec1: 2               # ##
+      sec2: 3               # ###
+      sec3: 4               # ####
+```
+
+A mapped class outranks the level a TOC link would give the same paragraph.
+Levels outside 1–6 are clamped. Only book-length ePubs use this.
 
 ## What about PDFs?
 

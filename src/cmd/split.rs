@@ -39,7 +39,7 @@ pub fn run(
     // An ePub is extracted in memory rather than round-tripped through disk;
     // `fte extract` is what writes the combined document.
     let md = if ext == "epub" {
-        epub::extract(&book, &args.input)
+        epub::extract(&book, &args.input, &cfg.epub)
             .map_err(|e| AppError::new(Kind::ExtractionFailed, e.to_string()))?
     } else {
         std::fs::read_to_string(&args.input).map_err(|e| {
